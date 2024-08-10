@@ -21,10 +21,10 @@ class HomePage extends StatelessWidget {
         elevation: 0,
         toolbarHeight: 200,
         backgroundColor: Colors.transparent,
-        flexibleSpace: Stack(
-          children: [
-            SafeArea(
-              child: Positioned(
+        flexibleSpace: SafeArea(
+          child: Stack(
+            children: [
+              Positioned(
                   top: 0,
                   left: 0,
                   child: Builder(
@@ -37,39 +37,39 @@ class HomePage extends StatelessWidget {
                       );
                     }
                   )),
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end, //,
-              children: [
-                Text(Strings.rohanEkam, style: TextStyles.appBarTextStyle),
-                const SizedBox(
-                  height: 20,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(30.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        color: const Color(0xFF0E2D98)),
-                    height: 60,
-                    width: double.infinity,
-                    child: FittedBox(
-                      child: Row(children: [
-                        CountnName(count: 02, name: Strings.workPermit),
-                        const VerticalDivider(color: Colors.white),
-                        CountnName(count: 02, name: Strings.workPermit),
-                        const VerticalDivider(),
-                        CountnName(count: 02, name: Strings.workPermit),
-                        const VerticalDivider(),
-                        CountnName(count: 02, name: Strings.workPermit),
-                      ]),
-                    ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.end, //,
+                children: [
+                  Text(Strings.rohanEkam, style: TextStyles.appBarTextStyle),
+                  const SizedBox(
+                    height: 20,
                   ),
-                )
-                //
-              ],
-            ),
-          ],
+                  Padding(
+                    padding: const EdgeInsets.all(30.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          color: const Color(0xFF0E2D98)),
+                      height: 60,
+                      width: double.infinity,
+                      child: FittedBox(
+                        child: Row(children: [
+                          CountnName(count: 02, name: Strings.workPermit),
+                          const VerticalDivider(color: Colors.white),
+                          CountnName(count: 02, name: Strings.workPermit),
+                          const VerticalDivider(),
+                          CountnName(count: 02, name: Strings.workPermit),
+                          const VerticalDivider(),
+                          CountnName(count: 02, name: Strings.workPermit),
+                        ]),
+                      ),
+                    ),
+                  )
+                  //
+                ],
+              ),
+            ],
+          ),
         ),
       ),
       body: Container(

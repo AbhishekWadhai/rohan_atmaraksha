@@ -1,48 +1,106 @@
 [
     {
-        "title": "Title 1",
-        "fields": [
-            {
-                "label": "Text",
-                "fieldType": "TextInput"
-            }
-        ]
+      "_id": "66b34b204ecde7c5bfeab152",
+      "Page": "Home",
+      "PageFields": [
+        {
+          "Headers": "Welcome to Home",
+          "Type": "CustomTextField",
+          "_id": "66b34b204ecde7c5bfeab153"
+        },
+        {
+          "Headers": "Our Services",
+          "Type": "CustomTextField",
+          "_id": "66b34b204ecde7c5bfeab154"
+        }
+      ],
+      "__v": 0
     },
     {
-        "title": "Title 2",
-        "fields": [
-            {
-                "label": "Date time",
-                "fieldType": "DatetimePicker"
-            },
-            {
-                "label": "T&C",
-                "fieldType": "SwitchInput"
-            },
-            {
-                "label": "Select",
-                "fieldType": "SelectList",
-                "options": [
-                    {
-                        "color": "#FFFFFF",
-                        "is_faulty": false,
-                        "optionLabel": "Option Label 1",
-                        "optionValue": "Option 1"
-                    },
-                    {
-                        "color": "#FFFFFF",
-                        "is_faulty": false,
-                        "optionLabel": "Option Label 2",
-                        "optionValue": "Option 2"
-                    },
-                    {
-                        "color": "#FFFFFF",
-                        "is_faulty": false,
-                        "optionLabel": "Option Label 3",
-                        "optionValue": "Option 3"
-                    }
-                ]
-            }
-        ]
+      "_id": "66b34cd83190d84d50262c71",
+      "Page": "workpermit",
+      "PageFields": [
+    {
+      "Headers": "projectName",
+      "Type": "CustomTextField",
+      "_id": "66b230b6cc8539b4ed3861cc1"
+    },
+    {
+      "Headers": "area",
+      "Type": "CustomTextField",
+      "_id": "66b230b6cc8539b4ed3861cc2"
+    },
+    {
+      "Headers": "permitTypes",
+      "Type": "CustomTextField",
+      "_id": "66b230b6cc8539b4ed3861cc3"
+    },
+    {
+      "Headers": "date",
+      "Type": "CustomTextField",
+      "_id": "66b230b6cc8539b4ed3861cc4"
+    },
+    {
+      "Headers": "time",
+      "Type": "CustomTextField",
+      "_id": "66b230b6cc8539b4ed3861cc5"
+    },
+    {
+      "Headers": "toolsAndEquipment",
+      "Type": "CustomTextField",
+      "_id": "66b230b6cc8539b4ed3861cc6"
+    },
+    {
+      "Headers": "workDescription",
+      "Type": "CustomTextField",
+      "_id": "66b230b6cc8539b4ed3861cc7"
+    },
+    {
+      "Headers": "typeOfHazard",
+      "Type": "CustomTextField",
+      "_id": "66b230b6cc8539b4ed3861cc8"
+    },
+    {
+      "Headers": "applicablePPEs",
+      "Type": "CustomTextField",
+      "_id": "66b230b6cc8539b4ed3861cc9"
+    },
+    {
+      "Headers": "safetyMeasuresTaken",
+      "Type": "CustomTextField",
+      "_id": "66b230b6cc8539b4ed3861cca"
+    },
+    {
+      "Headers": "undersignDraft",
+      "Type": "CustomTextField",
+      "_id": "66b230b6cc8539b4ed3861ccb"
+    },
+    {
+      "Headers": "createdBy",
+      "Type": "CustomTextField",
+      "_id": "66b230b6cc8539b4ed3861ccc"
+    },
+    {
+      "Headers": "verifiedBy",
+      "Type": "CustomTextField",
+      "_id": "66b230b6cc8539b4ed3861ccd"
+    },
+    {
+      "Headers": "approvalBy",
+      "Type": "CustomTextField",
+      "_id": "66b230b6cc8539b4ed3861cce"
+    },
+    {
+      "Headers": "verifiedDone",
+      "Type": "CustomTextField",
+      "_id": "66b230b6cc8539b4ed3861ccf"
+    },
+    {
+      "Headers": "approvalDone",
+      "Type": "CustomTextField",
+      "_id": "66b230b6cc8539b4ed3861cd0"
     }
-]
+  ],
+      "__v": 0
+    }
+  ]

@@ -12,8 +12,6 @@ class ApiService {
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
-        print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-        print(response.body);
         return jsonDecode(response.body);
       } else {
         throw Exception('Failed to load data');
@@ -27,6 +25,7 @@ class ApiService {
   Future<dynamic> postRequest(
       String endpoint, Map<String, dynamic> data) async {
     final url = Uri.parse('$baseUrl/$endpoint');
+    
 
     try {
       final response = await http.post(
@@ -37,11 +36,17 @@ class ApiService {
         body: jsonEncode(data),
       );
       if (response.statusCode == 201) {
+        print(
+            "-----------------------------------${response.statusCode}----------------------------------------------------------");
+        print("api post successfully");
         return jsonDecode(response.body);
       } else {
+        print(
+            "-----------------------------------${response.statusCode}----------------------------------------------------------");
         throw Exception('Failed to post data');
       }
     } catch (e) {
+      print(e);
       throw Exception('Error: $e');
     }
   }

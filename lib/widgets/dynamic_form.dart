@@ -5,46 +5,83 @@ import 'package:rohan_atmaraksha/model/form_data_model.dart';
 
 class DynamicForm extends StatelessWidget {
   final String pageName;
-  const DynamicForm({super.key, required this.pageName});
+  DynamicForm({super.key, required this.pageName});
+  final DynamicFormController controller =
+      Get.put(DynamicFormController());
+
   @override
   Widget build(BuildContext context) {
-    final DynamicFormController controller = Get.put(DynamicFormController());
-    final pageFields = controller.formResponse
-                .where((e) => e.page == pageName)
-                .expand((e) => e.pageFields)
-                .toList();
+    return Stack(
+      children: [
+        Obx(
+          () {
+            if (controller.isLoading.value) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-    return Obx(
-      () {
-        if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        return ListView.separated(
-          itemCount: pageFields.length,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: (context, innerIndex) {
-            
-            return buildFormField(pageFields[innerIndex]);
+            return ListView.separated(
+                padding: const EdgeInsets.all(10.0),
+                itemCount: controller.pageFields.length +
+                    1, // Increment itemCount by 1
+                shrinkWrap: true,
+                itemBuilder: (context, innerIndex) {
+                  if (innerIndex < controller.pageFields.length) {
+                    return Obx(() => buildFormField(controller.pageFields[innerIndex]));
+                  } else {
+                    return ElevatedButton(
+                      onPressed: () {
+                        controller.submitForm();
+                      },
+                      child: const Text('Submit'),
+                    );
+                  }
+                },
+                separatorBuilder: (context, innerIndex) =>
+                    const SizedBox(height: 10),
+              
+            );
           },
-          separatorBuilder: (context, innerIndex) => SizedBox(height: 10),
-        );
-      },
+        ),
+      ],
     );
   }
 
   Widget buildFormField(PageField field) {
     switch (field.type) {
       case 'CustomTextField':
-        return TextField(
-          decoration: InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: field.headers,
-          ),
+        final TextEditingController textController = TextEditingController(
+          text: controller.formData[field.headers]?.toString() ?? '',
         );
 
-      case 'CustomTextField':
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              field.headers,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            TextField(
+              controller: textController,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
+                //labelText: field.headers,
+              ),
+              onChanged: (value) {
+                controller.updateFormData(field.id, value);
+              },
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+          ],
+        );
+
+      case 'Type 2':
         return SwitchListTile(
           title: const Text("For Switch"),
           value: false, // Initial value
@@ -70,7 +107,7 @@ class DynamicForm extends StatelessWidget {
           // Handle picked date
         }
       },
-      child: Text("testing"),
+      child: const Text("testing"),
     );
   }
 

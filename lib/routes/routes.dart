@@ -22,6 +22,6 @@ class AppRoutes {
         page: () => const IncidentReportPage()),
     GetPage(
         name: Routes.safetyInductionPage, page: () => const SafetyCheckPage()),
-    GetPage(name: Routes.workPermitForm, page: () => const WorkPermitFormPage()),
+    GetPage(name: Routes.workPermitForm, page: () => WorkPermitFormPage()),
   ];
 }
