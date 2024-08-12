@@ -1,48 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rohan_atmaraksha/controller/dynamic_form_contoller.dart';
+
 import 'package:rohan_atmaraksha/model/form_data_model.dart';
 
 class DynamicForm extends StatelessWidget {
   final String pageName;
+
   DynamicForm({super.key, required this.pageName});
-  final DynamicFormController controller =
-      Get.put(DynamicFormController());
+
+  final DynamicFormController controller = Get.put(DynamicFormController());
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Obx(
-          () {
-            if (controller.isLoading.value) {
-              return const Center(child: CircularProgressIndicator());
-            }
+    // Call getPageFields with the provided pageName
 
-            return ListView.separated(
-                padding: const EdgeInsets.all(10.0),
-                itemCount: controller.pageFields.length +
-                    1, // Increment itemCount by 1
-                shrinkWrap: true,
-                itemBuilder: (context, innerIndex) {
-                  if (innerIndex < controller.pageFields.length) {
-                    return Obx(() => buildFormField(controller.pageFields[innerIndex]));
-                  } else {
-                    return ElevatedButton(
-                      onPressed: () {
-                        controller.submitForm();
-                      },
-                      child: const Text('Submit'),
-                    );
-                  }
-                },
-                separatorBuilder: (context, innerIndex) =>
-                    const SizedBox(height: 10),
-              
-            );
-          },
-        ),
-      ],
+    return Scaffold(
+      body: Stack(
+        children: [
+          Obx(
+            () {
+              if (controller.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              controller.getPageFields(pageName);
+              return GetBuilder<DynamicFormController>(builder: (controller) {
+                return ListView.separated(
+                  padding: const EdgeInsets.all(10.0),
+                  itemCount: controller.pageFields.length +
+                      1, // Increment itemCount by 1
+                  shrinkWrap: true,
+                  itemBuilder: (context, innerIndex) {
+                    if (innerIndex < controller.pageFields.length) {
+                      return buildFormField(controller.pageFields[innerIndex]);
+                    } else {
+                      return ElevatedButton(
+                        onPressed: () {
+                          controller.submitForm();
+                        },
+                        child: const Text('Submit'),
+                      );
+                    }
+                  },
+                  separatorBuilder: (context, innerIndex) =>
+                      const SizedBox(height: 10),
+                );
+              });
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -69,9 +76,9 @@ class DynamicForm extends StatelessWidget {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
-                //labelText: field.headers,
               ),
               onChanged: (value) {
+                textController.text = value;
                 controller.updateFormData(field.id, value);
               },
             ),
@@ -83,12 +90,14 @@ class DynamicForm extends StatelessWidget {
 
       case 'Type 2':
         return SwitchListTile(
-          title: const Text("For Switch"),
-          value: false, // Initial value
+          title: Text(field.headers),
+          value: controller.formData[field.headers] ??
+              false, // Get initial value from formData
           onChanged: (bool value) {
-            // Use GetX for state management
+            controller.updateFormData(field.id, value);
           },
         );
+
       default:
         return const Text('Unsupported field type');
     }

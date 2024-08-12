@@ -11,7 +11,7 @@ class DynamicFormController extends GetxController {
   RxList<PageField> pageFields = <PageField>[].obs;
   var formData = <String, dynamic>{
     "projectName": "64f8d1f0c73c5b4d9e72d1a1",
-    "area": "1234",
+    "area": "66b22b63cc8539b4ed3861ab",
     "permitTypes": "64f8d1f0c73c5b4d9e72d1a3",
     "date": "2024-08-06T00:00:00.000Z",
     "time": "09:00",
@@ -20,26 +20,26 @@ class DynamicFormController extends GetxController {
     "safetyMeasuresTaken": "Checked all connections and tested equipment.",
     "undersignDraft": "https://example.com/undersign_draft.jpg",
     "createdBy": "64f8d1f0c73c5b4d9e72d1a7",
-    "verifiedDone": true,
+    "verifiedDone": false,
     "approvalDone": false,
     "__v": 0
   }.obs;
 
   @override
-  void onInit() async{
+  void onInit() {
     super.onInit();
-    await loadFormData();
-    getPageFields("workpermit");
+    loadFormData();
   }
 
   getPageFields(String pageName) async {
-    pageFields.value = formResponse
+    pageFields.value = await formResponse
         .where((e) => e.page == pageName)
         .expand((e) => e.pageFields)
         .toList();
     print(
         "------------------------------------00000000000000000000000000000000000000000000--------------------------------");
     print(jsonEncode(pageFields));
+    update();
   }
 
   Future<void> loadFormData() async {
@@ -68,8 +68,8 @@ class DynamicFormController extends GetxController {
           .map<ResponseForm>((element) => ResponseForm.fromJson(element))
           .toList();
       print("Loaded form data from assets: $formResponse");
-          print(
-        "------------------------------------00000000000000000000000000000000000000000000--------------------------------");
+      print(
+          "------------------------------------00000000000000000000000000000000000000000000--------------------------------");
       print(jsonEncode(formResponse));
     } catch (e) {
       print("Error loading JSON from assets: $e");
