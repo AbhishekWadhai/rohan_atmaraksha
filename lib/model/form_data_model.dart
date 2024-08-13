@@ -28,25 +28,37 @@ class ResponseForm {
 }
 
 class PageField {
-  String headers;
-  String type;
-  String id;
+  final String id;
+  final String headers;
+  final String type;
+  final String? endpoint;
+  final String? key;
 
   PageField({
+    required this.id,
     required this.headers,
     required this.type,
-    required this.id,
+    this.endpoint,
+    this.key,
   });
 
-  factory PageField.fromJson(Map<String, dynamic> json) => PageField(
-        headers: json["Headers"],
-        type: json["Type"],
-        id: json["_id"],
-      );
+  factory PageField.fromJson(Map<String, dynamic> json) {
+    return PageField(
+      id: json['_id'],
+      headers: json['Headers'],
+      type: json['Type'],
+      endpoint: json['endpoint'],
+      key: json['key'],
+    );
+  }
 
-  Map<String, dynamic> toJson() => {
-        "Headers": headers,
-        "Type": type,
-        "_id": id,
-      };
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'Headers': headers,
+      'Type': type,
+      'endpoint': endpoint,
+      'key': key,
+    };
+  }
 }

@@ -13,8 +13,6 @@ class DynamicForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Call getPageFields with the provided pageName
-
     return Scaffold(
       body: Stack(
         children: [
@@ -67,9 +65,7 @@ class DynamicForm extends StatelessWidget {
               field.headers,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             TextField(
               controller: textController,
               decoration: const InputDecoration(
@@ -79,23 +75,126 @@ class DynamicForm extends StatelessWidget {
               ),
               onChanged: (value) {
                 textController.text = value;
-                controller.updateFormData(field.id, value);
+                controller.updateFormData(field.headers, value);
               },
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
           ],
         );
+      case 'dropdown':
+        return FutureBuilder<List<String>>(
+          future:
+              controller.getDropdownData(field.endpoint ?? "", field.key ?? ""),
+          builder:
+              (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              // While the data is being fetched, show a loading spinner or similar
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    field.headers,
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  const CircularProgressIndicator(), // Loading indicator
+                  const SizedBox(height: 10),
+                ],
+              );
+            } else if (snapshot.hasError) {
+              // If there's an error, display it
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    field.headers,
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text("Error loading data"), // Error message
+                  const SizedBox(height: 10),
+                ],
+              );
+            } else if (snapshot.hasData) {
+              // Once data is loaded, build the dropdown with the data
+              final List<String> options = snapshot.data ?? [""];
+              final String selectedValue =
+                  controller.formData[field.headers] ?? options.first;
 
-      case 'Type 2':
-        return SwitchListTile(
-          title: Text(field.headers),
-          value: controller.formData[field.headers] ??
-              false, // Get initial value from formData
-          onChanged: (bool value) {
-            controller.updateFormData(field.id, value);
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    field.headers,
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  DropdownButton<String>(
+                    value: selectedValue,
+                    items: options.map((String option) {
+                      return DropdownMenuItem<String>(
+                        value: option,
+                        child: Text(option),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      controller.updateFormData(field.headers, newValue);
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                ],
+              );
+            } else {
+              // In case there's no data, return an empty container
+              return Container();
+            }
           },
+        );
+
+      case 'datepicker':
+        return myDatePicker(field);
+
+      case 'timepicker':
+        return TextButton(
+            onPressed: () async {
+              TimeOfDay? selectedTime = await showTimePicker(
+                  context: Get.context!, initialTime: TimeOfDay.now());
+
+              if (selectedTime != null) {
+                controller.updateFormData(field.headers, selectedTime.toString());
+              }
+            },
+            child: const Text("Select a time"));
+
+      case 'radio':
+        final String selectedValue = controller.formData[field.headers] ?? '';
+        final List<String> options = ["true", "false"];
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              field.headers,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Column(
+              children: options.map((option) {
+                return RadioListTile<String>(
+                  title: Text(option),
+                  value: option,
+                  groupValue: selectedValue,
+                  onChanged: (String? newValue) {
+                    controller.updateFormData(field.headers, newValue);
+                  },
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 10),
+          ],
         );
 
       default:
@@ -113,26 +212,10 @@ class DynamicForm extends StatelessWidget {
           lastDate: DateTime(2101),
         );
         if (pickedDate != null) {
-          // Handle picked date
+          controller.updateFormData(field.headers, pickedDate.toString());
         }
       },
       child: const Text("testing"),
     );
   }
-
-  // Widget dropDownWidget(List<Options>? options) {
-  //   return DropdownButton<String>(
-  //     isExpanded: true,
-  //     hint: Text('Select an option'),
-  //     items: options?.map((option) {
-  //       return DropdownMenuItem<String>(
-  //         value: option.optionValue,
-  //         child: Text(option.optionLabel!),
-  //       );
-  //     }).toList(),
-  //     onChanged: (value) {
-  //       // Handle dropdown selection with GetX
-  //     },
-  //   );
-  // }
 }

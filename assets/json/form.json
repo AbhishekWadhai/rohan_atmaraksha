@@ -22,27 +22,34 @@
       "PageFields": [
     {
       "Headers": "projectName",
-      "Type": "CustomTextField",
-      "_id": "66b230b6cc8539b4ed3861cc1"
+      "Type": "dropdown",
+      "_id": "66b230b6cc8539b4ed3861cc1",
+      "endpoint": "projects",
+      "key": "projectName"
     },
     {
       "Headers": "area",
-      "Type": "CustomTextField",
-      "_id": "66b230b6cc8539b4ed3861cc2"
+      "Type": "dropdown",
+      "_id": "66b230b6cc8539b4ed3861cc2",
+      "endpoint": "projects",
+      "key":"siteLocation"
     },
     {
       "Headers": "permitTypes",
-      "Type": "CustomTextField",
-      "_id": "66b230b6cc8539b4ed3861cc3"
+      "Type": "dropdown",
+      "_id": "66b230b6cc8539b4ed3861cc3",
+      "endpoint": "permitstype",
+      "key":"permitsType"
+
     },
     {
       "Headers": "date",
-      "Type": "CustomTextField",
+      "Type": "datepicker",
       "_id": "66b230b6cc8539b4ed3861cc4"
     },
     {
       "Headers": "time",
-      "Type": "CustomTextField",
+      "Type": "timepicker",
       "_id": "66b230b6cc8539b4ed3861cc5"
     },
     {
@@ -77,8 +84,10 @@
     },
     {
       "Headers": "createdBy",
-      "Type": "CustomTextField",
-      "_id": "66b230b6cc8539b4ed3861ccc"
+      "Type": "dropdown",
+      "_id": "66b230b6cc8539b4ed3861ccc",
+      "endpoint": "permitstype",
+      "key":"permitsType"
     },
     {
       "Headers": "verifiedBy",
@@ -92,12 +101,12 @@
     },
     {
       "Headers": "verifiedDone",
-      "Type": "CustomTextField",
+      "Type": "radio",
       "_id": "66b230b6cc8539b4ed3861ccf"
     },
     {
       "Headers": "approvalDone",
-      "Type": "CustomTextField",
+      "Type": "radio",
       "_id": "66b230b6cc8539b4ed3861cd0"
     }
   ],

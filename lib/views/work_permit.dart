@@ -18,6 +18,14 @@ class WorkPermitPage extends StatelessWidget {
           foregroundColor: Colors.black,
           title: Text(Strings.workPermit),
           backgroundColor: Colors.white,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.home_filled),
+              onPressed: () {
+                Get.offAllNamed(Routes.homePage);
+              },
+            ),
+          ],
           elevation: 2,
         ),
         drawer: const MyDrawer(),
@@ -88,7 +96,7 @@ class WorkPermitPage extends StatelessWidget {
               Text('Approval Done: ${permit.approvalDone ? "Yes" : "No"}'),
               SizedBox(height: 10),
               Image.network(
-                permit.undersignDraft,
+                permit.undersignDraft ?? "",
                 height: 150,
                 width: 150,
                 fit: BoxFit.cover,

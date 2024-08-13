@@ -7,7 +7,7 @@ import 'package:rohan_atmaraksha/views/safety_check.dart';
 import 'package:rohan_atmaraksha/views/sora.dart';
 import 'package:rohan_atmaraksha/views/tbt_meeting.dart';
 import 'package:rohan_atmaraksha/views/work_permit.dart';
-import 'package:rohan_atmaraksha/views/work_permit_form_page.dart';
+import 'package:rohan_atmaraksha/views/form_page.dart';
 
 class AppRoutes {
   static final routes = [

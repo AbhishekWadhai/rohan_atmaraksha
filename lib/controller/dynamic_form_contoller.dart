@@ -9,21 +9,8 @@ class DynamicFormController extends GetxController {
   var formResponse = <ResponseForm>[].obs;
   var isLoading = true.obs;
   RxList<PageField> pageFields = <PageField>[].obs;
-  var formData = <String, dynamic>{
-    "projectName": "64f8d1f0c73c5b4d9e72d1a1",
-    "area": "66b22b63cc8539b4ed3861ab",
-    "permitTypes": "64f8d1f0c73c5b4d9e72d1a3",
-    "date": "2024-08-06T00:00:00.000Z",
-    "time": "09:00",
-    "workDescription":
-        "testing_flutter_form testing_flutter_form testing_flutter_form",
-    "safetyMeasuresTaken": "Checked all connections and tested equipment.",
-    "undersignDraft": "https://example.com/undersign_draft.jpg",
-    "createdBy": "64f8d1f0c73c5b4d9e72d1a7",
-    "verifiedDone": false,
-    "approvalDone": false,
-    "__v": 0
-  }.obs;
+  RxList<String> dropdownData = <String>[].obs;
+  var formData = <String, dynamic>{}.obs;
 
   @override
   void onInit() {
@@ -88,6 +75,20 @@ class DynamicFormController extends GetxController {
     }
   }
 
+  Future<List<String>> getDropdownData(String endpoint, String key) async {
+    final dropdownResult = await ApiService().getRequest(endpoint);
+    print(
+        "------------------------------------Dropdown Data--------------------------------");
+    print(jsonEncode(
+        dropdownResult.map((element) => element[key].toString()).toList()));
+
+    return dropdownResult
+        .map<String>((element) => element["_id"].toString())
+        .toList();
+  }
+
+  void deleteData() async {}
+
   void updateFormData(String key, dynamic value) {
     formData[key] = value;
     print("Updated form data: $formData");
@@ -95,14 +96,10 @@ class DynamicFormController extends GetxController {
 
   Future<void> submitForm() async {
     isLoading(true);
+    print("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSubmitted Data");
+    print(jsonEncode(formData));
     try {
-      final response = await ApiService().postRequest("permit", formData);
-
-      // if (response.statusCode == 201) {
-      //   print("Form submitted successfully");
-      // } else {
-      //   print("Failed to submit form: ${response.statusCode}");
-      // }
+      await ApiService().postRequest("permit", formData);
     } catch (e) {
       print("Error submitting form: $e");
     } finally {
