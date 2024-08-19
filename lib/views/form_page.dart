@@ -1,14 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rohan_atmaraksha/widgets/dynamic_form.dart';
 
 class WorkPermitFormPage extends StatelessWidget {
-  
   const WorkPermitFormPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final String pageTitle = Get.arguments['pageTitle'];
+    final dynamic pageTitle = Get.arguments[0];
+    final dynamic initialData = Get.arguments[1] as Map<String, dynamic>;
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.black,
@@ -17,7 +19,10 @@ class WorkPermitFormPage extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 2,
       ),
-      body: DynamicForm(pageName: "workpermit"),
+      body: DynamicForm(
+        pageName: pageTitle,
+        initialData: initialData,
+      ),
     );
   }
 }

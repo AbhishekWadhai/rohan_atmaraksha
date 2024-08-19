@@ -1,115 +1,142 @@
 [
-    {
-      "_id": "66b34b204ecde7c5bfeab152",
-      "Page": "Home",
-      "PageFields": [
-        {
-          "Headers": "Welcome to Home",
-          "Type": "CustomTextField",
-          "_id": "66b34b204ecde7c5bfeab153"
-        },
-        {
-          "Headers": "Our Services",
-          "Type": "CustomTextField",
-          "_id": "66b34b204ecde7c5bfeab154"
-        }
-      ],
-      "__v": 0
-    },
-    {
-      "_id": "66b34cd83190d84d50262c71",
-      "Page": "workpermit",
-      "PageFields": [
-    {
-      "Headers": "projectName",
-      "Type": "dropdown",
-      "_id": "66b230b6cc8539b4ed3861cc1",
-      "endpoint": "projects",
-      "key": "projectName"
-    },
-    {
-      "Headers": "area",
-      "Type": "dropdown",
-      "_id": "66b230b6cc8539b4ed3861cc2",
-      "endpoint": "projects",
-      "key":"siteLocation"
-    },
-    {
-      "Headers": "permitTypes",
-      "Type": "dropdown",
-      "_id": "66b230b6cc8539b4ed3861cc3",
-      "endpoint": "permitstype",
-      "key":"permitsType"
-
-    },
-    {
-      "Headers": "date",
-      "Type": "datepicker",
-      "_id": "66b230b6cc8539b4ed3861cc4"
-    },
-    {
-      "Headers": "time",
-      "Type": "timepicker",
-      "_id": "66b230b6cc8539b4ed3861cc5"
-    },
-    {
-      "Headers": "toolsAndEquipment",
-      "Type": "CustomTextField",
-      "_id": "66b230b6cc8539b4ed3861cc6"
-    },
-    {
-      "Headers": "workDescription",
-      "Type": "CustomTextField",
-      "_id": "66b230b6cc8539b4ed3861cc7"
-    },
-    {
-      "Headers": "typeOfHazard",
-      "Type": "CustomTextField",
-      "_id": "66b230b6cc8539b4ed3861cc8"
-    },
-    {
-      "Headers": "applicablePPEs",
-      "Type": "CustomTextField",
-      "_id": "66b230b6cc8539b4ed3861cc9"
-    },
-    {
-      "Headers": "safetyMeasuresTaken",
-      "Type": "CustomTextField",
-      "_id": "66b230b6cc8539b4ed3861cca"
-    },
-    {
-      "Headers": "undersignDraft",
-      "Type": "CustomTextField",
-      "_id": "66b230b6cc8539b4ed3861ccb"
-    },
-    {
-      "Headers": "createdBy",
-      "Type": "dropdown",
-      "_id": "66b230b6cc8539b4ed3861ccc",
-      "endpoint": "permitstype",
-      "key":"permitsType"
-    },
-    {
-      "Headers": "verifiedBy",
-      "Type": "CustomTextField",
-      "_id": "66b230b6cc8539b4ed3861ccd"
-    },
-    {
-      "Headers": "approvalBy",
-      "Type": "CustomTextField",
-      "_id": "66b230b6cc8539b4ed3861cce"
-    },
-    {
-      "Headers": "verifiedDone",
-      "Type": "radio",
-      "_id": "66b230b6cc8539b4ed3861ccf"
-    },
-    {
-      "Headers": "approvalDone",
-      "Type": "radio",
-      "_id": "66b230b6cc8539b4ed3861cd0"
-    }
-  ],
-      "__v": 0
-    }
-  ]
+  {
+    "_id": "66b34b204ecde7c5bfeab152",
+    "Page": "Home",
+    "PageFields": [
+      {
+        "Title": "Home",
+        "Headers": "Welcome to Home",
+        "Type": "CustomTextField",
+        "_id": "66b34b204ecde7c5bfeab153"
+      },
+      {
+        "Title": "Services",
+        "Headers": "Our Services",
+        "Type": "CustomTextField",
+        "_id": "66b34b204ecde7c5bfeab154"
+      }
+    ],
+    "__v": 0
+  },
+  {
+    "_id": "66b34cd83190d84d50262c71",
+    "Page": "workpermit",
+    "PageFields": [
+      {
+        "Title": "Project Name",
+        "Headers": "projectName",
+        "Type": "dropdown",
+        "_id": "66b230b6cc8539b4ed3861cc1",
+        "endpoint": "projects",
+        "key": "projectName"
+      },
+      {
+        "Title": "Area",
+        "Headers": "area",
+        "Type": "dropdown",
+        "_id": "66b230b6cc8539b4ed3861cc2",
+        "endpoint": "projects",
+        "key": "siteLocation"
+      },
+      {
+        "Title": "Permit Types",
+        "Headers": "permitTypes",
+        "Type": "dropdown",
+        "_id": "66b230b6cc8539b4ed3861cc3",
+        "endpoint": "permitstype",
+        "key": "permitsType"
+      },
+      {
+        "Title": "Date",
+        "Headers": "date",
+        "Type": "datepicker",
+        "_id": "66b230b6cc8539b4ed3861cc4"
+      },
+      {
+        "Title": "Time",
+        "Headers": "time",
+        "Type": "timepicker",
+        "_id": "66b230b6cc8539b4ed3861cc5"
+      },
+      {
+        "Title": "Tools and Equipment",
+        "Headers": "toolsAndEquipment",
+        "Type": "multiselect",
+        "_id": "66b230b6cc8539b4ed3861cc6",
+        "endpoint": "tools",
+        "key": "tools"
+      },
+      {
+        "Title": "Work Description",
+        "Headers": "workDescription",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861cc7"
+      },
+      {
+        "Title": "Type of Hazard",
+        "Headers": "typeOfHazard",
+        "Type": "multiselect",
+        "_id": "66b230b6cc8539b4ed3861cc8",
+        "endpoint": "hazards",
+        "key": "hazards"
+      },
+      {
+        "Title": "Applicable PPEs",
+        "Headers": "applicablePPEs",
+        "Type": "multiselect",
+        "_id": "66b230b6cc8539b4ed3861cc9",
+        "endpoint": "ppe",
+        "key": "ppes"
+      },
+      {
+        "Title": "Safety Measures Taken",
+        "Headers": "safetyMeasuresTaken",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861cca"
+      },
+      {
+        "Title": "Undersign Draft",
+        "Headers": "undersignDraft",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861ccb"
+      },
+      {
+        "Title": "Created By",
+        "Headers": "createdBy",
+        "Type": "dropdown",
+        "_id": "66b230b6cc8539b4ed3861ccc",
+        "endpoint": "user",
+        "key": "name"
+      },
+      {
+        "Title": "Verified By",
+        "Headers": "verifiedBy",
+        "Type": "dropdown",
+        "_id": "66b230b6cc8539b4ed3861ccd",
+        "endpoint": "user",
+        "key": "name"
+      },
+      {
+        "Title": "Approval By",
+        "Headers": "approvalBy",
+        "Type": "dropdown",
+        "_id": "66b230b6cc8539b4ed3861cce",
+        "endpoint": "user",
+        "key": "name"
+      },
+      {
+        "Title": "Verified Done",
+        "Headers": "verifiedDone",
+        "Type": "radio",
+        "_id": "66b230b6cc8539b4ed3861ccf"
+      },
+      {
+        "Title": "Approval Done",
+        "Headers": "approvalDone",
+        "Type": "radio",
+        "_id": "66b230b6cc8539b4ed3861cd0"
+      }
+    ],
+    "__v": 0
+  }
+]

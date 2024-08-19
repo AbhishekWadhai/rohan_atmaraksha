@@ -1,64 +1,73 @@
+import 'dart:convert';
+
 class ResponseForm {
-  String id;
-  String page;
-  List<PageField> pageFields;
-  int v;
+    String id;
+    String page;
+    List<PageField> pageFields;
+    int v;
 
-  ResponseForm({
-    required this.id,
-    required this.page,
-    required this.pageFields,
-    required this.v,
-  });
+    ResponseForm({
+        required this.id,
+        required this.page,
+        required this.pageFields,
+        required this.v,
+    });
 
-  factory ResponseForm.fromJson(Map<String, dynamic> json) => ResponseForm(
+    factory ResponseForm.fromRawJson(String str) => ResponseForm.fromJson(json.decode(str));
+
+    String toRawJson() => json.encode(toJson());
+
+    factory ResponseForm.fromJson(Map<String, dynamic> json) => ResponseForm(
         id: json["_id"],
         page: json["Page"],
-        pageFields: List<PageField>.from(
-            json["PageFields"].map((x) => PageField.fromJson(x))),
+        pageFields: List<PageField>.from(json["PageFields"].map((x) => PageField.fromJson(x))),
         v: json["__v"],
-      );
+    );
 
-  Map<String, dynamic> toJson() => {
+    Map<String, dynamic> toJson() => {
         "_id": id,
         "Page": page,
         "PageFields": List<dynamic>.from(pageFields.map((x) => x.toJson())),
         "__v": v,
-      };
+    };
 }
 
 class PageField {
-  final String id;
-  final String headers;
-  final String type;
-  final String? endpoint;
-  final String? key;
+    String title;
+    String headers;
+    String type;
+    String id;
+    String? endpoint;
+    String? key;
 
-  PageField({
-    required this.id,
-    required this.headers,
-    required this.type,
-    this.endpoint,
-    this.key,
-  });
+    PageField({
+        required this.title,
+        required this.headers,
+        required this.type,
+        required this.id,
+        this.endpoint,
+        this.key,
+    });
 
-  factory PageField.fromJson(Map<String, dynamic> json) {
-    return PageField(
-      id: json['_id'],
-      headers: json['Headers'],
-      type: json['Type'],
-      endpoint: json['endpoint'],
-      key: json['key'],
+    factory PageField.fromRawJson(String str) => PageField.fromJson(json.decode(str));
+
+    String toRawJson() => json.encode(toJson());
+
+    factory PageField.fromJson(Map<String, dynamic> json) => PageField(
+        title: json["Title"],
+        headers: json["Headers"],
+        type: json["Type"],
+        id: json["_id"],
+        endpoint: json["endpoint"],
+        key: json["key"],
     );
-  }
 
-  Map<String, dynamic> toJson() {
-    return {
-      '_id': id,
-      'Headers': headers,
-      'Type': type,
-      'endpoint': endpoint,
-      'key': key,
+    Map<String, dynamic> toJson() => {
+        "Title": title,
+        "Headers": headers,
+        "Type": type,
+        "_id": id,
+        "endpoint": endpoint,
+        "key": key,
     };
-  }
 }

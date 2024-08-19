@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = "https://rohan-sage.vercel.app"; // Replace with your base URL
+  static const String baseUrl =
+      "https://rohan-sage.vercel.app"; // Replace with your base URL
 
   // Common method for making GET requests
   Future<dynamic> getRequest(String endpoint) async {
@@ -21,7 +22,8 @@ class ApiService {
   }
 
   // Common method for making POST requests
-  Future<dynamic> postRequest(String endpoint, Map<String, dynamic> data) async {
+  Future<dynamic> postRequest(
+      String endpoint, Map<String, dynamic> data) async {
     final url = Uri.parse('$baseUrl/$endpoint');
 
     try {
@@ -36,7 +38,7 @@ class ApiService {
         print(
             "-----------------------------------${response.statusCode}----------------------------------------------------------");
         print("API post successfully");
-        return jsonDecode(response.body);
+        return response.statusCode;
       } else {
         print(
             "-----------------------------------${response.statusCode}----------------------------------------------------------");
@@ -49,8 +51,8 @@ class ApiService {
   }
 
   // Common method for making DELETE requests
-  Future<dynamic> deleteRequest(String endpoint) async {
-    final url = Uri.parse('$baseUrl/$endpoint');
+  Future<dynamic> deleteRequest(String endpoint, String key) async {
+    final url = Uri.parse('$baseUrl/$endpoint/$key');
 
     try {
       final response = await http.delete(url);
