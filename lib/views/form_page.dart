@@ -11,6 +11,7 @@ class WorkPermitFormPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final dynamic pageTitle = Get.arguments[0];
     final dynamic initialData = Get.arguments[1] as Map<String, dynamic>;
+    final bool isEditable = Get.arguments[2] ?? false;
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.black,
@@ -22,6 +23,7 @@ class WorkPermitFormPage extends StatelessWidget {
       body: DynamicForm(
         pageName: pageTitle,
         initialData: initialData,
+        isEdit: isEditable,
       ),
     );
   }

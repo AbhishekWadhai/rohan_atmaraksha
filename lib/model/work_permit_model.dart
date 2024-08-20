@@ -44,7 +44,9 @@ class WorkPermit {
       id: json["_id"],
       projectName: ProjectDetails.fromJson(json["projectName"]),
       area: ProjectDetails.fromJson(json["area"]),
-      permitTypes: json["permitTypes"] != null ? PermitTypes.fromJson(json["permitTypes"]) : null,
+      permitTypes: json["permitTypes"] != null
+          ? PermitTypes.fromJson(json["permitTypes"])
+          : null,
       date: json["date"],
       time: json["time"],
       toolsAndEquipment: List<ToolsAndEquipment>.from(
@@ -56,8 +58,9 @@ class WorkPermit {
           json["applicablePPEs"].map((x) => ApplicablePPE.fromJson(x))),
       safetyMeasuresTaken: json["safetyMeasuresTaken"],
       undersignDraft: json["undersignDraft"],
-      createdBy:
-          json["createdBy"] != null ? CreatedBy.fromJson(json["createdBy"]) : null,
+      createdBy: json["createdBy"] != null
+          ? CreatedBy.fromJson(json["createdBy"])
+          : null,
       verifiedBy: List<VerifiedBy>.from(
           json["verifiedBy"].map((x) => VerifiedBy.fromJson(x))),
       approvalBy: List<ApprovalBy>.from(

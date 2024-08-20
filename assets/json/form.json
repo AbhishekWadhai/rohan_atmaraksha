@@ -111,7 +111,7 @@
       {
         "Title": "Verified By",
         "Headers": "verifiedBy",
-        "Type": "dropdown",
+        "Type": "multiselect",
         "_id": "66b230b6cc8539b4ed3861ccd",
         "endpoint": "user",
         "key": "name"
@@ -119,7 +119,7 @@
       {
         "Title": "Approval By",
         "Headers": "approvalBy",
-        "Type": "dropdown",
+        "Type": "multiselect",
         "_id": "66b230b6cc8539b4ed3861cce",
         "endpoint": "user",
         "key": "name"

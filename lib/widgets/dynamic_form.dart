@@ -24,6 +24,7 @@ class DynamicForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    controller.initializeFormData(initialData);
     return Scaffold(
       body: Stack(
         children: [
@@ -33,7 +34,7 @@ class DynamicForm extends StatelessWidget {
               () {
                 controller.getPageFields(pageName);
 
-                controller.initializeFormData(initialData);
+                //controller.initializeFormData(initialData);
                 print(
                     "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
                 print(jsonEncode(initialData));
@@ -60,7 +61,11 @@ class DynamicForm extends StatelessWidget {
                           ElevatedButton(
                             onPressed: () {
                               if (_formKey.currentState?.validate() ?? false) {
-                                controller.submitForm();
+                                if (isEdit) {
+                                  controller.updateData(); // Call update method
+                                } else {
+                                  controller.submitForm(); // Call submit method
+                                }
                               } else {
                                 // If the form is invalid, show an error
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -72,7 +77,12 @@ class DynamicForm extends StatelessWidget {
                                 );
                               }
                             },
-                            child: const Text('Submit'),
+                            child: SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                                child: Text(
+                                  isEdit ? 'Update' : 'Submit',
+                                  textAlign: TextAlign.center,
+                                )),
                           ),
                         ],
                       ),
@@ -106,8 +116,8 @@ class DynamicForm extends StatelessWidget {
               validator: (value) => controller.validateTextField(value),
               controller: textController,
               decoration: kTextFieldDecoration("Enter ${field.title}"),
-              onChanged: (value) {
-                textController.text = value;
+              onFieldSubmitted: (value) {
+                //textController.text = value;
                 controller.updateFormData(field.headers, value);
               },
             ),
@@ -193,7 +203,7 @@ class DynamicForm extends StatelessWidget {
                             title: Text("Select ${field.title}"),
                             buttonText: Text(
                               "Select ${field.title}",
-                              style: TextStyle(),
+                              style: const TextStyle(),
                             ),
                             decoration: BoxDecoration(
                               border: Border.all(color: Colors.grey),
@@ -224,7 +234,7 @@ class DynamicForm extends StatelessWidget {
 
       case 'dropdown':
         return Obx(() {
-          final selectedValue = controller.dropdownSelections[field.headers];
+          final selectedValue = controller.formData[field.headers];
 
           return FutureBuilder<List<Map<String, String>>>(
             future: controller.getDropdownData(
@@ -320,7 +330,7 @@ class DynamicForm extends StatelessWidget {
 
       case 'radio':
         return Obx(() {
-          final selectedValue = controller.radioSelections[field.headers] ?? '';
+          final selectedValue = controller.formData[field.headers].toString();
           final List<String> options = ["true", "false"];
 
           return Column(
@@ -357,7 +367,9 @@ class DynamicForm extends StatelessWidget {
 
   Widget myDatePicker(PageField field) {
     // Create a TextEditingController to store and display the picked date
-    final TextEditingController dateController = TextEditingController();
+    final TextEditingController dateController = TextEditingController(
+      text: controller.formData[field.headers]?.toString() ?? '',
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -395,7 +407,9 @@ class DynamicForm extends StatelessWidget {
 
   Widget myTimePicker(PageField field) {
     // Create a TextEditingController to store and display the selected time
-    final TextEditingController timeController = TextEditingController();
+    final TextEditingController timeController = TextEditingController(
+      text: controller.formData[field.headers]?.toString() ?? '',
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

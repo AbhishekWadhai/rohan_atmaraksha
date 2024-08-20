@@ -50,6 +50,34 @@ class ApiService {
     }
   }
 
+//update method
+  Future<void> updateData(
+      String endpoint, String id, Map<String, dynamic> updatedData) async {
+    // Your API endpoint
+    final url = Uri.parse('$baseUrl/$endpoint/$id');
+
+    try {
+      // Make the PUT request
+      final response = await http.put(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(updatedData),
+      );
+
+      if (response.statusCode == 200) {
+        // Successful response, process if needed
+        final responseData = jsonDecode(response.body);
+        print('Data updated successfully: $responseData');
+      } else {
+        // Handle errors, e.g., 400, 404, etc.
+        print('Failed to update data. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Handle any exceptions during the API call
+      print('Error updating data: $e');
+    }
+  }
+
   // Common method for making DELETE requests
   Future<dynamic> deleteRequest(String endpoint, String key) async {
     final url = Uri.parse('$baseUrl/$endpoint/$key');

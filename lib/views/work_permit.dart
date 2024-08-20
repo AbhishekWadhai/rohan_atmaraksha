@@ -100,7 +100,8 @@ class WorkPermitPage extends StatelessWidget {
                                   Get.toNamed(Routes.workPermitForm,
                                       arguments: [
                                         'workpermit',
-                                        permit.toJson()
+                                        permit.toJson(),
+                                        true
                                       ]);
                                 },
                                 icon: const Icon(Icons.edit)),
@@ -188,7 +189,7 @@ class WorkPermitPage extends StatelessWidget {
                       onPressed: () {
                         Get.toNamed(
                           Routes.workPermitForm,
-                          arguments: ['workpermit', <String, dynamic>{}],
+                          arguments: ['workpermit', <String, dynamic>{}, false],
                         );
                       },
                       icon: const Icon(Icons.add_circle),

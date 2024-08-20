@@ -16,7 +16,6 @@ class HomePage extends StatelessWidget {
       backgroundColor: AppColors.backgroundColor,
       drawer: const MyDrawer(),
       appBar: AppBar(
-        
         automaticallyImplyLeading: false,
         elevation: 0,
         toolbarHeight: 200,
@@ -27,16 +26,14 @@ class HomePage extends StatelessWidget {
               Positioned(
                   top: 0,
                   left: 0,
-                  child: Builder(
-                    builder: (context) {
-                      return IconButton(
-                        icon: const Icon(Icons.menu, color: Colors.white),
-                        onPressed: () {
-                          Scaffold.of(context).openDrawer();
-                        },
-                      );
-                    }
-                  )),
+                  child: Builder(builder: (context) {
+                    return IconButton(
+                      icon: const Icon(Icons.menu, color: Colors.white),
+                      onPressed: () {
+                        Scaffold.of(context).openDrawer();
+                      },
+                    );
+                  })),
               Column(
                 mainAxisAlignment: MainAxisAlignment.end, //,
                 children: [
@@ -152,7 +149,14 @@ class HomePage extends StatelessWidget {
                         image: Image.asset("assets/create_work_permit.png"),
                         activity: Strings.workPermit,
                         onTap: () {
-                          Get.toNamed(Routes.workPermitForm);
+                          Get.toNamed(
+                            Routes.workPermitForm,
+                            arguments: [
+                              'workpermit',
+                              <String, dynamic>{},
+                              false
+                            ],
+                          );
                         }),
                     MyGridQuick(
                         image: Image.asset("assets/create_work_permit.png"),
