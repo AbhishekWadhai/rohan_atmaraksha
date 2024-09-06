@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rohan_atmaraksha/routes/routes_string.dart';
+import 'package:rohan_atmaraksha/services/api_services.dart';
+import 'package:rohan_atmaraksha/services/shared_preferences.dart';
 
 class LoginController extends GetxController {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -21,12 +23,25 @@ class LoginController extends GetxController {
     return null;
   }
 
-  void handleLogin() {
+  void handleLogin() async {
     if (formKey.currentState?.validate() ?? false) {
       // If the form is valid, display a snackbar and navigate
-      print('Username: ${usernameController.text}');
-      print('Password: ${passwordController.text}');
-      Get.toNamed(Routes.homePage);
+      try {
+        final a = await ApiService().postRequest("user/login", {
+          "emailId": usernameController.text,
+          "password": passwordController.text
+        });
+        if (a != null) {
+          SharedPrefService().saveString("token", a["token"]);
+          Get.toNamed(Routes.homePage);
+        } else {
+          Get.snackbar("Login Failed", "Enter valid credentials",
+              backgroundColor: Colors.red, colorText: Colors.white);
+        }
+        print(a);
+      } catch (e) {
+        print(e);
+      }
     }
   }
 

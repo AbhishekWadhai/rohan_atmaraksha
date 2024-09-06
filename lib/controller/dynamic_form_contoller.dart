@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:rohan_atmaraksha/model/form_data_model.dart';
 import 'package:rohan_atmaraksha/services/api_services.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
+import 'package:rohan_atmaraksha/services/location_service.dart';
 
 class DynamicFormController extends GetxController {
   var formResponse = <ResponseForm>[].obs;
@@ -23,17 +25,37 @@ class DynamicFormController extends GetxController {
     loadFormData();
   }
 
+  var selectedChips = <String>[].obs;
+
+  // Function to add or remove chips
+  void toggleChipSelection(String chipValue) {
+    if (selectedChips.contains(chipValue)) {
+      selectedChips.remove(chipValue);
+    } else {
+      selectedChips.add(chipValue);
+    }
+  }
+
   // Call this method when the form is first loaded
   void initializeFormData(Map<String, dynamic>? initialData) {
     if (initialData != null) {
       initialData.forEach((key, value) {
         if (value is List) {
-          // Convert list elements to strings
-          formData[key] = value.map((e) => e["_id"].toString()).toList();
-        } else if (value is Map) {
-          formData[key] = value["_id"];
+          // Check if the list elements contain an "id" or if they are regular strings
+          formData[key] = value.map((e) {
+            if (e is Map && e.containsKey("_id")) {
+              return e["_id"]
+                  .toString(); // Return the id if it's a Map with an "_id" key
+            } else if (e is String) {
+              return e; // If it's already a string, return it as is
+            }
+            return e.toString(); // Fallback to toString() for any other cases
+          }).toList();
+        } else if (value is Map && value.containsKey("_id")) {
+          formData[key] =
+              value["_id"].toString(); // Handle the map containing an "_id"
         } else {
-          formData[key] = value;
+          formData[key] = value; // Handle other cases
         }
       });
     }
@@ -108,8 +130,6 @@ class DynamicFormController extends GetxController {
         .toList();
   }
 
-  void deleteData() async {}
-
   void updateFormData(String key, dynamic value) {
     formData[key] = value;
     update();
@@ -144,20 +164,20 @@ class DynamicFormController extends GetxController {
     return null;
   }
 
-  Future<void> updateData() async {
+  Future<void> updateData(String endpoint) async {
     try {
       print(
           "UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUubmitted Data ");
       print(jsonEncode(formData));
 
-      await ApiService().updateData("permit", formData["_id"], formData);
+      await ApiService().updateData(endpoint, formData["_id"], formData);
       ScaffoldMessenger.of(Get.context!).showSnackBar(
         const SnackBar(
           content: Text('Data Updated Successfully'),
           backgroundColor: Colors.green,
         ),
       );
-      Get.back();
+      Get.back(result: true);
     } catch (e) {
       ScaffoldMessenger.of(Get.context!).showSnackBar(
         SnackBar(
@@ -169,12 +189,12 @@ class DynamicFormController extends GetxController {
     }
   }
 
-  Future<void> submitForm() async {
+  Future<void> submitForm(String endpoint) async {
     isLoading(true);
     print("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSubmitted Data");
     print(jsonEncode(formData));
     try {
-      final response = await ApiService().postRequest("permit", formData);
+      final response = await ApiService().postRequest(endpoint, formData);
       if (response == 201) {
         ScaffoldMessenger.of(Get.context!).showSnackBar(
           const SnackBar(
@@ -182,7 +202,7 @@ class DynamicFormController extends GetxController {
             backgroundColor: Colors.green,
           ),
         );
-        Get.back();
+        Get.back(result: true);
       }
     } catch (e) {
       print("Error submitting form: $e");
@@ -194,6 +214,17 @@ class DynamicFormController extends GetxController {
       );
     } finally {
       isLoading(false);
+    }
+  }
+
+  Future<void> fetchGeolocation(String fieldKey) async {
+    try {
+      Position position = await LocationService().determinePosition();
+      String latLong = "${position.latitude}, ${position.longitude}";
+      updateFormData(fieldKey, latLong);
+    } catch (e) {
+      print("Error fetching location: $e");
+      // Handle error, maybe update with a default value or show an error message
     }
   }
 }

@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:rohan_atmaraksha/controller/dynamic_form_contoller.dart';
@@ -21,6 +23,7 @@ class DynamicForm extends StatelessWidget {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final DynamicFormController controller = Get.put(DynamicFormController());
+  Timer? _debounce;
 
   @override
   Widget build(BuildContext context) {
@@ -62,9 +65,11 @@ class DynamicForm extends StatelessWidget {
                             onPressed: () {
                               if (_formKey.currentState?.validate() ?? false) {
                                 if (isEdit) {
-                                  controller.updateData(); // Call update method
+                                  controller.updateData(
+                                      pageName); // Call update method
                                 } else {
-                                  controller.submitForm(); // Call submit method
+                                  controller.submitForm(
+                                      pageName); // Call submit method
                                 }
                               } else {
                                 // If the form is invalid, show an error
@@ -116,14 +121,21 @@ class DynamicForm extends StatelessWidget {
               validator: (value) => controller.validateTextField(value),
               controller: textController,
               decoration: kTextFieldDecoration("Enter ${field.title}"),
-              onFieldSubmitted: (value) {
+              onChanged: (value) {
                 //textController.text = value;
-                controller.updateFormData(field.headers, value);
+                _debounce?.cancel();
+
+                // Start a new timer
+                _debounce = Timer(const Duration(milliseconds: 2000), () {
+                  controller.updateFormData(field.headers, value);
+                });
               },
             ),
             const SizedBox(height: 10),
           ],
         );
+      case 'editablechip':
+        return buildEditableChipField(field);
       case 'multiselect':
         return FutureBuilder<List<Map<String, String>>>(
           future:
@@ -331,7 +343,7 @@ class DynamicForm extends StatelessWidget {
       case 'radio':
         return Obx(() {
           final selectedValue = controller.formData[field.headers].toString();
-          final List<String> options = ["true", "false"];
+          final List<String> options = field.options!;
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -340,22 +352,102 @@ class DynamicForm extends StatelessWidget {
                   style: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
-              Column(
+              Row(
                 children: options.map((option) {
-                  return RadioListTile<String>(
-                    title: Text(option),
-                    value: option,
-                    groupValue: selectedValue,
-                    onChanged: (String? newValue) {
-                      if (newValue != null) {
-                        controller.updateRadioSelection(
-                            field.headers, newValue);
-                      }
-                    },
+                  return Expanded(
+                    child: RadioListTile<String>(
+                      title: Text(option),
+                      value: option,
+                      groupValue: selectedValue,
+                      onChanged: (String? newValue) {
+                        if (newValue != null) {
+                          controller.updateRadioSelection(
+                              field.headers, newValue);
+                        }
+                      },
+                    ),
                   );
                 }).toList(),
               ),
               const SizedBox(height: 10),
+            ],
+          );
+        });
+      case 'geolocation':
+  return Obx(() {
+    String? currentLocation = controller.formData[field.headers];
+    double? latitude, longitude;
+
+    if (currentLocation != null && currentLocation.isNotEmpty) {
+      var coordinates = currentLocation.split(',');
+      latitude = double.tryParse(coordinates[0]);
+      longitude = double.tryParse(coordinates[1]);
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          field.title,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 10),
+        TextFormField(
+          controller: TextEditingController(
+            text: currentLocation ?? 'Fetching location...',
+          ),
+          readOnly: true, // Make the TextField read-only
+          decoration: kTextFieldDecoration("Location"),
+          onTap: () async {
+            await controller.fetchGeolocation(field.headers);
+          },
+        ),
+        const SizedBox(height: 10),
+        if (latitude != null && longitude != null)
+          SizedBox(
+            height: 200.0,
+            child: GoogleMap(
+              initialCameraPosition: CameraPosition(
+                target: LatLng(latitude, longitude),
+                zoom: 15.0,
+              ),
+              markers: {
+                Marker(
+                  markerId: const MarkerId("currentLocation"),
+                  position: LatLng(latitude, longitude),
+                ),
+              },
+            ),
+          ),
+        const SizedBox(height: 10),
+      ],
+    );
+  });
+
+
+      case 'slider':
+        return Obx(() {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Number of Attendees - ${controller.formData[field.headers] ?? "0"}",
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              Slider(
+                value: controller.formData[field.headers] ?? 0,
+                min: 0.0,
+                max: 100.0,
+                divisions: 100,
+                label: controller.formData[field.headers].toString(),
+                onChanged: (value) {
+                  controller.formData[field.headers] = value;
+                },
+              ),
             ],
           );
         });
@@ -440,6 +532,84 @@ class DynamicForm extends StatelessWidget {
           },
         ),
       ],
+    );
+  }
+
+  Widget buildEditableChipField(PageField field) {
+    // Extract existing chips from form data or initialize as empty list
+    List<String> existingChips =
+        (controller.formData[field.headers] as List<String>?) ?? [];
+    TextEditingController chipController = TextEditingController();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          field.title,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10),
+        Wrap(
+          spacing: 8.0,
+          children: existingChips.map((chip) {
+            return Chip(
+              label: Text(chip),
+              onDeleted: () {
+                existingChips.remove(chip);
+                controller.updateFormData(field.headers, existingChips);
+              },
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: chipController,
+                decoration: kTextFieldDecoration("Add a chip"),
+                onSubmitted: (value) {
+                  if (value.isNotEmpty) {
+                    existingChips.add(value);
+                    chipController.clear();
+                    controller.updateFormData(field.headers, existingChips);
+                  }
+                },
+              ),
+            ),
+            const SizedBox(width: 8.0),
+            ElevatedButton(
+              onPressed: () {
+                final value = chipController.text.trim();
+                if (value.isNotEmpty) {
+                  existingChips.add(value);
+                  chipController.clear();
+                  controller.updateFormData(field.headers, existingChips);
+                }
+              },
+              child: const Text("Add"),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget buildInputChips(List<String> options, String fieldName) {
+    return Wrap(
+      spacing: 8.0,
+      children: options.map((option) {
+        return InputChip(
+          label: Text(option),
+          selected: controller.selectedChips.contains(option),
+          onSelected: (isSelected) {
+            isSelected
+                ? controller.selectedChips.add(option)
+                : controller.selectedChips.remove(option);
+            // Call setState or update your controller here
+          },
+        );
+      }).toList(),
     );
   }
 }

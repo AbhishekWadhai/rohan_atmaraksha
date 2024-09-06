@@ -3,14 +3,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:rohan_atmaraksha/app_constants/app_strings.dart';
-import 'package:rohan_atmaraksha/controller/tbt_meeting_controller.dart';
+
+import 'package:rohan_atmaraksha/controller/specific_training_controller.dart';
 import 'package:rohan_atmaraksha/routes/routes_string.dart';
 import 'package:rohan_atmaraksha/widgets/my_drawer.dart';
 
-class TBTMeetingPage extends StatelessWidget {
-  final controller = Get.put(TbtMeetingController());
-  TBTMeetingPage({super.key});
+class SpecificTrainingPage extends StatelessWidget {
+  final controller = Get.put(SpecificTrainingController());
+  SpecificTrainingPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class TBTMeetingPage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           foregroundColor: Colors.black,
-          title: Text(Strings.tbtMeeting),
+          title: const Text("Specific Training"),
           backgroundColor: Colors.white,
           actions: [
             IconButton(
@@ -37,11 +37,13 @@ class TBTMeetingPage extends StatelessWidget {
             Obx(
               () => Column(
                 children: [
+                  
+                   
                   Expanded(
                     child: ListView.builder(
-                      itemCount: controller.meetingList.length,
+                      itemCount: controller.trainingList.length,
                       itemBuilder: (context, index) {
-                        final meeting = controller.meetingList[index];
+                        final training = controller.trainingList[index];
                         return Card(
                           margin: const EdgeInsets.all(8.0),
                           child: ListTile(
@@ -67,8 +69,7 @@ class TBTMeetingPage extends StatelessWidget {
                                         TextButton(
                                           child: const Text('Delete'),
                                           onPressed: () async {
-                                            controller
-                                                .deleteSelection(meeting.id);
+                                            controller.deleteSelection(training.id);
                                             Navigator.of(context)
                                                 .pop(); // Delete the item
                                           },
@@ -77,18 +78,18 @@ class TBTMeetingPage extends StatelessWidget {
                                     );
                                   });
                             },
-                            title: Text(' Topic: ${meeting.topicName}'),
+                            title: Text(' Topic: ${training.projectName.projectName}'),
                             subtitle: Text(
-                              'Date: ${DateFormat('dd MM yyyy').format(DateTime.parse(meeting.date ?? ""))}',
+                              'Date: ${DateFormat('dd MM yyyy').format(DateTime.parse(training.date ?? ""))}',
                             ),
                             trailing: IconButton(
                                 onPressed: () async {
-                                  print(jsonEncode(meeting));
+                                  print(jsonEncode(training));
                                   var result = await Get.toNamed(
                                       Routes.formPage,
                                       arguments: [
-                                        'meeting',
-                                        meeting.toJson(),
+                                        'specific',
+                                        training.toJson(),
                                         true
                                       ]);
                                   if (result == true) {
@@ -118,7 +119,7 @@ class TBTMeetingPage extends StatelessWidget {
                       onPressed: () async {
                         var result = await Get.toNamed(
                           Routes.formPage,
-                          arguments: ['meeting', <String, dynamic>{}, false],
+                          arguments: ['specific', <String, dynamic>{}, false],
                         );
                         if (result == true) {
                           controller.getPermitData();

@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rohan_atmaraksha/routes/routes.dart';
 import 'package:rohan_atmaraksha/routes/routes_string.dart';
+import 'package:rohan_atmaraksha/services/jwt_service.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  bool isLoggedIn = await isTokenValid();
+  runApp(MyApp(isLoggedIn: isLoggedIn));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isLoggedIn;
+  const MyApp({super.key, required this.isLoggedIn});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +22,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: false,
       ),
-      initialRoute: Routes.loginPage,
+      initialRoute: isLoggedIn ? Routes.homePage : Routes.loginPage,
       getPages: AppRoutes.routes,
     );
   }

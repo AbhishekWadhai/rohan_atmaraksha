@@ -3,14 +3,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:rohan_atmaraksha/app_constants/app_strings.dart';
-import 'package:rohan_atmaraksha/controller/tbt_meeting_controller.dart';
+import 'package:rohan_atmaraksha/controller/incident_controller.dart';
+
 import 'package:rohan_atmaraksha/routes/routes_string.dart';
 import 'package:rohan_atmaraksha/widgets/my_drawer.dart';
 
-class TBTMeetingPage extends StatelessWidget {
-  final controller = Get.put(TbtMeetingController());
-  TBTMeetingPage({super.key});
+class IncidentPage extends StatelessWidget {
+  final controller = Get.put(IncidentController());
+  IncidentPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class TBTMeetingPage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           foregroundColor: Colors.black,
-          title: Text(Strings.tbtMeeting),
+          title: const Text("Incident Report"),
           backgroundColor: Colors.white,
           actions: [
             IconButton(
@@ -37,11 +37,22 @@ class TBTMeetingPage extends StatelessWidget {
             Obx(
               () => Column(
                 children: [
+                  const TabBar(labelColor: Colors.black, tabs: [
+                    Tab(
+                      text: "All",
+                    ),
+                    Tab(
+                      text: "Pending",
+                    ),
+                    Tab(
+                      text: "Completed",
+                    )
+                  ]),
                   Expanded(
                     child: ListView.builder(
-                      itemCount: controller.meetingList.length,
+                      itemCount: controller.incidentList.length,
                       itemBuilder: (context, index) {
-                        final meeting = controller.meetingList[index];
+                        final meeting = controller.incidentList[index];
                         return Card(
                           margin: const EdgeInsets.all(8.0),
                           child: ListTile(
@@ -67,8 +78,7 @@ class TBTMeetingPage extends StatelessWidget {
                                         TextButton(
                                           child: const Text('Delete'),
                                           onPressed: () async {
-                                            controller
-                                                .deleteSelection(meeting.id);
+                                            //controller.deletePermit(permit.id);
                                             Navigator.of(context)
                                                 .pop(); // Delete the item
                                           },
@@ -77,7 +87,7 @@ class TBTMeetingPage extends StatelessWidget {
                                     );
                                   });
                             },
-                            title: Text(' Topic: ${meeting.topicName}'),
+                            title: Text(' Topic: ${meeting.projectName}'),
                             subtitle: Text(
                               'Date: ${DateFormat('dd MM yyyy').format(DateTime.parse(meeting.date ?? ""))}',
                             ),

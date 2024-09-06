@@ -37,12 +37,18 @@ class ApiService {
       if (response.statusCode == 201) {
         print(
             "-----------------------------------${response.statusCode}----------------------------------------------------------");
-        print("API post successfully");
+
         return response.statusCode;
+      } else if (response.statusCode == 200) {
+        print(
+            "-----------------------------------${response.statusCode}----------------------------------------------------------");
+        print("API post successfully");
+        print(jsonEncode(response.body));
+        return jsonDecode(response.body);
       } else {
         print(
             "-----------------------------------${response.statusCode}----------------------------------------------------------");
-        throw Exception('Failed to post data');
+        
       }
     } catch (e) {
       print(e);

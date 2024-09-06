@@ -1,10 +1,13 @@
 import 'package:get/get.dart';
 import 'package:rohan_atmaraksha/routes/routes_string.dart';
 import 'package:rohan_atmaraksha/views/home_page.dart';
-import 'package:rohan_atmaraksha/views/incident_report.dart';
+import 'package:rohan_atmaraksha/views/incident_page.dart';
+import 'package:rohan_atmaraksha/views/induction_page.dart';
 import 'package:rohan_atmaraksha/views/login_page.dart';
 import 'package:rohan_atmaraksha/views/safety_check.dart';
+import 'package:rohan_atmaraksha/views/safety_training.dart';
 import 'package:rohan_atmaraksha/views/sora.dart';
+import 'package:rohan_atmaraksha/views/specific_training_page.dart';
 import 'package:rohan_atmaraksha/views/tbt_meeting.dart';
 import 'package:rohan_atmaraksha/views/work_permit.dart';
 import 'package:rohan_atmaraksha/views/form_page.dart';
@@ -14,14 +17,14 @@ class AppRoutes {
     GetPage(name: Routes.loginPage, page: () => LoginPage()),
     GetPage(name: Routes.homePage, page: () => const HomePage()),
     GetPage(name: Routes.workPermitPage, page: () => WorkPermitPage()),
-    GetPage(name: Routes.tbtMeetingPage, page: () => const TBTMeetingPage()),
+    GetPage(name: Routes.tbtMeetingPage, page: () => TBTMeetingPage()),
     GetPage(name: Routes.safetyCheckPage, page: () => const SafetyCheckPage()),
-    GetPage(name: Routes.soraPage, page: () => const SoraPage()),
+    GetPage(name: Routes.soraPage, page: () => UaucPage()),
+    GetPage(name: Routes.incidentReportPage, page: () => IncidentPage()),
+    GetPage(name: Routes.safetyTraining, page: () => const SafetyTraining()),
+    GetPage(name: Routes.inductionPage, page: () => InductionPage()),
     GetPage(
-        name: Routes.incidentReportPage,
-        page: () => const IncidentReportPage()),
-    GetPage(
-        name: Routes.safetyInductionPage, page: () => const SafetyCheckPage()),
-    GetPage(name: Routes.workPermitForm, page: () => WorkPermitFormPage()),
+        name: Routes.speceficTrainingPage, page: () => SpecificTrainingPage()),
+    GetPage(name: Routes.formPage, page: () => FormPage()),
   ];
 }

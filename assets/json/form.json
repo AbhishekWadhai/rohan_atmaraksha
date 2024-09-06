@@ -20,7 +20,7 @@
   },
   {
     "_id": "66b34cd83190d84d50262c71",
-    "Page": "workpermit",
+    "Page": "permit",
     "PageFields": [
       {
         "Title": "Project Name",
@@ -67,6 +67,13 @@
         "key": "tools"
       },
       {
+        "Title": "Tools Tested",
+        "Headers": "toolsTested",
+        "Type": "radio",
+        "Options": ["Yes", "No", "N/A"],
+        "_id": "66b230b6cc8539b4ed3861cc7"
+      },
+      {
         "Title": "Work Description",
         "Headers": "workDescription",
         "Type": "CustomTextField",
@@ -91,8 +98,10 @@
       {
         "Title": "Safety Measures Taken",
         "Headers": "safetyMeasuresTaken",
-        "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861cca"
+        "Type": "dropdown",
+        "_id": "66b230b6cc8539b4ed3861cca",
+        "endpoint": "PermitsType",
+        "key": "permitsType"
       },
       {
         "Title": "Undersign Draft",
@@ -128,13 +137,433 @@
         "Title": "Verified Done",
         "Headers": "verifiedDone",
         "Type": "radio",
+        "Options": ["true", "false"],
         "_id": "66b230b6cc8539b4ed3861ccf"
       },
       {
         "Title": "Approval Done",
         "Headers": "approvalDone",
         "Type": "radio",
+        "Options": ["true", "false"],
         "_id": "66b230b6cc8539b4ed3861cd0"
+      },
+      {
+        "Title": "Geo Tagging",
+        "Headers": "geotagging",
+        "Type": "geolocation",
+        "_id": "66b230b6cc8539b4ed3861cc1"
+      }
+    ],
+    "__v": 0
+  },
+  {
+    "_id": "66b34cd83190d84d50262c71",
+    "Page": "meeting",
+    "PageFields": [
+      {
+        "Title": "Project Name",
+        "Headers": "projectName",
+        "Type": "dropdown",
+        "_id": "66b230b6cc8539b4ed3861cc1",
+        "endpoint": "projects",
+        "key": "projectName"
+      },
+
+      {
+        "Title": "Date",
+        "Headers": "date",
+        "Type": "datepicker",
+        "_id": "66b230b6cc8539b4ed3861cc4"
+      },
+      {
+        "Title": "Time",
+        "Headers": "time",
+        "Type": "timepicker",
+        "_id": "66b230b6cc8539b4ed3861cc5"
+      },
+
+      {
+        "Title": "Topic Name",
+        "Headers": "topicName",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861cc7"
+      },
+
+      {
+        "Title": "Form Filled Sign By",
+        "Headers": "formFilledSignBy",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861cc9",
+        "endpoint": "user",
+        "key": "name"
+      },
+      {
+        "Title": "Attendees",
+        "Headers": "attendees",
+        "Type": "editablechip",
+        "_id": "66b230b6cc8539b4ed3861cc9"
+      },
+      {
+        "Title": "Number of Attendees",
+        "Headers": "attendeesNos",
+        "Type": "slider",
+        "_id": "66b230b6cc8539b4ed3861cc9",
+        "endpoint": "user",
+        "key": "name"
+      },
+      {
+        "Title": "Comments Box",
+        "Headers": "commentsBox",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861ccb"
+      },
+      {
+        "Title": "Documentation of Evidence Photo",
+        "Headers": "documentaryEvidencePhoto",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861ccb"
+      },
+      {
+        "Title": "Type of Topic",
+        "Headers": "typeOfTopic",
+        "Type": "dropdown",
+        "_id": "66b230b6cc8539b4ed3861cc1",
+        "endpoint": "topic",
+        "key": "topicTypes"
+      },
+      {
+        "Title": "Geo Tagging",
+        "Headers": "geotagging",
+        "Type": "geolocation",
+        "_id": "66b230b6cc8539b4ed3861cc1"
+      }
+    ],
+    "__v": 0
+  },
+  {
+    "_id": "66b34cd83190d84d50262c71",
+    "Page": "induction",
+    "PageFields": [
+      {
+        "Title": "Project Name",
+        "Headers": "projectName",
+        "Type": "dropdown",
+        "_id": "66b230b6cc8539b4ed3861cc1",
+        "endpoint": "projects",
+        "key": "projectName"
+      },
+
+      {
+        "Title": "Date",
+        "Headers": "date",
+        "Type": "datepicker",
+        "_id": "66b230b6cc8539b4ed3861cc4"
+      },
+      {
+        "Title": "Time",
+        "Headers": "time",
+        "Type": "timepicker",
+        "_id": "66b230b6cc8539b4ed3861cc5"
+      },
+
+      {
+        "Title": "Inductees",
+        "Headers": "inductees",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861cc7"
+      },
+
+      {
+        "Title": "Inductees Name",
+        "Headers": "inducteesName",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861cc9"
+      },
+      {
+        "Title": "Sub-Contractor Name",
+        "Headers": "subContractorName",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861cc9"
+      },
+      {
+        "Title": "Type of Topic",
+        "Headers": "typeOfTopic",
+        "Type": "dropdown",
+        "_id": "66b230b6cc8539b4ed3861cc1",
+        "endpoint": "topic",
+        "key": "topicTypes"
+      },
+      {
+        "Title": "Trade Type",
+        "Headers": "tradeTypes",
+        "Type": "multiselect",
+        "_id": "66b230b6cc8539b4ed3861cc9",
+        "endpoint": "trade",
+        "key": "tradeTypes"
+      },
+      {
+        "Title": "Instruction By",
+        "Headers": "instructionBy",
+        "Type": "dropdown",
+        "_id": "66b230b6cc8539b4ed3861cc1",
+        "endpoint": "user",
+        "key": "name"
+      },
+      {
+        "Title": "Documentation of Evidence Photo",
+        "Headers": "documentaryEvidencePhoto",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861ccb"
+      },
+      {
+        "Title": "Inducted Signed By",
+        "Headers": "inductedSignBy",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861ccb"
+      },
+      {
+        "Title": "Inductees Signed By",
+        "Headers": "inducteeSignBy",
+        "Type": "editablechip",
+        "_id": "66b230b6cc8539b4ed3861ccb"
+      },
+      {
+        "Title": "Geo Tagging",
+        "Headers": "geotagging",
+        "Type": "geolocation",
+        "_id": "66b230b6cc8539b4ed3861cc1"
+      },
+      {
+        "Title": "Comments Box",
+        "Headers": "commentsBox",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861ccb"
+      },
+      {
+        "Title": "Created At",
+        "Headers": "createdAt",
+        "Type": "datepicker",
+        "_id": "66b230b6cc8539b4ed3861cc4"
+      }
+    ],
+    "__v": 0
+  },
+  {
+    "_id": "66b34cd83190d84d50262c71",
+    "Page": "specific",
+    "PageFields": [
+      {
+        "Title": "Project Name",
+        "Headers": "projectName",
+        "Type": "dropdown",
+        "endpoint": "projects",
+        "key": "projectName",
+        "_id": "66b230b6cc8539b4ed3861cc4"
+      },
+      {
+        "Title": "Date",
+        "Headers": "date",
+        "Type": "datepicker",
+        "_id": "66b230b6cc8539b4ed3861cc4"
+      },
+      {
+        "Title": "Time",
+        "Headers": "time",
+        "Type": "timepicker",
+        "_id": "66b230b6cc8539b4ed3861cc4"
+      },
+      {
+        "Title": "Topic Name",
+        "Headers": "topicName",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861cc4"
+      },
+      {
+        "Title": "Type of Topic",
+        "Headers": "typeOfTopic",
+        "Type": "dropdown",
+        "endpoint": "topic",
+        "key": "topicTypes",
+        "_id": "66b230b6cc8539b4ed3861cc4"
+      },
+      {
+        "Title": "Attendees",
+        "Headers": "attendees",
+        "Type": "editablechip",
+        "_id": "66b230b6cc8539b4ed3861cc4"
+      },
+      {
+        "Title": "Inductees Name",
+        "Headers": "inducteesName",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861cc4"
+      },
+      {
+        "Title": "Trade Type",
+        "Headers": "tradeTypes",
+        "Type": "multiselect",
+        "endpoint": "trade",
+        "key": "tradeTypes",
+        "_id": "66b230b6cc8539b4ed3861cc4"
+      },
+      {
+        "Title": "Instruction By",
+        "Headers": "instructionBy",
+        "Type": "dropdown",
+        "endpoint": "user",
+        "key": "name",
+        "_id": "66b230b6cc8539b4ed3861cc4"
+      },
+      {
+        "Title": "Documentation of Evidence Photo",
+        "Headers": "documentaryEvidencePhoto",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861ccb"
+      },
+      {
+        "Title": "Trainee Signed By",
+        "Headers": "traineeSignBy",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861ccb"
+      },
+      {
+        "Title": "Traning Signed By",
+        "Headers": "trainingSignBy",
+        "Type": "editablechip",
+        "_id": "66b230b6cc8539b4ed3861ccb"
+      },
+
+      {
+        "Title": "Comments Box",
+        "Headers": "commentsBox",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861cc4"
+      },
+
+      {
+        "Title": "Geo Tagging",
+        "Headers": "geotagging",
+        "Type": "geolocation",
+        "_id": "66b230b6cc8539b4ed3861cc4"
+      }
+    ],
+    "__v": 0
+  },
+  {
+    "_id": "66b34cd83190d84d50262c71",
+    "Page": "uauc",
+    "PageFields": [
+      {
+        "Title": "Project Name",
+        "Headers": "projectName",
+        "Type": "dropdown",
+        "_id": "66b230b6cc8539b4ed3861cc1",
+        "endpoint": "projects",
+        "key": "projectName"
+      },
+      {
+        "Title": "Area",
+        "Headers": "area",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861cc2"
+      },
+
+      {
+        "Title": "Date",
+        "Headers": "date",
+        "Type": "datepicker",
+        "_id": "66b230b6cc8539b4ed3861cc4"
+      },
+      {
+        "Title": "Time",
+        "Headers": "time",
+        "Type": "timepicker",
+        "_id": "66b230b6cc8539b4ed3861cc5"
+      },
+      {
+        "Title": "Observer",
+        "Headers": "observer",
+        "Type": "dropdown",
+        "_id": "66b230b6cc8539b4ed3861ccc",
+        "endpoint": "user",
+        "key": "name"
+      },
+      {
+        "Title": "Observation",
+        "Headers": "observation",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861cc7"
+      },
+      {
+        "Title": "Photo",
+        "Headers": "photo",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861cc7"
+      },
+      {
+        "Title": "Type of Hazard",
+        "Headers": "hazards",
+        "Type": "multiselect",
+        "_id": "66b230b6cc8539b4ed3861cc8",
+        "endpoint": "hazards",
+        "key": "hazards"
+      },
+      {
+        "Title": "Causes",
+        "Headers": "causes",
+        "Type": "editablechip",
+        "_id": "66b230b6cc8539b4ed3861cc7"
+      },
+      {
+        "Title": "Risk Value",
+        "Headers": "riskValue",
+        "Type": "dropdown",
+        "_id": "66b230b6cc8539b4ed3861cca",
+        "endpoint": "RiskRating",
+        "key": "severity"
+      },
+      {
+        "Title": "Assigned To",
+        "Headers": "assignedTo",
+        "Type": "dropdown",
+        "_id": "66b230b6cc8539b4ed3861ccc",
+        "endpoint": "user",
+        "key": "name"
+      },
+      {
+        "Title": "Corrective Preventive Actions",
+        "Headers": "correctivePreventiveAction",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861cc7"
+      },
+      {
+        "Title": "Action Taken By",
+        "Headers": "actionTakenBy",
+        "Type": "dropdown",
+        "_id": "66b230b6cc8539b4ed3861ccc",
+        "endpoint": "user",
+        "key": "name"
+      },
+
+      {
+        "Title": "Status",
+        "Headers": "status",
+        "Type": "radio",
+        "Options": ["Open", "Closed"],
+        "_id": "66b230b6cc8539b4ed3861cc7"
+      },
+
+      {
+        "Title": "Geo Tagging",
+        "Headers": "geotagging",
+        "Type": "geolocation",
+        "_id": "66b230b6cc8539b4ed3861cc1"
+      },
+      {
+        "Title": "Comment",
+        "Headers": "comment",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861cc7"
       }
     ],
     "__v": 0

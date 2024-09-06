@@ -126,7 +126,7 @@ class HomePage extends StatelessWidget {
                         image: Image.asset(Assets.training),
                         activity: Strings.safetyInduction,
                         onTap: () {
-                          Get.toNamed(Routes.safetyInductionPage);
+                          Get.toNamed(Routes.safetyTraining);
                         }),
                   ],
                 ),
@@ -150,7 +150,7 @@ class HomePage extends StatelessWidget {
                         activity: Strings.workPermit,
                         onTap: () {
                           Get.toNamed(
-                            Routes.workPermitForm,
+                            Routes.formPage,
                             arguments: [
                               'workpermit',
                               <String, dynamic>{},

@@ -5,7 +5,10 @@ class Routes {
   static const incidentReportPage = "/incidentReportPage";
   static const safetyCheckPage = "/safetyCheckPage";
   static const safetyInductionPage = "/safetyInductionPage";
+  static const safetyTraining = "/safetyTraining";
   static const soraPage = "/soraPage";
   static const tbtMeetingPage = "/tbtMeetingPage";
-  static const workPermitForm = "/workPermitForm";
+  static const inductionPage = "/inductionPage";
+  static const speceficTrainingPage = "/speceficTrainingPage";
+  static const formPage = "/formPage";
 }

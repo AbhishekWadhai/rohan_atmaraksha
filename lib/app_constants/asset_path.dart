@@ -5,4 +5,5 @@ class Assets {
   static const String training = "assets/training.png";
   static const String incidentReport = "assets/incident_report.png";
   static const String sora = "assets/safety_action.png";
+  static const String rohanLogo =  "assets/rohan_logo.png";
 }

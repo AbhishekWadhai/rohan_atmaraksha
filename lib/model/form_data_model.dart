@@ -39,6 +39,7 @@ class PageField {
     String id;
     String? endpoint;
     String? key;
+    List<String>? options;
 
     PageField({
         required this.title,
@@ -47,6 +48,7 @@ class PageField {
         required this.id,
         this.endpoint,
         this.key,
+        this.options,
     });
 
     factory PageField.fromRawJson(String str) => PageField.fromJson(json.decode(str));
@@ -60,6 +62,7 @@ class PageField {
         id: json["_id"],
         endpoint: json["endpoint"],
         key: json["key"],
+        options: json["Options"] == null ? [] : List<String>.from(json["Options"]!.map((x) => x)),
     );
 
     Map<String, dynamic> toJson() => {
@@ -69,5 +72,6 @@ class PageField {
         "_id": id,
         "endpoint": endpoint,
         "key": key,
+        "Options": options == null ? [] : List<dynamic>.from(options!.map((x) => x)),
     };
 }
