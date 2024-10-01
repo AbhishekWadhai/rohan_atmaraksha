@@ -70,7 +70,7 @@ class MyDrawer extends StatelessWidget {
                     Get.toNamed(Routes.soraPage);
                   },
                   title: Text(
-                    Strings.sora,
+                    Strings.uauc,
                     style: TextStyles.drawerTextStyle,
                   ),
                 ),
@@ -99,7 +99,7 @@ class MyDrawer extends StatelessWidget {
                         Routes.safetyInductionPage); // Corrected route name
                   },
                   title: Text(
-                    Strings.safetyInduction,
+                    Strings.safetyTraining,
                     style: TextStyles.drawerTextStyle,
                   ),
                 ),

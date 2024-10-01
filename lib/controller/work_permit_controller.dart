@@ -25,7 +25,7 @@ class WorkPermitController extends GetxController
 
   getPermitData() async {
     try {
-      final permitData = await ApiService().getRequest("permit");
+      final permitData = await ApiService().getRequest("workpermit");
 
       if (permitData == null) {
         throw Exception("Received null data from API");
@@ -53,7 +53,7 @@ class WorkPermitController extends GetxController
   }
 
   deletePermit(String key) async {
-    await ApiService().deleteRequest("permit", key);
+    await ApiService().deleteRequest("workpermit", key);
     getPermitData();
   }
 }

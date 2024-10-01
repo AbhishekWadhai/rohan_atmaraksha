@@ -53,7 +53,7 @@ class WorkPermitPage extends StatelessWidget {
           onPressed: () async {
             var result = await Get.toNamed(
               Routes.formPage,
-              arguments: ['permit', <String, dynamic>{}, false],
+              arguments: ['workpermit', <String, dynamic>{}, false],
             );
             if (result == true) {
               workPermitController.getPermitData();
@@ -106,7 +106,7 @@ class WorkPermitPage extends StatelessWidget {
             trailing: IconButton(
                 onPressed: () async {
                   print(jsonEncode(permit));
-                  var result = await Get.toNamed(Routes.formPage, arguments: ['permit', permit.toJson(), true]);
+                  var result = await Get.toNamed(Routes.formPage, arguments: ['workpermit', permit.toJson(), true]);
                   if (result == true) {
                     workPermitController.getPermitData();
                   }

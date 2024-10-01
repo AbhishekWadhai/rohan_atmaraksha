@@ -88,8 +88,8 @@ class HomePage extends StatelessWidget {
               Expanded(
                 child: GridView(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      mainAxisSpacing: 5,
-                      crossAxisSpacing: 5,
+                      mainAxisSpacing: 4,
+                      crossAxisSpacing: 4,
                       crossAxisCount: 3),
                   children: [
                     MyGrid(
@@ -99,34 +99,16 @@ class HomePage extends StatelessWidget {
                           Get.toNamed(Routes.workPermitPage);
                         }),
                     MyGrid(
-                        image: Image.asset(Assets.tbtMeeting),
-                        activity: Strings.tbtMeeting,
+                        image: Image.asset(Assets.training),
+                        activity: Strings.safetyTraining,
                         onTap: () {
-                          Get.toNamed(Routes.tbtMeetingPage);
-                        }),
-                    MyGrid(
-                        image: Image.asset(Assets.safetyCheck),
-                        activity: Strings.safetyCheck,
-                        onTap: () {
-                          Get.toNamed(Routes.safetyCheckPage);
+                          Get.toNamed(Routes.safetyTraining);
                         }),
                     MyGrid(
                         image: Image.asset(Assets.sora),
-                        activity: Strings.sora,
+                        activity: Strings.uauc,
                         onTap: () {
                           Get.toNamed(Routes.soraPage);
-                        }),
-                    MyGrid(
-                        image: Image.asset(Assets.incidentReport),
-                        activity: Strings.incidentReport,
-                        onTap: () {
-                          Get.toNamed(Routes.incidentReportPage);
-                        }),
-                    MyGrid(
-                        image: Image.asset(Assets.training),
-                        activity: Strings.safetyInduction,
-                        onTap: () {
-                          Get.toNamed(Routes.safetyTraining);
                         }),
                   ],
                 ),
@@ -172,7 +154,7 @@ class HomePage extends StatelessWidget {
                         }),
                     MyGridQuick(
                         image: Image.asset("assets/create_work_permit.png"),
-                        activity: Strings.sora,
+                        activity: Strings.uauc,
                         onTap: () {
                           Get.toNamed(Routes.soraPage);
                         }),
@@ -184,7 +166,7 @@ class HomePage extends StatelessWidget {
                         }),
                     MyGridQuick(
                         image: Image.asset("assets/create_work_permit.png"),
-                        activity: Strings.safetyInduction,
+                        activity: Strings.safetyTraining,
                         onTap: () {
                           Get.toNamed(Routes.safetyInductionPage);
                         }),
@@ -196,7 +178,7 @@ class HomePage extends StatelessWidget {
                         }),
                     MyGridQuick(
                         image: Image.asset("assets/create_work_permit.png"),
-                        activity: Strings.safetyInduction,
+                        activity: Strings.safetyTraining,
                         onTap: () {
                           Get.toNamed(Routes.safetyInductionPage);
                         }),

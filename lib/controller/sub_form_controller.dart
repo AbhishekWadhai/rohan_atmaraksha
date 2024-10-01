@@ -1,20 +1,15 @@
-import 'dart:io';
-
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:rohan_atmaraksha/model/form_data_model.dart';
 import 'package:rohan_atmaraksha/services/api_services.dart';
-import 'package:rohan_atmaraksha/services/image_service.dart';
 import 'package:rohan_atmaraksha/services/location_service.dart';
 
-class DynamicFormController extends GetxController {
-  final ImageService imageUploadService = ImageService();
-
-  // Observable variables
+class SubFormController extends GetxController {
   var formResponse = <ResponseForm>[].obs;
   var isLoading = true.obs;
   RxList<PageField> pageFields = <PageField>[].obs;
@@ -23,64 +18,17 @@ class DynamicFormController extends GetxController {
   RxMap<String, String> dropdownSelections = <String, String>{}.obs;
   RxMap<String, String> radioSelections = <String, String>{}.obs;
 
-  bool fieldsLoaded = false;
+  bool fieldsLoaded = false; // Flag to check if fields are loaded
 
-  // Selected chips observable
-  var selectedChips = <String>[].obs;
-  // Observable list for storing attendees' names as maps
-  var subformData = <Map<String, dynamic>>[].obs;
-
-  // Lifecycle hook
   @override
   void onInit() {
     super.onInit();
     loadFormData();
   }
 
-  // Form Data Initialization
-  void initializeFormData(Map<String, dynamic>? initialData) {
-    if (initialData != null) {
-      initialData.forEach((key, value) {
-        if (value is List) {
-          formData[key] = value.map((e) {
-            if (e is Map && e.containsKey("_id")) {
-              return e["_id"].toString();
-            } else if (e is String) {
-              return e;
-            }
-            return e.toString();
-          }).toList();
-        } else if (value is Map && value.containsKey("_id")) {
-          formData[key] = value["_id"].toString();
-        } else {
-          formData[key] = value;
-        }
-      });
-    }
-    print("Initialized form data: ${jsonEncode(formData)}");
-  }
+  var selectedChips = <String>[].obs;
 
-  Future<void> pickAndUploadImage() async {
-    // Pick an image
-    File? imageFile = await imageUploadService.pickImage();
-
-    if (imageFile != null) {
-      // Upload the image and get the URL
-      String? imageUrl = await imageUploadService.uploadImage(imageFile);
-
-      if (imageUrl != null) {
-        // Save the image URL in the formData
-        formData['imageUrl'] = imageUrl;
-        print('Image uploaded successfully: $imageUrl');
-      } else {
-        print('Image upload failed.');
-      }
-    } else {
-      print('No image selected.');
-    }
-  }
-
-  // Toggle chip selection for multi-select fields
+  // Function to add or remove chips
   void toggleChipSelection(String chipValue) {
     if (selectedChips.contains(chipValue)) {
       selectedChips.remove(chipValue);
@@ -89,16 +37,43 @@ class DynamicFormController extends GetxController {
     }
   }
 
-  // Form Fields Loader
+  // Call this method when the form is first loaded
+  void initializeFormData(Map<String, dynamic>? initialData) {
+    if (initialData != null) {
+      initialData.forEach((key, value) {
+        if (value is List) {
+          // Check if the list elements contain an "id" or if they are regular strings
+          formData[key] = value.map((e) {
+            if (e is Map && e.containsKey("_id")) {
+              return e["_id"]
+                  .toString(); // Return the id if it's a Map with an "_id" key
+            } else if (e is String) {
+              return e; // If it's already a string, return it as is
+            }
+            return e.toString(); // Fallback to toString() for any other cases
+          }).toList();
+        } else if (value is Map && value.containsKey("_id")) {
+          formData[key] =
+              value["_id"].toString(); // Handle the map containing an "_id"
+        } else {
+          formData[key] = value; // Handle other cases
+        }
+      });
+    }
+    print(
+        "------------------------------------00000000000000 Current Page Data 0000000000000--------------------------------");
+    print(jsonEncode(formData));
+  }
+
   Future<void> getPageFields(String pageName) async {
     pageFields.value = await formResponse
         .where((e) => e.page == pageName)
         .expand((e) => e.pageFields)
         .toList();
+
     update();
   }
 
-  // Form Data Loader
   Future<void> loadFormData() async {
     isLoading(true);
     try {
@@ -106,7 +81,7 @@ class DynamicFormController extends GetxController {
       if (connectivityResult == ConnectivityResult.none) {
         await loadJsonFromAssets();
       } else {
-        await loadJsonFromAssets(); // Replace with loadJsonFromApi() for online mode
+        await loadJsonFromAssets(); // Should be loadJsonFromApi() if online
       }
       print("Form data loaded: $formData");
     } catch (e) {
@@ -116,14 +91,6 @@ class DynamicFormController extends GetxController {
     }
   }
 
-  // Method to add a new attendee
-  void addAttendee(Map<String, String> attendee) {
-    print("function called");
-    subformData.add(attendee);
-    print("Updated attendees list: $subformData");
-  }
-
-  // Load JSON from Assets
   Future<void> loadJsonFromAssets() async {
     try {
       final String response =
@@ -133,12 +100,14 @@ class DynamicFormController extends GetxController {
           .map<ResponseForm>((element) => ResponseForm.fromJson(element))
           .toList();
       print("Loaded form data from assets: $formResponse");
+      // print(
+      //     "------------------------------------00000000000000000000000000000000000000000000--------------------------------");
+      // print(jsonEncode(formResponse));
     } catch (e) {
       print("Error loading JSON from assets: $e");
     }
   }
 
-  // Load JSON from API
   Future<void> loadJsonFromApi() async {
     try {
       final jsonResult = await ApiService().getRequest("fields");
@@ -151,40 +120,80 @@ class DynamicFormController extends GetxController {
     }
   }
 
-  // Update form data for input fields
-  void updateFormData(String key, dynamic value) {
-    formData[key] = value;
-    update();
-    print("Updated form data: ${jsonEncode(formData)}");
-  }
-
-  // Update dropdown selection
-  void updateDropdownSelection(String key, String value) {
-    dropdownSelections[key] = value;
-    updateFormData(key, value);
-  }
-
-  // Update radio button selection
-  void updateRadioSelection(String key, String value) {
-    radioSelections[key] = value;
-    updateFormData(key, value);
-  }
-
-  // Get dropdown data dynamically from API
   Future<List<Map<String, String>>> getDropdownData(
       String endpoint, String key) async {
     final dropdownResult = await ApiService().getRequest(endpoint);
     return dropdownResult
         .map<Map<String, String>>((element) => {
               '_id': element['_id'].toString(),
-              key: element[key].toString(),
+              key: element[key].toString(), // Use the dynamic key here
             })
         .toList();
   }
 
-  // Form Submission
+  void updateFormData(String key, dynamic value) {
+    formData[key] = value;
+    update();
+    print(
+        "------------------------------------00000000000000 Updated Data 0000000000000--------------------------------");
+    print("Updated form data: $formData");
+  }
+
+  void updateDropdownSelection(String key, String value) {
+    dropdownSelections[key] = value;
+    print(jsonEncode(dropdownSelections));
+    updateFormData(key, value);
+  }
+
+  void updateRadioSelection(String key, String value) {
+    radioSelections[key] = value;
+    updateFormData(key, value);
+  }
+
+  //validations for the dynamic form
+  String? validateTextField(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'This field cannot be empty';
+    }
+    return null;
+  }
+
+  String? validateDropdown(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please select an option';
+    }
+    return null;
+  }
+
+  Future<void> updateData(String endpoint) async {
+    try {
+      print(
+          "UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUubmitted Data ");
+      print(jsonEncode(formData));
+
+      await ApiService().updateData(endpoint, formData["_id"], formData);
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(
+          content: Text('Data Updated Successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      Get.back(result: true);
+    } catch (e) {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        SnackBar(
+          content: Text('Error Updating data: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      print(e);
+    }
+  }
+
   Future<void> submitForm(String endpoint) async {
     isLoading(true);
+    print("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSubmitted Data");
+    print(jsonEncode(formData));
     try {
       final response = await ApiService().postRequest(endpoint, formData);
       if (response == 201) {
@@ -209,29 +218,6 @@ class DynamicFormController extends GetxController {
     }
   }
 
-  // Data Update
-  Future<void> updateData(String endpoint) async {
-    try {
-      await ApiService().updateData(endpoint, formData["_id"], formData);
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        const SnackBar(
-          content: Text('Data Updated Successfully'),
-          backgroundColor: Colors.green,
-        ),
-      );
-      Get.back(result: true);
-    } catch (e) {
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        SnackBar(
-          content: Text('Error Updating data: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      print(e);
-    }
-  }
-
-  // Fetch Geolocation
   Future<void> fetchGeolocation(String fieldKey) async {
     try {
       Position position = await LocationService().determinePosition();
@@ -239,21 +225,7 @@ class DynamicFormController extends GetxController {
       updateFormData(fieldKey, latLong);
     } catch (e) {
       print("Error fetching location: $e");
+      // Handle error, maybe update with a default value or show an error message
     }
-  }
-
-  // Validations for form fields
-  String? validateTextField(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'This field cannot be empty';
-    }
-    return null;
-  }
-
-  String? validateDropdown(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please select an option';
-    }
-    return null;
   }
 }

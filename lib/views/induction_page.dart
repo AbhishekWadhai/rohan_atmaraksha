@@ -16,7 +16,7 @@ class InductionPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.black,
-        title: Text(Strings.safetyInduction),
+        title: Text(Strings.safetyTraining),
         backgroundColor: Colors.white,
         actions: [
           IconButton(

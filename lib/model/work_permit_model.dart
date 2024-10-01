@@ -7,20 +7,20 @@ class WorkPermit {
   PermitTypes permitTypes;
   String date;
   String time;
-  List<ToolsAndEquipment> toolsAndEquipment;
+  List<dynamic> toolsAndEquipment;
+  String toolsTested;
   String workDescription;
   List<TypeOfHazard> typeOfHazard;
   List<ApplicablePpe> applicablePpEs;
+  String safetyMeasuresTaken;
   String undersignDraft;
   By createdBy;
   List<By> verifiedBy;
   List<By> approvalBy;
   bool verifiedDone;
   bool approvalDone;
+  String geotagging;
   int v;
-  String? toolsTested;
-  String? safetyMeasuresTaken;
-  String? geotagging;
 
   WorkPermit({
     required this.id,
@@ -30,19 +30,19 @@ class WorkPermit {
     required this.date,
     required this.time,
     required this.toolsAndEquipment,
+    required this.toolsTested,
     required this.workDescription,
     required this.typeOfHazard,
     required this.applicablePpEs,
+    required this.safetyMeasuresTaken,
     required this.undersignDraft,
     required this.createdBy,
     required this.verifiedBy,
     required this.approvalBy,
     required this.verifiedDone,
     required this.approvalDone,
+    required this.geotagging,
     required this.v,
-    this.toolsTested,
-    this.safetyMeasuresTaken,
-    this.geotagging,
   });
 
   factory WorkPermit.fromRawJson(String str) =>
@@ -57,14 +57,15 @@ class WorkPermit {
         permitTypes: PermitTypes.fromJson(json["permitTypes"]),
         date: json["date"],
         time: json["time"],
-        toolsAndEquipment: List<ToolsAndEquipment>.from(
-            json["toolsAndEquipment"]
-                .map((x) => ToolsAndEquipment.fromJson(x))),
+        toolsAndEquipment:
+            List<dynamic>.from(json["toolsAndEquipment"].map((x) => x)),
+        toolsTested: json["toolsTested"],
         workDescription: json["workDescription"],
         typeOfHazard: List<TypeOfHazard>.from(
             json["typeOfHazard"].map((x) => TypeOfHazard.fromJson(x))),
         applicablePpEs: List<ApplicablePpe>.from(
             json["applicablePPEs"].map((x) => ApplicablePpe.fromJson(x))),
+        safetyMeasuresTaken: json["safetyMeasuresTaken"],
         undersignDraft: json["undersignDraft"],
         createdBy: By.fromJson(json["createdBy"]),
         verifiedBy:
@@ -73,10 +74,8 @@ class WorkPermit {
             List<By>.from(json["approvalBy"].map((x) => By.fromJson(x))),
         verifiedDone: json["verifiedDone"],
         approvalDone: json["approvalDone"],
-        v: json["__v"],
-        toolsTested: json["toolsTested"],
-        safetyMeasuresTaken: json["safetyMeasuresTaken"],
         geotagging: json["geotagging"],
+        v: json["__v"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -87,21 +86,21 @@ class WorkPermit {
         "date": date,
         "time": time,
         "toolsAndEquipment":
-            List<dynamic>.from(toolsAndEquipment.map((x) => x.toJson())),
+            List<dynamic>.from(toolsAndEquipment.map((x) => x)),
+        "toolsTested": toolsTested,
         "workDescription": workDescription,
         "typeOfHazard": List<dynamic>.from(typeOfHazard.map((x) => x.toJson())),
         "applicablePPEs":
             List<dynamic>.from(applicablePpEs.map((x) => x.toJson())),
+        "safetyMeasuresTaken": safetyMeasuresTaken,
         "undersignDraft": undersignDraft,
         "createdBy": createdBy.toJson(),
         "verifiedBy": List<dynamic>.from(verifiedBy.map((x) => x.toJson())),
         "approvalBy": List<dynamic>.from(approvalBy.map((x) => x.toJson())),
         "verifiedDone": verifiedDone,
         "approvalDone": approvalDone,
-        "__v": v,
-        "toolsTested": toolsTested,
-        "safetyMeasuresTaken": safetyMeasuresTaken,
         "geotagging": geotagging,
+        "__v": v,
       };
 }
 
@@ -135,7 +134,6 @@ class ApplicablePpe {
 }
 
 class By {
-  Address address;
   String id;
   String userId;
   String name;
@@ -143,13 +141,12 @@ class By {
   String emailId;
   String password;
   String phone;
-  bool isActive;
   DateTime createdAt;
   DateTime updatedAt;
+  bool isActive;
   int v;
 
   By({
-    required this.address,
     required this.id,
     required this.userId,
     required this.name,
@@ -157,9 +154,9 @@ class By {
     required this.emailId,
     required this.password,
     required this.phone,
-    required this.isActive,
     required this.createdAt,
     required this.updatedAt,
+    required this.isActive,
     required this.v,
   });
 
@@ -168,7 +165,6 @@ class By {
   String toRawJson() => json.encode(toJson());
 
   factory By.fromJson(Map<String, dynamic> json) => By(
-        address: Address.fromJson(json["address"]),
         id: json["_id"],
         userId: json["userId"],
         name: json["name"],
@@ -176,14 +172,13 @@ class By {
         emailId: json["emailId"],
         password: json["password"],
         phone: json["phone"],
-        isActive: json["isActive"],
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
+        isActive: json["isActive"],
         v: json["__v"],
       );
 
   Map<String, dynamic> toJson() => {
-        "address": address.toJson(),
         "_id": id,
         "userId": userId,
         "name": name,
@@ -191,46 +186,10 @@ class By {
         "emailId": emailId,
         "password": password,
         "phone": phone,
-        "isActive": isActive,
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
+        "isActive": isActive,
         "__v": v,
-      };
-}
-
-class Address {
-  String street;
-  String city;
-  String state;
-  String zip;
-  String country;
-
-  Address({
-    required this.street,
-    required this.city,
-    required this.state,
-    required this.zip,
-    required this.country,
-  });
-
-  factory Address.fromRawJson(String str) => Address.fromJson(json.decode(str));
-
-  String toRawJson() => json.encode(toJson());
-
-  factory Address.fromJson(Map<String, dynamic> json) => Address(
-        street: json["street"],
-        city: json["city"],
-        state: json["state"],
-        zip: json["zip"],
-        country: json["country"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "street": street,
-        "city": city,
-        "state": state,
-        "zip": zip,
-        "country": country,
       };
 }
 
@@ -320,36 +279,6 @@ class PermitTypes {
         "_id": id,
         "permitsType": permitsType,
         "__v": v,
-      };
-}
-
-class ToolsAndEquipment {
-  String id;
-  int v;
-  String tools;
-
-  ToolsAndEquipment({
-    required this.id,
-    required this.v,
-    required this.tools,
-  });
-
-  factory ToolsAndEquipment.fromRawJson(String str) =>
-      ToolsAndEquipment.fromJson(json.decode(str));
-
-  String toRawJson() => json.encode(toJson());
-
-  factory ToolsAndEquipment.fromJson(Map<String, dynamic> json) =>
-      ToolsAndEquipment(
-        id: json["_id"],
-        v: json["__v"],
-        tools: json["tools"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "_id": id,
-        "__v": v,
-        "tools": tools,
       };
 }
 

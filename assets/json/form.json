@@ -19,8 +19,39 @@
     "__v": 0
   },
   {
+    "_id": "66b34b204ecde7c5bfeab152",
+    "Page": "attendeesName",
+    "PageFields": [
+      {
+        "Title": "Name",
+        "Headers": "name",
+        "Type": "CustomTextField",
+        "_id": "66b34b204ecde7c5bfeab153"
+      },
+      {
+        "Title": "Sub-Contractor Name",
+        "Headers": "subcontractorName",
+        "Type": "CustomTextField",
+        "_id": "66b34b204ecde7c5bfeab154"
+      },
+      {
+        "Title": "Signature",
+        "Headers": "signature",
+        "Type": "CustomTextField",
+        "_id": "66b34b204ecde7c5bfeab154"
+      },
+      {
+        "Title": "Designation",
+        "Headers": "designation",
+        "Type": "CustomTextField",
+        "_id": "66b34b204ecde7c5bfeab154"
+      }
+    ],
+    "__v": 0
+  },
+  {
     "_id": "66b34cd83190d84d50262c71",
-    "Page": "permit",
+    "Page": "workpermit",
     "PageFields": [
       {
         "Title": "Project Name",
@@ -183,47 +214,6 @@
       },
 
       {
-        "Title": "Topic Name",
-        "Headers": "topicName",
-        "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861cc7"
-      },
-
-      {
-        "Title": "Form Filled Sign By",
-        "Headers": "formFilledSignBy",
-        "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861cc9",
-        "endpoint": "user",
-        "key": "name"
-      },
-      {
-        "Title": "Attendees",
-        "Headers": "attendees",
-        "Type": "editablechip",
-        "_id": "66b230b6cc8539b4ed3861cc9"
-      },
-      {
-        "Title": "Number of Attendees",
-        "Headers": "attendeesNos",
-        "Type": "slider",
-        "_id": "66b230b6cc8539b4ed3861cc9",
-        "endpoint": "user",
-        "key": "name"
-      },
-      {
-        "Title": "Comments Box",
-        "Headers": "commentsBox",
-        "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861ccb"
-      },
-      {
-        "Title": "Documentation of Evidence Photo",
-        "Headers": "documentaryEvidencePhoto",
-        "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861ccb"
-      },
-      {
         "Title": "Type of Topic",
         "Headers": "typeOfTopic",
         "Type": "dropdown",
@@ -232,10 +222,49 @@
         "key": "topicTypes"
       },
       {
+        "Title": "Form Filled By Name",
+        "Headers": "formFilledByName",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861cc9",
+        "endpoint": "user",
+        "key": "name"
+      },
+      {
+        "Title": "Form Filled Sign By",
+        "Headers": "formFilledSignBy",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861cc9",
+        "endpoint": "user",
+        "key": "name"
+      },
+
+      {
+        "Title": "Number of Attendees",
+        "Headers": "attendeesNos",
+        "Type": "slider",
+        "_id": "66b230b6cc8539b4ed3861cc9",
+        "endpoint": "user",
+        "key": "name"
+      },
+
+      {
+        "Title": "Documentation of Evidence Photo",
+        "Headers": "documentaryEvidencePhoto",
+        "Type": "imagepicker",
+        "_id": "66b230b6cc8539b4ed3861ccb"
+      },
+
+      {
         "Title": "Geo Tagging",
         "Headers": "geotagging",
         "Type": "geolocation",
         "_id": "66b230b6cc8539b4ed3861cc1"
+      },
+      {
+        "Title": "Comments Box",
+        "Headers": "commentsBox",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861ccb"
       }
     ],
     "__v": 0
@@ -265,6 +294,13 @@
         "Type": "timepicker",
         "_id": "66b230b6cc8539b4ed3861cc5"
       },
+      {
+        "Title": "Inductees",
+        "Headers": "inductees",
+        "Type": "simpledropdown",
+        "_id": "66b34b204ecde7c5bfeab153",
+        "Options": ["Staff", "Workers", "Suppliers", "Clients", "Visitors"]
+      },
 
       {
         "Title": "Inductees",
@@ -280,13 +316,21 @@
         "_id": "66b230b6cc8539b4ed3861cc9"
       },
       {
+        "Title": "Trade Name",
+        "Headers": "tradeTypes",
+        "Type": "multiselect",
+        "_id": "66b230b6cc8539b4ed3861cc9",
+        "endpoint": "trade",
+        "key": "tradeTypes"
+      },
+      {
         "Title": "Sub-Contractor Name",
         "Headers": "subContractorName",
         "Type": "CustomTextField",
         "_id": "66b230b6cc8539b4ed3861cc9"
       },
       {
-        "Title": "Type of Topic",
+        "Title": "Topic Discussed",
         "Headers": "typeOfTopic",
         "Type": "dropdown",
         "_id": "66b230b6cc8539b4ed3861cc1",
@@ -294,12 +338,22 @@
         "key": "topicTypes"
       },
       {
-        "Title": "Trade Type",
-        "Headers": "tradeTypes",
-        "Type": "multiselect",
-        "_id": "66b230b6cc8539b4ed3861cc9",
-        "endpoint": "trade",
-        "key": "tradeTypes"
+        "Title": "Documentation of Evidence Photo",
+        "Headers": "documentaryEvidencePhoto",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861ccb"
+      },
+      {
+        "Title": "Any Other",
+        "Headers": "anyOthers",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861cc9"
+      },
+      {
+        "Title": "Inducted Signed By",
+        "Headers": "inductedSignBy",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861ccb"
       },
       {
         "Title": "Instruction By",
@@ -309,41 +363,12 @@
         "endpoint": "user",
         "key": "name"
       },
-      {
-        "Title": "Documentation of Evidence Photo",
-        "Headers": "documentaryEvidencePhoto",
-        "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861ccb"
-      },
-      {
-        "Title": "Inducted Signed By",
-        "Headers": "inductedSignBy",
-        "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861ccb"
-      },
-      {
-        "Title": "Inductees Signed By",
-        "Headers": "inducteeSignBy",
-        "Type": "editablechip",
-        "_id": "66b230b6cc8539b4ed3861ccb"
-      },
+
       {
         "Title": "Geo Tagging",
         "Headers": "geotagging",
         "Type": "geolocation",
         "_id": "66b230b6cc8539b4ed3861cc1"
-      },
-      {
-        "Title": "Comments Box",
-        "Headers": "commentsBox",
-        "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861ccb"
-      },
-      {
-        "Title": "Created At",
-        "Headers": "createdAt",
-        "Type": "datepicker",
-        "_id": "66b230b6cc8539b4ed3861cc4"
       }
     ],
     "__v": 0
@@ -372,42 +397,33 @@
         "Type": "timepicker",
         "_id": "66b230b6cc8539b4ed3861cc4"
       },
+      
       {
-        "Title": "Topic Name",
-        "Headers": "topicName",
-        "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861cc4"
-      },
-      {
-        "Title": "Type of Topic",
+        "Title": "Training Topic",
         "Headers": "typeOfTopic",
         "Type": "dropdown",
         "endpoint": "topic",
         "key": "topicTypes",
         "_id": "66b230b6cc8539b4ed3861cc4"
       },
+     
       {
         "Title": "Attendees",
         "Headers": "attendees",
-        "Type": "editablechip",
-        "_id": "66b230b6cc8539b4ed3861cc4"
+        "Type": "simpledropdown",
+        "_id": "66b34b204ecde7c5bfeab153",
+        "Options": ["Staff", "Workers", "Suppliers", "Clients", "Visitors"]
       },
       {
-        "Title": "Inductees Name",
-        "Headers": "inducteesName",
-        "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861cc4"
+        "Title": "Attendees Name",
+        "Headers": "attendeesName",
+        "Type": "secondaryForm",
+        "_id": "66b230b6cc8539b4ed3861cc4",
+        "key": "name"
       },
+      
       {
-        "Title": "Trade Type",
-        "Headers": "tradeTypes",
-        "Type": "multiselect",
-        "endpoint": "trade",
-        "key": "tradeTypes",
-        "_id": "66b230b6cc8539b4ed3861cc4"
-      },
-      {
-        "Title": "Instruction By",
+        "Title": "Training Given By",
         "Headers": "instructionBy",
         "Type": "dropdown",
         "endpoint": "user",
@@ -415,23 +431,20 @@
         "_id": "66b230b6cc8539b4ed3861cc4"
       },
       {
+        "Title": "Number of Attendees",
+        "Headers": "attendeesNos",
+        "Type": "slider",
+        "_id": "66b230b6cc8539b4ed3861cc9",
+        "endpoint": "user",
+        "key": "name"
+      },
+      {
         "Title": "Documentation of Evidence Photo",
         "Headers": "documentaryEvidencePhoto",
         "Type": "CustomTextField",
         "_id": "66b230b6cc8539b4ed3861ccb"
       },
-      {
-        "Title": "Trainee Signed By",
-        "Headers": "traineeSignBy",
-        "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861ccb"
-      },
-      {
-        "Title": "Traning Signed By",
-        "Headers": "trainingSignBy",
-        "Type": "editablechip",
-        "_id": "66b230b6cc8539b4ed3861ccb"
-      },
+     
 
       {
         "Title": "Comments Box",

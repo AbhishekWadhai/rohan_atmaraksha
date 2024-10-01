@@ -5,23 +5,26 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:rohan_atmaraksha/controller/dynamic_form_contoller.dart';
+import 'package:rohan_atmaraksha/controller/sub_form_controller.dart';
 
 import 'package:rohan_atmaraksha/model/form_data_model.dart';
-import 'package:rohan_atmaraksha/widgets/subform.dart';
 
-class DynamicForm extends StatelessWidget {
+class SubForm extends StatelessWidget {
   final String pageName;
   final Map<String, dynamic>? initialData;
   final bool isEdit;
 
-  DynamicForm(
-      {super.key,
-      required this.pageName,
-      this.initialData,
-      this.isEdit = false});
+  SubForm({
+    super.key,
+    required this.pageName,
+    this.initialData,
+    this.isEdit = false,
+  });
 
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final DynamicFormController controller = Get.put(DynamicFormController());
+  final GlobalKey<FormState> _subformKey = GlobalKey<FormState>();
+  final SubFormController controller = Get.put(SubFormController());
+  final DynamicFormController mainController =
+      Get.find<DynamicFormController>();
   Timer? _debounce;
 
   @override
@@ -32,11 +35,11 @@ class DynamicForm extends StatelessWidget {
       body: Stack(
         children: [
           Form(
-            key: _formKey,
+            key: _subformKey,
             child: Obx(
               () {
                 controller.getPageFields(pageName);
-                return GetBuilder<DynamicFormController>(builder: (controller) {
+                return GetBuilder<SubFormController>(builder: (controller) {
                   return SingleChildScrollView(
                     child: Padding(
                       padding: const EdgeInsets.all(14.0),
@@ -73,7 +76,7 @@ class DynamicForm extends StatelessWidget {
                                 ),
                                 ElevatedButton(
                                   onPressed: () {
-                                    if (_formKey.currentState?.validate() ??
+                                    if (_subformKey.currentState?.validate() ??
                                         false) {
                                       if (isEdit) {
                                         controller.updateData(pageName);
@@ -129,7 +132,7 @@ class DynamicForm extends StatelessWidget {
                                 ),
                                 ElevatedButton(
                                   onPressed: () {
-                                    if (_formKey.currentState?.validate() ??
+                                    if (_subformKey.currentState?.validate() ??
                                         false) {
                                       if (isEdit) {
                                         controller.updateData(pageName);
@@ -178,12 +181,33 @@ class DynamicForm extends StatelessWidget {
                                 // Submit button
                                 ElevatedButton(
                                   onPressed: () {
-                                    if (_formKey.currentState?.validate() ??
+                                    if (_subformKey.currentState?.validate() ??
                                         false) {
                                       if (isEdit) {
-                                        controller.updateData(pageName);
+                                        var result = Map<String, dynamic>.from(
+                                            controller
+                                                .formData); // Copy the data
+
+                                        // Now you can safely clear the formData
+                                        controller.formData.clear();
+
+                                        // Finally, pass the result back
+                                        Get.back(result: result);
                                       } else {
-                                        controller.submitForm(pageName);
+                                        // First, assign the formData to result before clearing it
+                                        var result = Map<String, dynamic>.from(
+                                            controller
+                                                .formData); // Copy the data
+
+                                        // Now you can safely clear the formData
+                                        controller.formData.clear();
+
+                                        // Finally, pass the result back
+                                        Get.back(result: result);
+
+                                        print(
+                                            "0000000000000000000000000000000000000000000000000000000000000000000000000000");
+                                        print(mainController.formData);
                                       }
                                     } else {
                                       // Show an error if form is invalid
@@ -361,174 +385,6 @@ class DynamicForm extends StatelessWidget {
               return Container();
             }
           },
-        );
-      case 'imagepicker':
-        return Column(
-          children: [
-            // Image Upload Button
-            ElevatedButton(
-              onPressed: controller.pickAndUploadImage,
-              child: const Text('Pick and Upload Image'),
-            ),
-
-            // Display uploaded image URL
-            Obx(() {
-              return controller.formData['imageUrl'] != null
-                  ? Column(
-                      children: [
-                        const SizedBox(height: 10),
-                        Image.network(controller.formData['imageUrl'] ?? '',
-                            height: 150),
-                        const SizedBox(height: 10),
-                        const Text('Image uploaded successfully!'),
-                      ],
-                    )
-                  : Container();
-            }),
-          ],
-        );
-
-      case 'secondaryForm':
-        return Column(
-          children: [
-            // Button to add attendees
-            TextButton(
-              onPressed: () async {
-                var result = await Get.bottomSheet(
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SubForm(pageName: field.headers),
-                  ),
-                  backgroundColor: Colors.white,
-                );
-                if (controller.formData[field.headers] == null) {
-                  controller.formData[field.headers] = [];
-                }
-                controller.formData[field.headers].add(result);
-                controller.subformData.value =
-                    (controller.formData[field.headers] as List)
-                        .map((item) => item as Map<String, dynamic>)
-                        .toList();
-                print(
-                    "---------------------------------------------------------------------------");
-                print(controller.subformData);
-              },
-              child: const Text("Add Attendee's Name"),
-            ),
-            // Displaying the attendees as chips
-            Obx(() => Wrap(
-                  spacing: 8.0, // space between chips
-                  runSpacing: 4.0, // space between rows of chips
-                  children: controller.subformData.map((attendee) {
-                    return InkWell(
-                      onTap: () async {
-                        var result = await Get.bottomSheet(
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      const Text(
-                                        "Details",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      const Spacer(),
-                                      IconButton(
-                                          onPressed: () async {
-                                            var result = await Get.bottomSheet(
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: SubForm(
-                                                  pageName: field.headers,
-                                                  initialData: attendee,
-                                                  isEdit: true,
-                                                ),
-                                              ),
-                                              backgroundColor: Colors.white,
-                                            );
-                                            if (result != null) {
-                                              // Find index of current attendee in the list
-                                              int index = controller.subformData
-                                                  .indexOf(attendee);
-
-                                              if (index != -1) {
-                                                // Replace the attendee with the updated result
-                                                controller.subformData[index] =
-                                                    result;
-                                                controller.formData[
-                                                        field.headers] =
-                                                    List.from(controller
-                                                        .subformData); // Update the main form data
-                                                print(
-                                                    "Updated attendee: $result");
-                                              }
-                                            }
-                                            Get.back();
-                                          },
-                                          icon: const Icon(Icons.edit))
-                                    ],
-                                  ),
-                                  const SizedBox(height: 16),
-
-                                  // Dynamically create Text widgets for each key-value pair
-                                  ...attendee.entries.map((entry) {
-                                    return Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 18.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            "${entry.key}: ", // Field key
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          Text(
-                                              entry.value?.toString() ?? "N/A"),
-                                        ],
-                                      ),
-                                    );
-                                  }).toList(),
-
-                                  const SizedBox(height: 16),
-                                ]),
-                          ),
-                          backgroundColor: Colors.white,
-                        );
-                        if (controller.formData[field.headers] == null) {
-                          controller.formData[field.headers] = [];
-                        }
-                        controller.formData[field.headers].add(result);
-                        controller.subformData.value =
-                            (controller.formData[field.headers] as List)
-                                .map((item) => item as Map<String, dynamic>)
-                                .toList();
-                        print(
-                            "---------------------------------------------------------------------------");
-                        print(controller.subformData);
-                      },
-                      child: Chip(
-                        label: Text(attendee[field.key] ?? ""),
-                        onDeleted: () {
-                          controller.subformData.remove(
-                              attendee); // Remove the chip from the list
-                          controller.formData[field.headers] =
-                              controller.subformData;
-                          print(
-                              "Removed attendee: $attendee"); // Optional: for debugging
-                        },
-                      ),
-                    );
-                  }).toList(),
-                )),
-          ],
         );
 
       case 'dropdown':
@@ -925,7 +781,7 @@ class DynamicForm extends StatelessWidget {
             Expanded(
               child: TextField(
                 controller: chipController,
-                decoration: kTextFieldDecoration("Add"),
+                decoration: kTextFieldDecoration("Add a chip"),
                 onSubmitted: (value) {
                   if (value.isNotEmpty) {
                     existingChips.add(value);
