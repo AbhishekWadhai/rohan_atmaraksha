@@ -247,6 +247,54 @@ class SubForm extends StatelessWidget {
 
   Widget buildFormField(PageField field) {
     switch (field.type) {
+      case 'imagepicker':
+        return Column(
+          children: [
+            // Image Upload Button
+            Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () async {
+                    // Call the function to pick and upload the image
+                    await controller.pickAndUploadImage(
+                        field.headers, field.endpoint ?? "", "");
+                  },
+                  child: const Text('Upload Image from Gallery'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    // Call the function to pick and upload the image
+                    await controller.pickAndUploadImage(
+                        field.headers, field.endpoint ?? "", "camera");
+                  },
+                  child: const Text('Click and Upload Image'),
+                ),
+              ],
+            ),
+
+            // Display uploaded image URL
+            Obx(() {
+              // Check if the field.endpoint exists in formData and is a non-null String
+              final imageUrl = controller.formData[field.headers];
+
+              // Ensure that imageUrl is a String and not null
+              if (imageUrl is String && imageUrl.isNotEmpty) {
+                return Column(
+                  children: [
+                    const SizedBox(height: 10),
+                    Image.network(imageUrl,
+                        height: 150), // Safely use the non-null imageUrl
+                    const SizedBox(height: 10),
+                    const Text('Image uploaded successfully!'),
+                  ],
+                );
+              } else {
+                // Return an empty Container or some placeholder when no image is uploaded
+                return Container();
+              }
+            })
+          ],
+        );
       case 'CustomTextField':
         final TextEditingController textController = TextEditingController(
           text: controller.formData[field.headers]?.toString() ?? '',

@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:io'; // Import for File
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart'; // Import for basename
 
 class ApiService {
   static const String baseUrl =
@@ -35,20 +37,14 @@ class ApiService {
         body: jsonEncode(data),
       );
       if (response.statusCode == 201) {
-        print(
-            "-----------------------------------${response.statusCode}----------------------------------------------------------");
-
+        print("API post successfully: ${response.statusCode}");
         return response.statusCode;
       } else if (response.statusCode == 200) {
-        print(
-            "-----------------------------------${response.statusCode}----------------------------------------------------------");
         print("API post successfully");
         print(jsonEncode(response.body));
         return jsonDecode(response.body);
       } else {
-        print(
-            "-----------------------------------${response.statusCode}----------------------------------------------------------");
-        
+        print("Failed to post data. Status code: ${response.statusCode}");
       }
     } catch (e) {
       print(e);
@@ -56,14 +52,12 @@ class ApiService {
     }
   }
 
-//update method
+  // Update method
   Future<void> updateData(
       String endpoint, String id, Map<String, dynamic> updatedData) async {
-    // Your API endpoint
     final url = Uri.parse('$baseUrl/$endpoint/$id');
 
     try {
-      // Make the PUT request
       final response = await http.put(
         url,
         headers: {"Content-Type": "application/json"},
@@ -71,15 +65,12 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        // Successful response, process if needed
         final responseData = jsonDecode(response.body);
         print('Data updated successfully: $responseData');
       } else {
-        // Handle errors, e.g., 400, 404, etc.
         print('Failed to update data. Status code: ${response.statusCode}');
       }
     } catch (e) {
-      // Handle any exceptions during the API call
       print('Error updating data: $e');
     }
   }
@@ -91,18 +82,47 @@ class ApiService {
     try {
       final response = await http.delete(url);
       if (response.statusCode == 200 || response.statusCode == 204) {
-        print(
-            "-----------------------------------${response.statusCode}----------------------------------------------------------");
         print("API delete successfully");
         return response.body.isNotEmpty ? jsonDecode(response.body) : null;
       } else {
-        print(
-            "-----------------------------------${response.statusCode}----------------------------------------------------------");
         throw Exception('Failed to delete data');
       }
     } catch (e) {
       print(e);
       throw Exception('Error: $e');
+    }
+  }
+
+  // New method for multipart file uploads
+  Future<void> uploadFile(
+      String endpoint, File file, Map<String, dynamic> data) async {
+    final url = Uri.parse('$baseUrl/$endpoint');
+
+    try {
+      var request = http.MultipartRequest('POST', url);
+
+      // Attach the file
+      request.files.add(await http.MultipartFile.fromPath(
+        'documentaryEvidencePhoto', // Field name expected by the API
+        file.path,
+        filename: basename(file.path), // Get the file name
+      ));
+
+      // Add other form fields
+      data.forEach((key, value) {
+        request.fields[key] = value.toString();
+      });
+
+      // Send the request
+      final response = await request.send();
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("File uploaded successfully.");
+      } else {
+        print('Failed to upload file. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error uploading file: $e');
     }
   }
 }

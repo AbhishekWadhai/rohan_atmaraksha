@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:rohan_atmaraksha/app_constants/app_strings.dart';
 import 'package:rohan_atmaraksha/controller/uauc_controller.dart';
 import 'package:rohan_atmaraksha/routes/routes_string.dart';
 import 'package:rohan_atmaraksha/widgets/my_drawer.dart';
@@ -48,8 +49,10 @@ class UaucPage extends StatelessWidget {
                 () => TabBarView(
                   children: [
                     _buildListView(_getFilteredUaucList()), // All
-                    _buildListView(_getFilteredUaucList(status: "Open")), // Pending
-                    _buildListView(_getFilteredUaucList(status: "Closed")), // Completed
+                    _buildListView(
+                        _getFilteredUaucList(status: "Open")), // Pending
+                    _buildListView(
+                        _getFilteredUaucList(status: "Closed")), // Completed
                   ],
                 ),
               ),
@@ -77,7 +80,9 @@ class UaucPage extends StatelessWidget {
     if (status == null) {
       return controller.uaucList; // All items
     } else {
-      return controller.uaucList.where((uauc) => uauc.status == status).toList();
+      return controller.uaucList
+          .where((uauc) => uauc.status == status)
+          .toList();
     }
   }
 
@@ -99,7 +104,8 @@ class UaucPage extends StatelessWidget {
                 builder: (BuildContext context) {
                   return AlertDialog(
                     title: const Text('Confirm Delete'),
-                    content: const Text('Are you sure you want to delete this item?'),
+                    content: const Text(
+                        'Are you sure you want to delete this item?'),
                     actions: [
                       TextButton(
                         child: const Text('Cancel'),
@@ -125,19 +131,22 @@ class UaucPage extends StatelessWidget {
             subtitle: Text(
               'Date: ${DateFormat('dd MM yyyy').format(DateTime.parse(specificUauc.date ?? ""))}',
             ),
-            trailing: IconButton(
-              onPressed: () async {
-                print(jsonEncode(specificUauc));
-                var result = await Get.toNamed(
-                  Routes.formPage,
-                  arguments: ['uauc', specificUauc.toJson(), true],
-                );
-                if (result == true) {
-                  controller.getPermitData();
-                }
-              },
-              icon: const Icon(Icons.edit),
-            ),
+            trailing: specificUauc.assignedTo?.id == Strings.userId
+                ? IconButton(
+                    onPressed: () async {
+                      print(jsonEncode(specificUauc));
+
+                      var result = await Get.toNamed(
+                        Routes.formPage,
+                        arguments: ['uauc', specificUauc.toJson(), true],
+                      );
+                      if (result == true) {
+                        controller.getPermitData();
+                      }
+                    },
+                    icon: const Icon(Icons.edit),
+                  )
+                : null,
             onTap: () {
               // Handle on tap if needed
             },

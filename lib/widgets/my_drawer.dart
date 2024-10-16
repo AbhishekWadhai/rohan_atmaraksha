@@ -57,7 +57,7 @@ class MyDrawer extends StatelessWidget {
                     Get.toNamed(Routes.safetyCheckPage);
                   },
                   title: Text(
-                    Strings.safetyCheck,
+                    Strings.safetyInduction,
                     style: TextStyles.drawerTextStyle,
                   ),
                 ),
@@ -112,6 +112,7 @@ class MyDrawer extends StatelessWidget {
             leading: const Icon(Icons.logout),
             onTap: () async {
               SharedPrefService().remove("token");
+              SharedPrefService().remove("decodedData");
               Get.offAllNamed(
                   Routes.loginPage); // Replace with your login route
             },

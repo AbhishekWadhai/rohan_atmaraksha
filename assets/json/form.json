@@ -20,6 +20,26 @@
   },
   {
     "_id": "66b34b204ecde7c5bfeab152",
+    "Page": "formFilled",
+    "PageFields": [
+      {
+        "Title": "Name",
+        "Headers": "name",
+        "Type": "CustomTextField",
+        "_id": "66b34b204ecde7c5bfeab153"
+      },
+      {
+        "Title": "Signature",
+        "Headers": "signature",
+        "Type": "imagepicker",
+        "_id": "66b34b204ecde7c5bfeab154",
+        "endpoint":"meeting/image"
+      }
+    ],
+    "__v": 0
+  },
+  {
+    "_id": "66b34b204ecde7c5bfeab152",
     "Page": "attendeesName",
     "PageFields": [
       {
@@ -37,8 +57,9 @@
       {
         "Title": "Signature",
         "Headers": "signature",
-        "Type": "CustomTextField",
-        "_id": "66b34b204ecde7c5bfeab154"
+        "Type": "imagepicker",
+        "_id": "66b34b204ecde7c5bfeab154",
+        "endpoint": "specific/image"
       },
       {
         "Title": "Designation",
@@ -137,8 +158,9 @@
       {
         "Title": "Undersign Draft",
         "Headers": "undersignDraft",
-        "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861ccb"
+        "Type": "imagepicker",
+        "_id": "66b230b6cc8539b4ed3861ccb",
+        "endpoint":"workpermit/image"
       },
       {
         "Title": "Created By",
@@ -167,14 +189,14 @@
       {
         "Title": "Verified Done",
         "Headers": "verifiedDone",
-        "Type": "radio",
+        "Type": "switch",
         "Options": ["true", "false"],
         "_id": "66b230b6cc8539b4ed3861ccf"
       },
       {
         "Title": "Approval Done",
         "Headers": "approvalDone",
-        "Type": "radio",
+        "Type": "switch",
         "Options": ["true", "false"],
         "_id": "66b230b6cc8539b4ed3861cd0"
       },
@@ -222,28 +244,10 @@
         "key": "topicTypes"
       },
       {
-        "Title": "Form Filled By Name",
-        "Headers": "formFilledByName",
-        "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861cc9",
-        "endpoint": "user",
-        "key": "name"
-      },
-      {
-        "Title": "Form Filled Sign By",
-        "Headers": "formFilledSignBy",
-        "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861cc9",
-        "endpoint": "user",
-        "key": "name"
-      },
-
-      {
-        "Title": "Number of Attendees",
-        "Headers": "attendeesNos",
-        "Type": "slider",
-        "_id": "66b230b6cc8539b4ed3861cc9",
-        "endpoint": "user",
+        "Title": "Form Filled By",
+        "Headers": "formFilled",
+        "Type": "secondaryForm",
+        "_id": "66b230b6cc8539b4ed3861cc4",
         "key": "name"
       },
 
@@ -251,7 +255,8 @@
         "Title": "Documentation of Evidence Photo",
         "Headers": "documentaryEvidencePhoto",
         "Type": "imagepicker",
-        "_id": "66b230b6cc8539b4ed3861ccb"
+        "_id": "66b230b6cc8539b4ed3861ccb",
+        "endpoint":"meeting/image"
       },
 
       {
@@ -340,8 +345,9 @@
       {
         "Title": "Documentation of Evidence Photo",
         "Headers": "documentaryEvidencePhoto",
-        "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861ccb"
+        "Type": "imagepicker",
+        "_id": "66b230b6cc8539b4ed3861ccb",
+        "endpoint": "induction/image"
       },
       {
         "Title": "Any Other",
@@ -397,7 +403,7 @@
         "Type": "timepicker",
         "_id": "66b230b6cc8539b4ed3861cc4"
       },
-      
+
       {
         "Title": "Training Topic",
         "Headers": "typeOfTopic",
@@ -406,7 +412,7 @@
         "key": "topicTypes",
         "_id": "66b230b6cc8539b4ed3861cc4"
       },
-     
+
       {
         "Title": "Attendees",
         "Headers": "attendees",
@@ -421,7 +427,7 @@
         "_id": "66b230b6cc8539b4ed3861cc4",
         "key": "name"
       },
-      
+
       {
         "Title": "Training Given By",
         "Headers": "instructionBy",
@@ -430,21 +436,14 @@
         "key": "name",
         "_id": "66b230b6cc8539b4ed3861cc4"
       },
-      {
-        "Title": "Number of Attendees",
-        "Headers": "attendeesNos",
-        "Type": "slider",
-        "_id": "66b230b6cc8539b4ed3861cc9",
-        "endpoint": "user",
-        "key": "name"
-      },
+      
       {
         "Title": "Documentation of Evidence Photo",
         "Headers": "documentaryEvidencePhoto",
-        "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861ccb"
+        "Type": "imagepicker",
+        "_id": "66b230b6cc8539b4ed3861ccb",
+        "endpoint":"specific/image"
       },
-     
 
       {
         "Title": "Comments Box",
@@ -510,8 +509,9 @@
       {
         "Title": "Photo",
         "Headers": "photo",
-        "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861cc7"
+        "Type": "imagepicker",
+        "_id": "66b230b6cc8539b4ed3861cc7",
+        "endpoint": "uauc/image"
       },
       {
         "Title": "Type of Hazard",

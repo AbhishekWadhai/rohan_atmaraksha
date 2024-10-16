@@ -4,11 +4,13 @@ import 'package:rohan_atmaraksha/app_constants/app_strings.dart';
 import 'package:rohan_atmaraksha/app_constants/asset_path.dart';
 import 'package:rohan_atmaraksha/app_constants/colors.dart';
 import 'package:rohan_atmaraksha/app_constants/textstyles.dart';
+import 'package:rohan_atmaraksha/controller/home_controller.dart';
 import 'package:rohan_atmaraksha/routes/routes_string.dart';
 import 'package:rohan_atmaraksha/widgets/my_drawer.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  final HomeController controller = Get.put(HomeController());
+  HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -148,7 +150,7 @@ class HomePage extends StatelessWidget {
                         }),
                     MyGridQuick(
                         image: Image.asset("assets/create_work_permit.png"),
-                        activity: Strings.safetyCheck,
+                        activity: Strings.safetyInduction,
                         onTap: () {
                           Get.toNamed(Routes.safetyCheckPage);
                         }),

@@ -1,106 +1,135 @@
 import 'dart:convert';
 
 class TbtMeeting {
-  String id;
-  ProjectName projectName;
-  String date;
-  String time;
-  String topicName;
-  dynamic typeOfTopic;
-  List<String> attendees;
-  String attendeesNos;
-  String documentaryEvidencePhoto;
-  List<String> formFilledSignBy;
-  String geotagging;
-  String commentsBox;
-  int v;
+    String id;
+    ProjectName? projectName;
+    String date;
+    String time;
+    TypeOfTopic? typeOfTopic;
+    List<FormFilled> formFilled;
+    String? documentaryEvidencePhoto;
+    String geotagging;
+    String commentsBox;
+    int v;
+    int attendeesNos;
+    double attendeesHours;
+    String tbtMeetingId;
 
-  TbtMeeting({
-    required this.id,
-    required this.projectName,
-    required this.date,
-    required this.time,
-    required this.topicName,
-    required this.typeOfTopic,
-    required this.attendees,
-    required this.attendeesNos,
-    required this.documentaryEvidencePhoto,
-    required this.formFilledSignBy,
-    required this.geotagging,
-    required this.commentsBox,
-    required this.v,
-  });
+    TbtMeeting({
+        required this.id,
+        required this.projectName,
+        required this.date,
+        required this.time,
+        required this.typeOfTopic,
+        required this.formFilled,
+        this.documentaryEvidencePhoto,
+        required this.geotagging,
+        required this.commentsBox,
+        required this.v,
+        required this.attendeesNos,
+        required this.attendeesHours,
+        required this.tbtMeetingId,
+    });
 
-  factory TbtMeeting.fromRawJson(String str) =>
-      TbtMeeting.fromJson(json.decode(str));
+    factory TbtMeeting.fromRawJson(String str) => TbtMeeting.fromJson(json.decode(str));
 
-  String toRawJson() => json.encode(toJson());
+    String toRawJson() => json.encode(toJson());
 
-  factory TbtMeeting.fromJson(Map<String, dynamic> json) => TbtMeeting(
+    factory TbtMeeting.fromJson(Map<String, dynamic> json) => TbtMeeting(
         id: json["_id"],
-        projectName: ProjectName.fromJson(json["projectName"]),
+        projectName: json["projectName"] == null ? null : ProjectName.fromJson(json["projectName"]),
         date: json["date"],
         time: json["time"],
-        topicName: json["topicName"],
-        typeOfTopic: json["typeOfTopic"],
-        attendees: List<String>.from(json["attendees"].map((x) => x)),
-        attendeesNos: json["attendeesNos"],
+        typeOfTopic: json["typeOfTopic"] == null ? null : TypeOfTopic.fromJson(json["typeOfTopic"]),
+        formFilled: List<FormFilled>.from(json["formFilled"].map((x) => FormFilled.fromJson(x))),
         documentaryEvidencePhoto: json["documentaryEvidencePhoto"],
-        formFilledSignBy:
-            List<String>.from(json["formFilledSignBy"].map((x) => x)),
         geotagging: json["geotagging"],
         commentsBox: json["commentsBox"],
         v: json["__v"],
-      );
+        attendeesNos: json["attendeesNos"],
+        attendeesHours: json["attendeesHours"]?.toDouble(),
+        tbtMeetingId: json["id"],
+    );
 
-  Map<String, dynamic> toJson() => {
+    Map<String, dynamic> toJson() => {
         "_id": id,
-        "projectName": projectName.toJson(),
+        "projectName": projectName?.toJson(),
         "date": date,
         "time": time,
-        "topicName": topicName,
-        "typeOfTopic": typeOfTopic,
-        "attendees": List<dynamic>.from(attendees.map((x) => x)),
-        "attendeesNos": attendeesNos,
+        "typeOfTopic": typeOfTopic?.toJson(),
+        "formFilled": List<dynamic>.from(formFilled.map((x) => x.toJson())),
         "documentaryEvidencePhoto": documentaryEvidencePhoto,
-        "formFilledSignBy": List<dynamic>.from(formFilledSignBy.map((x) => x)),
         "geotagging": geotagging,
         "commentsBox": commentsBox,
         "__v": v,
-      };
+        "attendeesNos": attendeesNos,
+        "attendeesHours": attendeesHours,
+        "id": tbtMeetingId,
+    };
+}
+
+class FormFilled {
+    String name;
+    String signature;
+    String id;
+    String formFilledId;
+
+    FormFilled({
+        required this.name,
+        required this.signature,
+        required this.id,
+        required this.formFilledId,
+    });
+
+    factory FormFilled.fromRawJson(String str) => FormFilled.fromJson(json.decode(str));
+
+    String toRawJson() => json.encode(toJson());
+
+    factory FormFilled.fromJson(Map<String, dynamic> json) => FormFilled(
+        name: json["name"],
+        signature: json["signature"],
+        id: json["_id"],
+        formFilledId: json["id"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "name": name,
+        "signature": signature,
+        "_id": id,
+        "id": formFilledId,
+    };
 }
 
 class ProjectName {
-  String id;
-  String projectId;
-  String projectName;
-  String siteLocation;
-  DateTime startDate;
-  DateTime endDate;
-  String status;
-  String description;
-  String company;
-  int v;
+    String id;
+    String projectId;
+    String projectName;
+    String siteLocation;
+    DateTime startDate;
+    DateTime endDate;
+    String status;
+    String description;
+    String company;
+    int v;
 
-  ProjectName({
-    required this.id,
-    required this.projectId,
-    required this.projectName,
-    required this.siteLocation,
-    required this.startDate,
-    required this.endDate,
-    required this.status,
-    required this.description,
-    required this.company,
-    required this.v,
-  });
+    ProjectName({
+        required this.id,
+        required this.projectId,
+        required this.projectName,
+        required this.siteLocation,
+        required this.startDate,
+        required this.endDate,
+        required this.status,
+        required this.description,
+        required this.company,
+        required this.v,
+    });
 
-  factory ProjectName.fromRawJson(String str) =>
-      ProjectName.fromJson(json.decode(str));
+    factory ProjectName.fromRawJson(String str) => ProjectName.fromJson(json.decode(str));
 
-  String toRawJson() => json.encode(toJson());
+    String toRawJson() => json.encode(toJson());
 
-  factory ProjectName.fromJson(Map<String, dynamic> json) => ProjectName(
+    factory ProjectName.fromJson(Map<String, dynamic> json) => ProjectName(
         id: json["_id"],
         projectId: json["projectId"],
         projectName: json["projectName"],
@@ -111,9 +140,9 @@ class ProjectName {
         description: json["description"],
         company: json["company"],
         v: json["__v"],
-      );
+    );
 
-  Map<String, dynamic> toJson() => {
+    Map<String, dynamic> toJson() => {
         "_id": id,
         "projectId": projectId,
         "projectName": projectName,
@@ -124,5 +153,33 @@ class ProjectName {
         "description": description,
         "company": company,
         "__v": v,
-      };
+    };
+}
+
+class TypeOfTopic {
+    String id;
+    String topicTypes;
+    int v;
+
+    TypeOfTopic({
+        required this.id,
+        required this.topicTypes,
+        required this.v,
+    });
+
+    factory TypeOfTopic.fromRawJson(String str) => TypeOfTopic.fromJson(json.decode(str));
+
+    String toRawJson() => json.encode(toJson());
+
+    factory TypeOfTopic.fromJson(Map<String, dynamic> json) => TypeOfTopic(
+        id: json["_id"],
+        topicTypes: json["topicTypes"],
+        v: json["__v"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "_id": id,
+        "topicTypes": topicTypes,
+        "__v": v,
+    };
 }

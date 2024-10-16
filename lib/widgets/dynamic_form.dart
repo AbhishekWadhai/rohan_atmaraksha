@@ -364,31 +364,69 @@ class DynamicForm extends StatelessWidget {
         );
       case 'imagepicker':
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(field.title,
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             // Image Upload Button
-            ElevatedButton(
-              onPressed: controller.pickAndUploadImage,
-              child: const Text('Pick and Upload Image'),
+            Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () async {
+                    // Call the function to pick and upload the image
+                    await controller.pickAndUploadImage(
+                        field.headers, field.endpoint ?? "", "");
+                  },
+                  child: const Text('Gallery'),
+                ),
+                const SizedBox(width: 30),
+                ElevatedButton(
+                  onPressed: () async {
+                    // Call the function to pick and upload the image
+                    await controller.pickAndUploadImage(
+                        field.headers, field.endpoint ?? "", "camera");
+                  },
+                  child: const Text('Camera'),
+                ),
+              ],
             ),
 
             // Display uploaded image URL
             Obx(() {
-              return controller.formData['imageUrl'] != null
-                  ? Column(
-                      children: [
-                        const SizedBox(height: 10),
-                        Image.network(controller.formData['imageUrl'] ?? '',
-                            height: 150),
-                        const SizedBox(height: 10),
-                        const Text('Image uploaded successfully!'),
-                      ],
-                    )
-                  : Container();
-            }),
+              // Check if the field.endpoint exists in formData and is a non-null String
+              final imageUrl = controller.formData[field.headers];
+
+              // Ensure that imageUrl is a String and not null
+              if (imageUrl is String && imageUrl.isNotEmpty) {
+                return Column(
+                  children: [
+                    const SizedBox(height: 10),
+                    Image.network(imageUrl,
+                        height: 150), // Safely use the non-null imageUrl
+                    const SizedBox(height: 10),
+                    const Text('Image uploaded successfully!'),
+                  ],
+                );
+              } else {
+                // Return an empty Container or some placeholder when no image is uploaded
+                return Container();
+              }
+            })
           ],
         );
 
       case 'secondaryForm':
+        // Initialize subformData if it's not initialized
+        if (controller.formData[field.headers] != null &&
+            controller.formData[field.headers].isNotEmpty &&
+            controller.subformData.isEmpty) {
+          controller.subformData.value =
+              (controller.formData[field.headers] as List)
+                  .map((item) => item as Map<String, dynamic>)
+                  .toList();
+        }
+
         return Column(
           children: [
             // Button to add attendees
@@ -732,6 +770,34 @@ class DynamicForm extends StatelessWidget {
             ],
           );
         });
+      case 'switch':
+        if (isEdit) {
+          return Obx(() {
+            final bool isSwitched = controller.formData[field.headers] == true;
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  field.title,
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                SwitchListTile(
+                  title: Text(field.title),
+                  value: isSwitched,
+                  onChanged: (bool newValue) {
+                    controller.updateSwitchSelection(field.headers, newValue);
+                  },
+                ),
+                const SizedBox(height: 10),
+              ],
+            );
+          });
+        } else {
+          return const SizedBox.shrink();
+        }
       case 'geolocation':
         return Obx(() {
           String? currentLocation = controller.formData[field.headers];

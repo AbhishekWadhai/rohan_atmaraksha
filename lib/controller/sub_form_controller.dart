@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-
+import 'package:image_picker/image_picker.dart';
+import 'package:rohan_atmaraksha/services/image_service.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:rohan_atmaraksha/model/form_data_model.dart';
@@ -10,6 +13,7 @@ import 'package:rohan_atmaraksha/services/api_services.dart';
 import 'package:rohan_atmaraksha/services/location_service.dart';
 
 class SubFormController extends GetxController {
+  final ImageService imageUploadService = ImageService();
   var formResponse = <ResponseForm>[].obs;
   var isLoading = true.obs;
   RxList<PageField> pageFields = <PageField>[].obs;
@@ -63,6 +67,34 @@ class SubFormController extends GetxController {
     print(
         "------------------------------------00000000000000 Current Page Data 0000000000000--------------------------------");
     print(jsonEncode(formData));
+  }
+
+  Future<dynamic> pickAndUploadImage(
+      String key, String endpoint, String source) async {
+    // Pick an image
+    File? imageFile;
+    // Pick an image
+    if (source == "camera") {
+      imageFile = await imageUploadService.pickImage(ImageSource.camera);
+    } else {
+      imageFile = await imageUploadService.pickImage(ImageSource.gallery);
+    }
+
+    if (imageFile != null) {
+      // Upload the image and get the URL
+      String? imageUrl =
+          await imageUploadService.uploadImage(imageFile, endpoint);
+
+      if (imageUrl != null) {
+        // Save the image URL in the formData
+        updateFormData(key, imageUrl);
+        print('Image uploaded successfully: $imageUrl');
+      } else {
+        print('Image upload failed.');
+      }
+    } else {
+      print('No image selected.');
+    }
   }
 
   Future<void> getPageFields(String pageName) async {

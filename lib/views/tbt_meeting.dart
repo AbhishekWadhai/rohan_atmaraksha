@@ -77,7 +77,7 @@ class TBTMeetingPage extends StatelessWidget {
                                     );
                                   });
                             },
-                            title: Text(' Topic: ${meeting.topicName}'),
+                            title: Text(' Topic: ${meeting.projectName?.projectName}'),
                             subtitle: Text(
                               'Date: ${DateFormat('dd MM yyyy').format(DateTime.parse(meeting.date ?? ""))}',
                             ),

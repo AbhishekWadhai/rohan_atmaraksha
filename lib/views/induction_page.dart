@@ -16,7 +16,7 @@ class InductionPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.black,
-        title: Text(Strings.safetyTraining),
+        title: Text(Strings.safetyInduction),
         backgroundColor: Colors.white,
         actions: [
           IconButton(
@@ -34,7 +34,6 @@ class InductionPage extends StatelessWidget {
           Obx(
             () => Column(
               children: [
-               
                 Expanded(
                   child: ListView.builder(
                     itemCount: controller.inductionList.length,
@@ -65,7 +64,8 @@ class InductionPage extends StatelessWidget {
                                       TextButton(
                                         child: const Text('Delete'),
                                         onPressed: () async {
-                                          controller.deleteSelection(induction.id);
+                                          controller
+                                              .deleteSelection(induction.id);
                                           Navigator.of(context)
                                               .pop(); // Delete the item
                                         },
@@ -74,7 +74,8 @@ class InductionPage extends StatelessWidget {
                                   );
                                 });
                           },
-                          title: Text(' Topic: ${induction.projectName.projectName}'),
+                          title: Text(
+                              ' Topic: ${induction.projectName?.projectName}'),
                           subtitle: Text(
                             'Date: ${DateFormat('dd MM yyyy').format(DateTime.parse(induction.date ?? ""))}',
                           ),

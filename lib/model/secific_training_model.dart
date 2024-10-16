@@ -1,180 +1,223 @@
 import 'dart:convert';
 
 class SpecificTraining {
-  String id;
-  ProjectName projectName;
-  String date;
-  String time;
-  String topicName;
-  dynamic typeOfTopic;
-  List<String> attendees;
-  String inducteesName;
-  List<TradeType> tradeTypes;
-  InstructionBy instructionBy;
-  String documentaryEvidencePhoto;
-  String traineeSignBy;
-  List<String> trainingSignBy;
-  String geotagging;
-  String commentsBox;
-  int v;
+    String id;
+    ProjectName projectName;
+    String date;
+    String time;
+    TypeOfTopic typeOfTopic;
+    List<String> attendees;
+    List<AttendeesName?> attendeesName;
+    InstructionBy? instructionBy;
+    String? documentaryEvidencePhoto;
+    String geotagging;
+    String commentsBox;
+    int v;
+    int attendance;
+    double attendanceHours;
+    String specificTrainingId;
 
-  SpecificTraining({
-    required this.id,
-    required this.projectName,
-    required this.date,
-    required this.time,
-    required this.topicName,
-    required this.typeOfTopic,
-    required this.attendees,
-    required this.inducteesName,
-    required this.tradeTypes,
-    required this.instructionBy,
-    required this.documentaryEvidencePhoto,
-    required this.traineeSignBy,
-    required this.trainingSignBy,
-    required this.geotagging,
-    required this.commentsBox,
-    required this.v,
-  });
+    SpecificTraining({
+        required this.id,
+        required this.projectName,
+        required this.date,
+        required this.time,
+        required this.typeOfTopic,
+        required this.attendees,
+        required this.attendeesName,
+        required this.instructionBy,
+        this.documentaryEvidencePhoto,
+        required this.geotagging,
+        required this.commentsBox,
+        required this.v,
+        required this.attendance,
+        required this.attendanceHours,
+        required this.specificTrainingId,
+    });
 
-  factory SpecificTraining.fromRawJson(String str) =>
-      SpecificTraining.fromJson(json.decode(str));
+    factory SpecificTraining.fromRawJson(String str) => SpecificTraining.fromJson(json.decode(str));
 
-  String toRawJson() => json.encode(toJson());
+    String toRawJson() => json.encode(toJson());
 
-  factory SpecificTraining.fromJson(Map<String, dynamic> json) =>
-      SpecificTraining(
+    factory SpecificTraining.fromJson(Map<String, dynamic> json) => SpecificTraining(
         id: json["_id"],
         projectName: ProjectName.fromJson(json["projectName"]),
         date: json["date"],
         time: json["time"],
-        topicName: json["topicName"],
-        typeOfTopic: json["typeOfTopic"],
+        typeOfTopic: TypeOfTopic.fromJson(json["typeOfTopic"]),
         attendees: List<String>.from(json["attendees"].map((x) => x)),
-        inducteesName: json["inducteesName"],
-        tradeTypes: List<TradeType>.from(
-            json["tradeTypes"].map((x) => TradeType.fromJson(x))),
-        instructionBy: InstructionBy.fromJson(json["instructionBy"]),
+        attendeesName: List<AttendeesName?>.from(json["attendeesName"].map((x) => x == null ? null : AttendeesName.fromJson(x))),
+        instructionBy: json["instructionBy"] == null ? null : InstructionBy.fromJson(json["instructionBy"]),
         documentaryEvidencePhoto: json["documentaryEvidencePhoto"],
-        traineeSignBy: json["traineeSignBy"],
-        trainingSignBy: List<String>.from(json["trainingSignBy"].map((x) => x)),
         geotagging: json["geotagging"],
         commentsBox: json["commentsBox"],
         v: json["__v"],
-      );
+        attendance: json["attendance"],
+        attendanceHours: json["attendanceHours"]?.toDouble(),
+        specificTrainingId: json["id"],
+    );
 
-  Map<String, dynamic> toJson() => {
+    Map<String, dynamic> toJson() => {
         "_id": id,
         "projectName": projectName.toJson(),
         "date": date,
         "time": time,
-        "topicName": topicName,
-        "typeOfTopic": typeOfTopic,
+        "typeOfTopic": typeOfTopic.toJson(),
         "attendees": List<dynamic>.from(attendees.map((x) => x)),
-        "inducteesName": inducteesName,
-        "tradeTypes": List<dynamic>.from(tradeTypes.map((x) => x.toJson())),
-        "instructionBy": instructionBy.toJson(),
+        "attendeesName": List<dynamic>.from(attendeesName.map((x) => x?.toJson())),
+        "instructionBy": instructionBy?.toJson(),
         "documentaryEvidencePhoto": documentaryEvidencePhoto,
-        "traineeSignBy": traineeSignBy,
-        "trainingSignBy": List<dynamic>.from(trainingSignBy.map((x) => x)),
         "geotagging": geotagging,
         "commentsBox": commentsBox,
         "__v": v,
-      };
+        "attendance": attendance,
+        "attendanceHours": attendanceHours,
+        "id": specificTrainingId,
+    };
+}
+
+class AttendeesName {
+    String name;
+    String subcontractorName;
+    String signature;
+    String designation;
+    String id;
+    String attendeesNameId;
+
+    AttendeesName({
+        required this.name,
+        required this.subcontractorName,
+        required this.signature,
+        required this.designation,
+        required this.id,
+        required this.attendeesNameId,
+    });
+
+    factory AttendeesName.fromRawJson(String str) => AttendeesName.fromJson(json.decode(str));
+
+    String toRawJson() => json.encode(toJson());
+
+    factory AttendeesName.fromJson(Map<String, dynamic> json) => AttendeesName(
+        name: json["name"],
+        subcontractorName: json["subcontractorName"],
+        signature: json["signature"],
+        designation: json["designation"],
+        id: json["_id"],
+        attendeesNameId: json["id"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "name": name,
+        "subcontractorName": subcontractorName,
+        "signature": signature,
+        "designation": designation,
+        "_id": id,
+        "id": attendeesNameId,
+    };
 }
 
 class InstructionBy {
-  String id;
-  String userId;
-  String name;
-  String photo;
-  String emailId;
-  String password;
-  String phone;
-  DateTime createdAt;
-  DateTime updatedAt;
-  bool isActive;
-  int v;
+    String id;
+    String userId;
+    String name;
+    String photo;
+    String role;
+    String emailId;
+    String password;
+    String phone;
+    String address;
+    bool isActive;
+    List<String> projectName;
+    DateTime createdAt;
+    DateTime updatedAt;
+    int v;
 
-  InstructionBy({
-    required this.id,
-    required this.userId,
-    required this.name,
-    required this.photo,
-    required this.emailId,
-    required this.password,
-    required this.phone,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.isActive,
-    required this.v,
-  });
+    InstructionBy({
+        required this.id,
+        required this.userId,
+        required this.name,
+        required this.photo,
+        required this.role,
+        required this.emailId,
+        required this.password,
+        required this.phone,
+        required this.address,
+        required this.isActive,
+        required this.projectName,
+        required this.createdAt,
+        required this.updatedAt,
+        required this.v,
+    });
 
-  factory InstructionBy.fromRawJson(String str) =>
-      InstructionBy.fromJson(json.decode(str));
+    factory InstructionBy.fromRawJson(String str) => InstructionBy.fromJson(json.decode(str));
 
-  String toRawJson() => json.encode(toJson());
+    String toRawJson() => json.encode(toJson());
 
-  factory InstructionBy.fromJson(Map<String, dynamic> json) => InstructionBy(
+    factory InstructionBy.fromJson(Map<String, dynamic> json) => InstructionBy(
         id: json["_id"],
         userId: json["userId"],
         name: json["name"],
         photo: json["photo"],
+        role: json["role"],
         emailId: json["emailId"],
         password: json["password"],
         phone: json["phone"],
+        address: json["address"],
+        isActive: json["isActive"],
+        projectName: List<String>.from(json["projectName"].map((x) => x)),
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
-        isActive: json["isActive"],
         v: json["__v"],
-      );
+    );
 
-  Map<String, dynamic> toJson() => {
+    Map<String, dynamic> toJson() => {
         "_id": id,
         "userId": userId,
         "name": name,
         "photo": photo,
+        "role": role,
         "emailId": emailId,
         "password": password,
         "phone": phone,
+        "address": address,
+        "isActive": isActive,
+        "projectName": List<dynamic>.from(projectName.map((x) => x)),
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
-        "isActive": isActive,
         "__v": v,
-      };
+    };
 }
 
 class ProjectName {
-  String id;
-  String projectId;
-  String projectName;
-  String siteLocation;
-  DateTime startDate;
-  DateTime endDate;
-  String status;
-  String description;
-  String company;
-  int v;
+    String id;
+    String projectId;
+    String projectName;
+    String siteLocation;
+    DateTime startDate;
+    DateTime endDate;
+    String status;
+    String description;
+    String company;
+    int v;
 
-  ProjectName({
-    required this.id,
-    required this.projectId,
-    required this.projectName,
-    required this.siteLocation,
-    required this.startDate,
-    required this.endDate,
-    required this.status,
-    required this.description,
-    required this.company,
-    required this.v,
-  });
+    ProjectName({
+        required this.id,
+        required this.projectId,
+        required this.projectName,
+        required this.siteLocation,
+        required this.startDate,
+        required this.endDate,
+        required this.status,
+        required this.description,
+        required this.company,
+        required this.v,
+    });
 
-  factory ProjectName.fromRawJson(String str) =>
-      ProjectName.fromJson(json.decode(str));
+    factory ProjectName.fromRawJson(String str) => ProjectName.fromJson(json.decode(str));
 
-  String toRawJson() => json.encode(toJson());
+    String toRawJson() => json.encode(toJson());
 
-  factory ProjectName.fromJson(Map<String, dynamic> json) => ProjectName(
+    factory ProjectName.fromJson(Map<String, dynamic> json) => ProjectName(
         id: json["_id"],
         projectId: json["projectId"],
         projectName: json["projectName"],
@@ -185,9 +228,9 @@ class ProjectName {
         description: json["description"],
         company: json["company"],
         v: json["__v"],
-      );
+    );
 
-  Map<String, dynamic> toJson() => {
+    Map<String, dynamic> toJson() => {
         "_id": id,
         "projectId": projectId,
         "projectName": projectName,
@@ -198,34 +241,33 @@ class ProjectName {
         "description": description,
         "company": company,
         "__v": v,
-      };
+    };
 }
 
-class TradeType {
-  String id;
-  String tradeTypes;
-  int v;
+class TypeOfTopic {
+    String id;
+    String topicTypes;
+    int v;
 
-  TradeType({
-    required this.id,
-    required this.tradeTypes,
-    required this.v,
-  });
+    TypeOfTopic({
+        required this.id,
+        required this.topicTypes,
+        required this.v,
+    });
 
-  factory TradeType.fromRawJson(String str) =>
-      TradeType.fromJson(json.decode(str));
+    factory TypeOfTopic.fromRawJson(String str) => TypeOfTopic.fromJson(json.decode(str));
 
-  String toRawJson() => json.encode(toJson());
+    String toRawJson() => json.encode(toJson());
 
-  factory TradeType.fromJson(Map<String, dynamic> json) => TradeType(
+    factory TypeOfTopic.fromJson(Map<String, dynamic> json) => TypeOfTopic(
         id: json["_id"],
-        tradeTypes: json["tradeTypes"],
+        topicTypes: json["topicTypes"],
         v: json["__v"],
-      );
+    );
 
-  Map<String, dynamic> toJson() => {
+    Map<String, dynamic> toJson() => {
         "_id": id,
-        "tradeTypes": tradeTypes,
+        "topicTypes": topicTypes,
         "__v": v,
-      };
+    };
 }

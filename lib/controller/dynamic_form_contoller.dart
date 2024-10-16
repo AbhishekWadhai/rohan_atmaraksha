@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:rohan_atmaraksha/model/form_data_model.dart';
 import 'package:rohan_atmaraksha/services/api_services.dart';
 import 'package:rohan_atmaraksha/services/image_service.dart';
@@ -60,17 +61,28 @@ class DynamicFormController extends GetxController {
     print("Initialized form data: ${jsonEncode(formData)}");
   }
 
-  Future<void> pickAndUploadImage() async {
-    // Pick an image
-    File? imageFile = await imageUploadService.pickImage();
+  void updateSwitchSelection(String header, bool newValue) {
+    formData[header] = newValue;
+    update(); // Update the UI if using GetX
+  }
 
+  Future<dynamic> pickAndUploadImage(
+      String key, String endpoint, String source) async {
+    File? imageFile;
+    // Pick an image
+    if (source == "camera") {
+      imageFile = await imageUploadService.pickImage(ImageSource.camera);
+    } else {
+      imageFile = await imageUploadService.pickImage(ImageSource.gallery);
+    }
     if (imageFile != null) {
       // Upload the image and get the URL
-      String? imageUrl = await imageUploadService.uploadImage(imageFile);
+      String? imageUrl =
+          await imageUploadService.uploadImage(imageFile, endpoint);
 
       if (imageUrl != null) {
         // Save the image URL in the formData
-        formData['imageUrl'] = imageUrl;
+        updateFormData(key, imageUrl);
         print('Image uploaded successfully: $imageUrl');
       } else {
         print('Image upload failed.');

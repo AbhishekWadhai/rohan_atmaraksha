@@ -15,7 +15,7 @@ import 'package:rohan_atmaraksha/views/form_page.dart';
 class AppRoutes {
   static final routes = [
     GetPage(name: Routes.loginPage, page: () => LoginPage()),
-    GetPage(name: Routes.homePage, page: () => const HomePage()),
+    GetPage(name: Routes.homePage, page: () => HomePage()),
     GetPage(name: Routes.workPermitPage, page: () => WorkPermitPage()),
     GetPage(name: Routes.tbtMeetingPage, page: () => TBTMeetingPage()),
     GetPage(name: Routes.safetyCheckPage, page: () => const SafetyCheckPage()),
