@@ -40,6 +40,7 @@ class PageField {
     String? endpoint;
     String? key;
     List<String>? options;
+    Permissions? permissions;
 
     PageField({
         required this.title,
@@ -49,6 +50,7 @@ class PageField {
         this.endpoint,
         this.key,
         this.options,
+        this.permissions,
     });
 
     factory PageField.fromRawJson(String str) => PageField.fromJson(json.decode(str));
@@ -63,6 +65,7 @@ class PageField {
         endpoint: json["endpoint"],
         key: json["key"],
         options: json["Options"] == null ? [] : List<String>.from(json["Options"]!.map((x) => x)),
+        permissions: json["permissions"] == null ? null : Permissions.fromJson(json["permissions"]),
     );
 
     Map<String, dynamic> toJson() => {
@@ -73,5 +76,30 @@ class PageField {
         "endpoint": endpoint,
         "key": key,
         "Options": options == null ? [] : List<dynamic>.from(options!.map((x) => x)),
+        "permissions": permissions?.toJson(),
+    };
+}
+
+class Permissions {
+    List<String> view;
+    List<String> edit;
+
+    Permissions({
+        required this.view,
+        required this.edit,
+    });
+
+    factory Permissions.fromRawJson(String str) => Permissions.fromJson(json.decode(str));
+
+    String toRawJson() => json.encode(toJson());
+
+    factory Permissions.fromJson(Map<String, dynamic> json) => Permissions(
+        view: List<String>.from(json["view"].map((x) => x)),
+        edit: List<String>.from(json["edit"].map((x) => x)),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "view": List<dynamic>.from(view.map((x) => x)),
+        "edit": List<dynamic>.from(edit.map((x) => x)),
     };
 }

@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:rohan_atmaraksha/app_constants/app_strings.dart';
 import 'package:rohan_atmaraksha/model/form_data_model.dart';
 import 'package:rohan_atmaraksha/services/api_services.dart';
 import 'package:rohan_atmaraksha/services/image_service.dart';
@@ -38,26 +39,72 @@ class DynamicFormController extends GetxController {
     loadFormData();
   }
 
+  // Function to check if the user has permission to view a field
+  bool hasViewPermission(List<String> requiredPermissions) {
+    return requiredPermissions.isEmpty ||
+        requiredPermissions.any((perm) => Strings.permisssions.contains(perm));
+  }
+
+  // Function to check if the user has permission to edit a field
+  bool hasEditPermission(List<String> requiredPermissions) {
+    return requiredPermissions.isEmpty ||
+        requiredPermissions.any((perm) => Strings.permisssions.contains(perm));
+  }
+
+  Future<void> initializeAndFetchData(
+      Map<String, dynamic>? initialData, String pageName) async {
+    await getPageFields(pageName);
+    await initializeFormData(initialData); // Initialize form data first
+
+    // Then call getPageFields after initialization
+  }
+
   // Form Data Initialization
-  void initializeFormData(Map<String, dynamic>? initialData) {
+  initializeFormData(Map<String, dynamic>? initialData) {
+    print("Initializing form data...");
+    print(initialData);
+
     if (initialData != null) {
       initialData.forEach((key, value) {
-        if (value is List) {
-          formData[key] = value.map((e) {
-            if (e is Map && e.containsKey("_id")) {
-              return e["_id"].toString();
-            } else if (e is String) {
-              return e;
-            }
-            return e.toString();
-          }).toList();
-        } else if (value is Map && value.containsKey("_id")) {
-          formData[key] = value["_id"].toString();
+        // Find the matching field in pageFields based on the header (key)
+        PageField? pageField = pageFields.firstWhere(
+          (field) => field.headers == key,
+          orElse: () => PageField(
+              headers: '',
+              type: '',
+              title: "",
+              id: ""), // Safely return null if no matching field is found
+        );
+
+        print("Processing key: $key with value: $value");
+
+        if (pageField != null) {
+          String fieldType = pageField.type;
+
+          if (value is List) {
+            formData[key] = value.map((e) {
+              if (e is Map && e.containsKey("_id")) {
+                // Store only _id for multiselect
+                return fieldType == "multiselect" ? e["_id"].toString() : e;
+              } else if (e is String) {
+                return e;
+              }
+              return e.toString();
+            }).toList();
+          } else if (value is Map && value.containsKey("_id")) {
+            // Store entire map for subform fields, otherwise store only _id
+            formData[key] = value["_id"].toString();
+          } else {
+            formData[key] = value;
+          }
         } else {
+          // If no matching pageField is found, store the value as it is
+          print("No matching pageField found for key: $key");
           formData[key] = value;
         }
       });
     }
+
     print("Initialized form data: ${jsonEncode(formData)}");
   }
 

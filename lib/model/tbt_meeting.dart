@@ -2,12 +2,12 @@ import 'dart:convert';
 
 class TbtMeeting {
     String id;
-    ProjectName? projectName;
+    ProjectName projectName;
     String date;
     String time;
-    TypeOfTopic? typeOfTopic;
+    TypeOfTopic typeOfTopic;
+    String documentaryEvidencePhoto;
     List<FormFilled> formFilled;
-    String? documentaryEvidencePhoto;
     String geotagging;
     String commentsBox;
     int v;
@@ -21,8 +21,8 @@ class TbtMeeting {
         required this.date,
         required this.time,
         required this.typeOfTopic,
+        required this.documentaryEvidencePhoto,
         required this.formFilled,
-        this.documentaryEvidencePhoto,
         required this.geotagging,
         required this.commentsBox,
         required this.v,
@@ -37,12 +37,12 @@ class TbtMeeting {
 
     factory TbtMeeting.fromJson(Map<String, dynamic> json) => TbtMeeting(
         id: json["_id"],
-        projectName: json["projectName"] == null ? null : ProjectName.fromJson(json["projectName"]),
+        projectName: ProjectName.fromJson(json["projectName"]),
         date: json["date"],
         time: json["time"],
-        typeOfTopic: json["typeOfTopic"] == null ? null : TypeOfTopic.fromJson(json["typeOfTopic"]),
-        formFilled: List<FormFilled>.from(json["formFilled"].map((x) => FormFilled.fromJson(x))),
+        typeOfTopic: TypeOfTopic.fromJson(json["typeOfTopic"]),
         documentaryEvidencePhoto: json["documentaryEvidencePhoto"],
+        formFilled: List<FormFilled>.from(json["formFilled"].map((x) => FormFilled.fromJson(x))),
         geotagging: json["geotagging"],
         commentsBox: json["commentsBox"],
         v: json["__v"],
@@ -53,12 +53,12 @@ class TbtMeeting {
 
     Map<String, dynamic> toJson() => {
         "_id": id,
-        "projectName": projectName?.toJson(),
+        "projectName": projectName.toJson(),
         "date": date,
         "time": time,
-        "typeOfTopic": typeOfTopic?.toJson(),
-        "formFilled": List<dynamic>.from(formFilled.map((x) => x.toJson())),
+        "typeOfTopic": typeOfTopic.toJson(),
         "documentaryEvidencePhoto": documentaryEvidencePhoto,
+        "formFilled": List<dynamic>.from(formFilled.map((x) => x.toJson())),
         "geotagging": geotagging,
         "commentsBox": commentsBox,
         "__v": v,

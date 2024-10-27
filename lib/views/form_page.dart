@@ -10,6 +10,8 @@ class FormPage extends StatelessWidget {
     final dynamic pageTitle = Get.arguments[0];
     final dynamic initialData = Get.arguments[1];
     final bool isEditable = Get.arguments[2] ?? false;
+   
+
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.black,

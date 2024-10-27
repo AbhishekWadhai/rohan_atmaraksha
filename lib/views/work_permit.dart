@@ -41,22 +41,31 @@ class WorkPermitPage extends StatelessWidget {
         ),
         drawer: const MyDrawer(),
         body: Obx(
-          ()=> TabBarView(
+          () => TabBarView(
             children: [
-              _buildWorkPermitList(workPermitController.workPermitList), // All permits
-              _buildWorkPermitList(workPermitController.workPermitList.where((permit) => !permit.verifiedDone).toList()), // Pending permits
-              _buildWorkPermitList(workPermitController.workPermitList.where((permit) => permit.verifiedDone).toList()), // Completed permits
+              _buildWorkPermitList(
+                  workPermitController.workPermitList), // All permits
+              _buildWorkPermitList(workPermitController.workPermitList
+                  .where((permit) => !permit.verifiedDone)
+                  .toList()), // Pending permits
+              _buildWorkPermitList(workPermitController.workPermitList
+                  .where((permit) => permit.verifiedDone)
+                  .toList()), // Completed permits
             ],
           ),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
-            var result = await Get.toNamed(
-              Routes.formPage,
-              arguments: ['workpermit', <String, dynamic>{}, false],
-            );
-            if (result == true) {
-              workPermitController.getPermitData();
+            if (Strings.permisssions.contains("Workpermit Creation")) {
+              var result = await Get.toNamed(
+                Routes.formPage,
+                arguments: ['workpermit', <String, dynamic>{}, false],
+              );
+              if (result == true) {
+                workPermitController.getPermitData();
+              }
+            } else {
+              Get.snackbar("Not Authorized to create Workpermit", "");
             }
           },
           child: const Icon(Icons.add),
@@ -73,14 +82,16 @@ class WorkPermitPage extends StatelessWidget {
         return Card(
           margin: const EdgeInsets.all(8.0),
           child: ListTile(
-            tileColor: permit.verifiedDone ? Colors.green[100] : Colors.red[100],
+            tileColor:
+                permit.verifiedDone ? Colors.green[100] : Colors.red[100],
             onLongPress: () {
               showDialog(
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
                       title: const Text('Confirm Delete'),
-                      content: const Text('Are you sure you want to delete this item?'),
+                      content: const Text(
+                          'Are you sure you want to delete this item?'),
                       actions: [
                         TextButton(
                           child: const Text('Cancel'),
@@ -106,7 +117,8 @@ class WorkPermitPage extends StatelessWidget {
             trailing: IconButton(
                 onPressed: () async {
                   print(jsonEncode(permit));
-                  var result = await Get.toNamed(Routes.formPage, arguments: ['workpermit', permit.toJson(), true]);
+                  var result = await Get.toNamed(Routes.formPage,
+                      arguments: ['workpermit', permit.toJson(), true]);
                   if (result == true) {
                     workPermitController.getPermitData();
                   }
@@ -123,27 +135,36 @@ class WorkPermitPage extends StatelessWidget {
                           children: [
                             Text('Work Description: ${permit.workDescription}'),
                             const SizedBox(height: 10),
-                            Text('Date: ${permit.date.toString().split(' ')[0]}'),
+                            Text(
+                                'Date: ${permit.date.toString().split(' ')[0]}'),
                             const SizedBox(height: 10),
                             Text('Time: ${permit.time}'),
                             const SizedBox(height: 10),
-                            Text('Project Name: ${permit.projectName?.projectName ?? ""}'),
+                            Text(
+                                'Project Name: ${permit.projectName?.projectName ?? ""}'),
                             const SizedBox(height: 10),
                             Text('Area: ${permit.area?.siteLocation ?? ""}'),
                             const SizedBox(height: 10),
-                            Text('Permit Type: ${permit.permitTypes?.permitsType ?? ""}'),
+                            Text(
+                                'Permit Type: ${permit.permitTypes?.permitsType ?? ""}'),
                             const SizedBox(height: 10),
-                            Text('Tools & Equipment: ${permit.toolsAndEquipment.map((tool) => tool.tools).join(", ")}'),
+                            Text(
+                                'Tools & Equipment: ${permit.toolsAndEquipment.map((tool) => tool.tools).join(", ")}'),
                             const SizedBox(height: 10),
-                            Text('Type of Hazard: ${permit.typeOfHazard.map((e) => e.hazards).join(", ")}'),
+                            Text(
+                                'Type of Hazard: ${permit.typeOfHazard.map((e) => e.hazards).join(", ")}'),
                             const SizedBox(height: 10),
-                            Text('Applicable PPEs: ${permit.applicablePpEs.map((e) => e.ppes).join(", ")}'),
+                            Text(
+                                'Applicable PPEs: ${permit.applicablePpEs.map((e) => e.ppes).join(", ")}'),
                             const SizedBox(height: 10),
-                            Text('Safety Measures Taken: ${permit.safetyMeasuresTaken}'),
+                            Text(
+                                'Safety Measures Taken: ${permit.safetyMeasuresTaken}'),
                             const SizedBox(height: 10),
-                            Text('Verified Done: ${permit.verifiedDone ? "Yes" : "No"}'),
+                            Text(
+                                'Verified Done: ${permit.verifiedDone ? "Yes" : "No"}'),
                             const SizedBox(height: 10),
-                            Text('Approval Done: ${permit.approvalDone ? "Yes" : "No"}'),
+                            Text(
+                                'Approval Done: ${permit.approvalDone ? "Yes" : "No"}'),
                             const SizedBox(height: 10),
                             Image.network(
                               permit.undersignDraft,

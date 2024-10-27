@@ -33,7 +33,7 @@
         "Headers": "signature",
         "Type": "imagepicker",
         "_id": "66b34b204ecde7c5bfeab154",
-        "endpoint":"meeting/image"
+        "endpoint": "meeting/image"
       }
     ],
     "__v": 0
@@ -80,7 +80,11 @@
         "Type": "dropdown",
         "_id": "66b230b6cc8539b4ed3861cc1",
         "endpoint": "projects",
-        "key": "projectName"
+        "key": "projectName",
+        "permissions": {
+          "view": ["Workpermit Creation", "UAUC Prevention Action"],
+          "edit": ["Workpermit Creation"]
+        }
       },
       {
         "Title": "Area",
@@ -88,7 +92,11 @@
         "Type": "dropdown",
         "_id": "66b230b6cc8539b4ed3861cc2",
         "endpoint": "projects",
-        "key": "siteLocation"
+        "key": "siteLocation",
+        "permissions": {
+          "view": ["Workpermit Creation", "UAUC Prevention Action"],
+          "edit": ["Workpermit Creation"]
+        }
       },
       {
         "Title": "Permit Types",
@@ -96,19 +104,31 @@
         "Type": "dropdown",
         "_id": "66b230b6cc8539b4ed3861cc3",
         "endpoint": "permitstype",
-        "key": "permitsType"
+        "key": "permitsType",
+        "permissions": {
+          "view": ["Workpermit Creation", "UAUC Prevention Action"],
+          "edit": ["Workpermit Creation"]
+        }
       },
       {
         "Title": "Date",
         "Headers": "date",
         "Type": "datepicker",
-        "_id": "66b230b6cc8539b4ed3861cc4"
+        "_id": "66b230b6cc8539b4ed3861cc4",
+        "permissions": {
+          "view": ["Workpermit Creation", "UAUC Prevention Action"],
+          "edit": ["Workpermit Creation"]
+        }
       },
       {
         "Title": "Time",
         "Headers": "time",
         "Type": "timepicker",
-        "_id": "66b230b6cc8539b4ed3861cc5"
+        "_id": "66b230b6cc8539b4ed3861cc5",
+        "permissions": {
+          "view": ["Workpermit Creation", "UAUC Prevention Action"],
+          "edit": ["Workpermit Creation"]
+        }
       },
       {
         "Title": "Tools and Equipment",
@@ -116,20 +136,32 @@
         "Type": "multiselect",
         "_id": "66b230b6cc8539b4ed3861cc6",
         "endpoint": "tools",
-        "key": "tools"
+        "key": "tools",
+        "permissions": {
+          "view": ["Workpermit Creation", "UAUC Prevention Action"],
+          "edit": ["Workpermit Creation"]
+        }
       },
       {
         "Title": "Tools Tested",
         "Headers": "toolsTested",
         "Type": "radio",
         "Options": ["Yes", "No", "N/A"],
-        "_id": "66b230b6cc8539b4ed3861cc7"
+        "_id": "66b230b6cc8539b4ed3861cc7",
+        "permissions": {
+          "view": ["Workpermit Creation", "UAUC Prevention Action"],
+          "edit": ["Workpermit Creation"]
+        }
       },
       {
         "Title": "Work Description",
         "Headers": "workDescription",
         "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861cc7"
+        "_id": "66b230b6cc8539b4ed3861cc7",
+        "permissions": {
+          "view": ["Workpermit Creation", "UAUC Prevention Action"],
+          "edit": ["Workpermit Creation"]
+        }
       },
       {
         "Title": "Type of Hazard",
@@ -137,7 +169,11 @@
         "Type": "multiselect",
         "_id": "66b230b6cc8539b4ed3861cc8",
         "endpoint": "hazards",
-        "key": "hazards"
+        "key": "hazards",
+        "permissions": {
+          "view": ["Workpermit Creation", "UAUC Prevention Action"],
+          "edit": ["Workpermit Creation"]
+        }
       },
       {
         "Title": "Applicable PPEs",
@@ -145,7 +181,11 @@
         "Type": "multiselect",
         "_id": "66b230b6cc8539b4ed3861cc9",
         "endpoint": "ppe",
-        "key": "ppes"
+        "key": "ppes",
+        "permissions": {
+          "view": ["Workpermit Creation", "UAUC Prevention Action"],
+          "edit": ["Workpermit Creation"]
+        }
       },
       {
         "Title": "Safety Measures Taken",
@@ -153,14 +193,22 @@
         "Type": "dropdown",
         "_id": "66b230b6cc8539b4ed3861cca",
         "endpoint": "PermitsType",
-        "key": "permitsType"
+        "key": "permitsType",
+        "permissions": {
+          "view": ["Workpermit Creation", "UAUC Prevention Action"],
+          "edit": ["Workpermit Creation"]
+        }
       },
       {
         "Title": "Undersign Draft",
         "Headers": "undersignDraft",
         "Type": "imagepicker",
         "_id": "66b230b6cc8539b4ed3861ccb",
-        "endpoint":"workpermit/image"
+        "endpoint": "workpermit/image",
+        "permissions": {
+          "view": ["Workpermit Creation", "UAUC Prevention Action"],
+          "edit": ["Workpermit Creation"]
+        }
       },
       {
         "Title": "Created By",
@@ -168,7 +216,11 @@
         "Type": "dropdown",
         "_id": "66b230b6cc8539b4ed3861ccc",
         "endpoint": "user",
-        "key": "name"
+        "key": "name",
+        "permissions": {
+          "view": ["Workpermit Creation", "UAUC Prevention Action"],
+          "edit": ["Workpermit Creation"]
+        }
       },
       {
         "Title": "Verified By",
@@ -176,7 +228,11 @@
         "Type": "multiselect",
         "_id": "66b230b6cc8539b4ed3861ccd",
         "endpoint": "user",
-        "key": "name"
+        "key": "name",
+        "permissions": {
+          "view": ["Workpermit Creation", "UAUC Prevention Action"],
+          "edit": ["Workpermit Creation"]
+        }
       },
       {
         "Title": "Approval By",
@@ -184,27 +240,43 @@
         "Type": "multiselect",
         "_id": "66b230b6cc8539b4ed3861cce",
         "endpoint": "user",
-        "key": "name"
+        "key": "name",
+        "permissions": {
+          "view": ["Workpermit Creation", "UAUC Prevention Action"],
+          "edit": ["Workpermit Creation"]
+        }
       },
       {
         "Title": "Verified Done",
         "Headers": "verifiedDone",
         "Type": "switch",
         "Options": ["true", "false"],
-        "_id": "66b230b6cc8539b4ed3861ccf"
+        "_id": "66b230b6cc8539b4ed3861ccf",
+        "permissions": {
+          "view": ["Workpermit Creation", "UAUC Prevention Action"],
+          "edit": ["Workpermit Creation"]
+        }
       },
       {
         "Title": "Approval Done",
         "Headers": "approvalDone",
         "Type": "switch",
         "Options": ["true", "false"],
-        "_id": "66b230b6cc8539b4ed3861cd0"
+        "_id": "66b230b6cc8539b4ed3861cd0",
+        "permissions": {
+          "view": ["Workpermit Creation", "UAUC Prevention Action"],
+          "edit": ["Workpermit Creation"]
+        }
       },
       {
         "Title": "Geo Tagging",
         "Headers": "geotagging",
         "Type": "geolocation",
-        "_id": "66b230b6cc8539b4ed3861cc1"
+        "_id": "66b230b6cc8539b4ed3861cc1",
+        "permissions": {
+          "view": ["Workpermit Creation", "UAUC Prevention Action"],
+          "edit": ["Workpermit Creation"]
+        }
       }
     ],
     "__v": 0
@@ -219,20 +291,32 @@
         "Type": "dropdown",
         "_id": "66b230b6cc8539b4ed3861cc1",
         "endpoint": "projects",
-        "key": "projectName"
+        "key": "projectName",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
 
       {
         "Title": "Date",
         "Headers": "date",
         "Type": "datepicker",
-        "_id": "66b230b6cc8539b4ed3861cc4"
+        "_id": "66b230b6cc8539b4ed3861cc4",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
       {
         "Title": "Time",
         "Headers": "time",
         "Type": "timepicker",
-        "_id": "66b230b6cc8539b4ed3861cc5"
+        "_id": "66b230b6cc8539b4ed3861cc5",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
 
       {
@@ -241,14 +325,22 @@
         "Type": "dropdown",
         "_id": "66b230b6cc8539b4ed3861cc1",
         "endpoint": "topic",
-        "key": "topicTypes"
+        "key": "topicTypes",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
       {
         "Title": "Form Filled By",
         "Headers": "formFilled",
         "Type": "secondaryForm",
         "_id": "66b230b6cc8539b4ed3861cc4",
-        "key": "name"
+        "key": "name",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
 
       {
@@ -256,20 +348,32 @@
         "Headers": "documentaryEvidencePhoto",
         "Type": "imagepicker",
         "_id": "66b230b6cc8539b4ed3861ccb",
-        "endpoint":"meeting/image"
+        "endpoint": "meeting/image",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
 
       {
         "Title": "Geo Tagging",
         "Headers": "geotagging",
         "Type": "geolocation",
-        "_id": "66b230b6cc8539b4ed3861cc1"
+        "_id": "66b230b6cc8539b4ed3861cc1",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
       {
         "Title": "Comments Box",
         "Headers": "commentsBox",
         "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861ccb"
+        "_id": "66b230b6cc8539b4ed3861ccb",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       }
     ],
     "__v": 0
@@ -284,41 +388,65 @@
         "Type": "dropdown",
         "_id": "66b230b6cc8539b4ed3861cc1",
         "endpoint": "projects",
-        "key": "projectName"
+        "key": "projectName",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
 
       {
         "Title": "Date",
         "Headers": "date",
         "Type": "datepicker",
-        "_id": "66b230b6cc8539b4ed3861cc4"
+        "_id": "66b230b6cc8539b4ed3861cc4",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
       {
         "Title": "Time",
         "Headers": "time",
         "Type": "timepicker",
-        "_id": "66b230b6cc8539b4ed3861cc5"
+        "_id": "66b230b6cc8539b4ed3861cc5",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
       {
         "Title": "Inductees",
         "Headers": "inductees",
         "Type": "simpledropdown",
         "_id": "66b34b204ecde7c5bfeab153",
-        "Options": ["Staff", "Workers", "Suppliers", "Clients", "Visitors"]
+        "Options": ["Staff", "Workers", "Suppliers", "Clients", "Visitors"],
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
 
       {
         "Title": "Inductees",
         "Headers": "inductees",
         "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861cc7"
+        "_id": "66b230b6cc8539b4ed3861cc7",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
 
       {
         "Title": "Inductees Name",
         "Headers": "inducteesName",
         "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861cc9"
+        "_id": "66b230b6cc8539b4ed3861cc9",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
       {
         "Title": "Trade Name",
@@ -326,13 +454,21 @@
         "Type": "multiselect",
         "_id": "66b230b6cc8539b4ed3861cc9",
         "endpoint": "trade",
-        "key": "tradeTypes"
+        "key": "tradeTypes",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
       {
         "Title": "Sub-Contractor Name",
         "Headers": "subContractorName",
         "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861cc9"
+        "_id": "66b230b6cc8539b4ed3861cc9",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
       {
         "Title": "Topic Discussed",
@@ -340,26 +476,42 @@
         "Type": "dropdown",
         "_id": "66b230b6cc8539b4ed3861cc1",
         "endpoint": "topic",
-        "key": "topicTypes"
+        "key": "topicTypes",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
       {
         "Title": "Documentation of Evidence Photo",
         "Headers": "documentaryEvidencePhoto",
         "Type": "imagepicker",
         "_id": "66b230b6cc8539b4ed3861ccb",
-        "endpoint": "induction/image"
+        "endpoint": "induction/image",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
       {
         "Title": "Any Other",
         "Headers": "anyOthers",
         "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861cc9"
+        "_id": "66b230b6cc8539b4ed3861cc9",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
       {
         "Title": "Inducted Signed By",
         "Headers": "inductedSignBy",
         "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861ccb"
+        "_id": "66b230b6cc8539b4ed3861ccb",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
       {
         "Title": "Instruction By",
@@ -367,14 +519,22 @@
         "Type": "dropdown",
         "_id": "66b230b6cc8539b4ed3861cc1",
         "endpoint": "user",
-        "key": "name"
+        "key": "name",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
 
       {
         "Title": "Geo Tagging",
         "Headers": "geotagging",
         "Type": "geolocation",
-        "_id": "66b230b6cc8539b4ed3861cc1"
+        "_id": "66b230b6cc8539b4ed3861cc1",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       }
     ],
     "__v": 0
@@ -389,19 +549,31 @@
         "Type": "dropdown",
         "endpoint": "projects",
         "key": "projectName",
-        "_id": "66b230b6cc8539b4ed3861cc4"
+        "_id": "66b230b6cc8539b4ed3861cc4",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
       {
         "Title": "Date",
         "Headers": "date",
         "Type": "datepicker",
-        "_id": "66b230b6cc8539b4ed3861cc4"
+        "_id": "66b230b6cc8539b4ed3861cc4",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
       {
         "Title": "Time",
         "Headers": "time",
         "Type": "timepicker",
-        "_id": "66b230b6cc8539b4ed3861cc4"
+        "_id": "66b230b6cc8539b4ed3861cc4",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
 
       {
@@ -410,7 +582,11 @@
         "Type": "dropdown",
         "endpoint": "topic",
         "key": "topicTypes",
-        "_id": "66b230b6cc8539b4ed3861cc4"
+        "_id": "66b230b6cc8539b4ed3861cc4",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
 
       {
@@ -418,14 +594,22 @@
         "Headers": "attendees",
         "Type": "simpledropdown",
         "_id": "66b34b204ecde7c5bfeab153",
-        "Options": ["Staff", "Workers", "Suppliers", "Clients", "Visitors"]
+        "Options": ["Staff", "Workers", "Suppliers", "Clients", "Visitors"],
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
       {
         "Title": "Attendees Name",
         "Headers": "attendeesName",
         "Type": "secondaryForm",
         "_id": "66b230b6cc8539b4ed3861cc4",
-        "key": "name"
+        "key": "name",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
 
       {
@@ -434,29 +618,45 @@
         "Type": "dropdown",
         "endpoint": "user",
         "key": "name",
-        "_id": "66b230b6cc8539b4ed3861cc4"
+        "_id": "66b230b6cc8539b4ed3861cc4",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
-      
+
       {
         "Title": "Documentation of Evidence Photo",
         "Headers": "documentaryEvidencePhoto",
         "Type": "imagepicker",
         "_id": "66b230b6cc8539b4ed3861ccb",
-        "endpoint":"specific/image"
+        "endpoint": "specific/image",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
 
       {
         "Title": "Comments Box",
         "Headers": "commentsBox",
         "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861cc4"
+        "_id": "66b230b6cc8539b4ed3861cc4",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       },
 
       {
         "Title": "Geo Tagging",
         "Headers": "geotagging",
         "Type": "geolocation",
-        "_id": "66b230b6cc8539b4ed3861cc4"
+        "_id": "66b230b6cc8539b4ed3861cc4",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
       }
     ],
     "__v": 0
@@ -471,26 +671,42 @@
         "Type": "dropdown",
         "_id": "66b230b6cc8539b4ed3861cc1",
         "endpoint": "projects",
-        "key": "projectName"
+        "key": "projectName",
+        "permissions": {
+          "view": ["UAUC Creation", "UAUC Prevention Action"],
+          "edit": ["UAUC Creation"]
+        }
       },
       {
         "Title": "Area",
         "Headers": "area",
         "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861cc2"
+        "_id": "66b230b6cc8539b4ed3861cc2",
+        "permissions": {
+          "view": ["UAUC Creation", "UAUC Prevention Action"],
+          "edit": ["UAUC Creation"]
+        }
       },
 
       {
         "Title": "Date",
         "Headers": "date",
         "Type": "datepicker",
-        "_id": "66b230b6cc8539b4ed3861cc4"
+        "_id": "66b230b6cc8539b4ed3861cc4",
+        "permissions": {
+          "view": ["UAUC Creation", "UAUC Prevention Action"],
+          "edit": ["UAUC Creation"]
+        }
       },
       {
         "Title": "Time",
         "Headers": "time",
         "Type": "timepicker",
-        "_id": "66b230b6cc8539b4ed3861cc5"
+        "_id": "66b230b6cc8539b4ed3861cc5",
+        "permissions": {
+          "view": ["UAUC Creation", "UAUC Prevention Action"],
+          "edit": ["UAUC Creation"]
+        }
       },
       {
         "Title": "Observer",
@@ -498,20 +714,32 @@
         "Type": "dropdown",
         "_id": "66b230b6cc8539b4ed3861ccc",
         "endpoint": "user",
-        "key": "name"
+        "key": "name",
+        "permissions": {
+          "view": ["UAUC Creation", "UAUC Prevention Action"],
+          "edit": ["UAUC Creation"]
+        }
       },
       {
         "Title": "Observation",
         "Headers": "observation",
         "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861cc7"
+        "_id": "66b230b6cc8539b4ed3861cc7",
+        "permissions": {
+          "view": ["UAUC Creation", "UAUC Prevention Action"],
+          "edit": ["UAUC Creation"]
+        }
       },
       {
         "Title": "Photo",
         "Headers": "photo",
         "Type": "imagepicker",
         "_id": "66b230b6cc8539b4ed3861cc7",
-        "endpoint": "uauc/image"
+        "endpoint": "uauc/image",
+        "permissions": {
+          "view": ["UAUC Creation", "UAUC Prevention Action"],
+          "edit": ["UAUC Creation"]
+        }
       },
       {
         "Title": "Type of Hazard",
@@ -519,13 +747,21 @@
         "Type": "multiselect",
         "_id": "66b230b6cc8539b4ed3861cc8",
         "endpoint": "hazards",
-        "key": "hazards"
+        "key": "hazards",
+        "permissions": {
+          "view": ["UAUC Creation", "UAUC Prevention Action"],
+          "edit": ["UAUC Creation"]
+        }
       },
       {
         "Title": "Causes",
         "Headers": "causes",
         "Type": "editablechip",
-        "_id": "66b230b6cc8539b4ed3861cc7"
+        "_id": "66b230b6cc8539b4ed3861cc7",
+        "permissions": {
+          "view": ["UAUC Creation", "UAUC Prevention Action"],
+          "edit": ["UAUC Creation"]
+        }
       },
       {
         "Title": "Risk Value",
@@ -533,7 +769,11 @@
         "Type": "dropdown",
         "_id": "66b230b6cc8539b4ed3861cca",
         "endpoint": "RiskRating",
-        "key": "severity"
+        "key": "severity",
+        "permissions": {
+          "view": ["UAUC Creation", "UAUC Prevention Action"],
+          "edit": ["UAUC Creation"]
+        }
       },
       {
         "Title": "Assigned To",
@@ -541,13 +781,21 @@
         "Type": "dropdown",
         "_id": "66b230b6cc8539b4ed3861ccc",
         "endpoint": "user",
-        "key": "name"
+        "key": "name",
+        "permissions": {
+          "view": ["UAUC Creation", "UAUC Prevention Action"],
+          "edit": ["UAUC Creation"]
+        }
       },
       {
         "Title": "Corrective Preventive Actions",
         "Headers": "correctivePreventiveAction",
         "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861cc7"
+        "_id": "66b230b6cc8539b4ed3861cc7",
+        "permissions": {
+          "view": ["UAUC Creation", "UAUC Prevention Action"],
+          "edit": ["UAUC Prevention Action"]
+        }
       },
       {
         "Title": "Action Taken By",
@@ -555,7 +803,11 @@
         "Type": "dropdown",
         "_id": "66b230b6cc8539b4ed3861ccc",
         "endpoint": "user",
-        "key": "name"
+        "key": "name",
+        "permissions": {
+          "view": ["UAUC Creation", "UAUC Prevention Action"],
+          "edit": ["UAUC Prevention Action"]
+        }
       },
 
       {
@@ -563,20 +815,32 @@
         "Headers": "status",
         "Type": "radio",
         "Options": ["Open", "Closed"],
-        "_id": "66b230b6cc8539b4ed3861cc7"
+        "_id": "66b230b6cc8539b4ed3861cc7",
+        "permissions": {
+          "view": ["UAUC Creation", "UAUC Prevention Action"],
+          "edit": ["UAUC Creation"]
+        }
       },
 
       {
         "Title": "Geo Tagging",
         "Headers": "geotagging",
         "Type": "geolocation",
-        "_id": "66b230b6cc8539b4ed3861cc1"
+        "_id": "66b230b6cc8539b4ed3861cc1",
+        "permissions": {
+          "view": ["UAUC Creation", "UAUC Prevention Action"],
+          "edit": ["UAUC Creation"]
+        }
       },
       {
         "Title": "Comment",
         "Headers": "comment",
         "Type": "CustomTextField",
-        "_id": "66b230b6cc8539b4ed3861cc7"
+        "_id": "66b230b6cc8539b4ed3861cc7",
+        "permissions": {
+          "view": ["UAUC Creation", "UAUC Prevention Action"],
+          "edit": ["UAUC Creation"]
+        }
       }
     ],
     "__v": 0

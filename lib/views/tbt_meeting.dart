@@ -77,7 +77,8 @@ class TBTMeetingPage extends StatelessWidget {
                                     );
                                   });
                             },
-                            title: Text(' Topic: ${meeting.projectName?.projectName}'),
+                            title: Text(
+                                ' Topic: ${meeting.projectName?.projectName}'),
                             subtitle: Text(
                               'Date: ${DateFormat('dd MM yyyy').format(DateTime.parse(meeting.date ?? ""))}',
                             ),
@@ -97,6 +98,7 @@ class TBTMeetingPage extends StatelessWidget {
                                 },
                                 icon: const Icon(Icons.edit)),
                             onTap: () {
+                              print(jsonEncode(meeting));
                               // Handle on tap if needed
                             },
                           ),

@@ -61,12 +61,16 @@ class UaucPage extends StatelessWidget {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
-            var result = await Get.toNamed(
-              Routes.formPage,
-              arguments: ['uauc', <String, dynamic>{}, false],
-            );
-            if (result == true) {
-              controller.getPermitData();
+            if (Strings.permisssions.contains("UAUC Creation")) {
+              var result = await Get.toNamed(
+                Routes.formPage,
+                arguments: ['uauc', <String, dynamic>{}, false],
+              );
+              if (result == true) {
+                controller.getPermitData();
+              }
+            } else {
+              Get.snackbar("Not Authorized to create UAUC", "");
             }
           },
           child: const Icon(Icons.add),

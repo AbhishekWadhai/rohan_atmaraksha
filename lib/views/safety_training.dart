@@ -26,6 +26,7 @@ class SafetyTraining extends StatelessWidget {
                 crossAxisCount: 2, crossAxisSpacing: 20, mainAxisSpacing: 20),
             children: [
               TrainingCard(
+                createAction: "Create TBT Meeting",
                 moduleName: "TBT Meeting",
                 imageAsset: Assets.tbtMeeting,
                 action1: () {
@@ -39,6 +40,7 @@ class SafetyTraining extends StatelessWidget {
                 },
               ),
               TrainingCard(
+                createAction: "Create Safety Induction",
                 moduleName: "Safety Induction",
                 imageAsset: Assets.training,
                 action1: () {
@@ -47,17 +49,23 @@ class SafetyTraining extends StatelessWidget {
                 action2: () {
                   Get.toNamed(
                     Routes.formPage,
-                    arguments: ['meeting', <String, dynamic>{}, false],
+                    arguments: ['induction', <String, dynamic>{}, false],
                   );
                 },
               ),
               TrainingCard(
-                moduleName: "Specific Training",
+                createAction: "Create Job Specific Safety Training",
+                moduleName: "Job Specific Safety Training",
                 imageAsset: Assets.training,
                 action1: () {
                   Get.toNamed(Routes.speceficTrainingPage);
                 },
-                action2: () {},
+                action2: () {
+                  Get.toNamed(
+                    Routes.formPage,
+                    arguments: ['specific', <String, dynamic>{}, false],
+                  );
+                },
               ),
             ],
           ),
@@ -70,12 +78,14 @@ class TrainingCard extends StatelessWidget {
   final String imageAsset;
   final VoidCallback action1;
   final VoidCallback action2;
+  final String createAction;
   const TrainingCard(
       {super.key,
       this.moduleName = "",
       this.imageAsset = Assets.rohanLogo,
       required this.action1,
-      required this.action2});
+      required this.action2,
+      this.createAction = "Create New"});
 
   @override
   Widget build(BuildContext context) {
@@ -104,18 +114,23 @@ class TrainingCard extends StatelessWidget {
             ),
             const Divider(),
             GestureDetector(
-              onTap: action2,
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("create meeting"),
-                  Icon(
-                    Icons.add_circle_outline,
-                    color: Colors.blue,
-                  )
-                ],
-              ),
-            )
+                onTap: action2,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        createAction,
+                        overflow: TextOverflow
+                            .ellipsis, // Optional: to prevent text from overflowing
+                      ),
+                    ),
+                    const Icon(
+                      Icons.add_circle_outline,
+                      color: Colors.blue,
+                    ),
+                  ],
+                ))
           ],
         ),
       ),

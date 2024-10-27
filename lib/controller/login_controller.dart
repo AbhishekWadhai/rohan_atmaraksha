@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rohan_atmaraksha/routes/routes_string.dart';
 import 'package:rohan_atmaraksha/services/api_services.dart';
+import 'package:rohan_atmaraksha/services/jwt_service.dart';
 import 'package:rohan_atmaraksha/services/shared_preferences.dart';
 
 class LoginController extends GetxController {
@@ -32,7 +33,8 @@ class LoginController extends GetxController {
           "password": passwordController.text
         });
         if (a != null) {
-          SharedPrefService().saveString("token", a["token"]);
+          await SharedPrefService().saveString("token", a["token"]);
+          await isTokenValid();
           Get.toNamed(Routes.homePage);
         } else {
           Get.snackbar("Login Failed", "Enter valid credentials",

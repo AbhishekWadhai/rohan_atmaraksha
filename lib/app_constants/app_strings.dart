@@ -8,5 +8,6 @@ class Strings {
   static String get safetyTraining => "Safety Training";
   static String userId = "";
   static String roleName = "";
+  static String userName = "";
   static List<String> permisssions = [];
 }

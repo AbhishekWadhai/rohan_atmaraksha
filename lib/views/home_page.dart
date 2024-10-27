@@ -39,7 +39,7 @@ class HomePage extends StatelessWidget {
               Column(
                 mainAxisAlignment: MainAxisAlignment.end, //,
                 children: [
-                  Text(Strings.rohanEkam, style: TextStyles.appBarTextStyle),
+                  Text("Welcome, ${Strings.userName}", style: TextStyles.appBarTextStyle),
                   const SizedBox(
                     height: 20,
                   ),
@@ -47,20 +47,32 @@ class HomePage extends StatelessWidget {
                     padding: const EdgeInsets.all(30.0),
                     child: Container(
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          color: const Color(0xFF0E2D98)),
+                        borderRadius: BorderRadius.circular(15),
+                        color: const Color(0xFF0E2D98),
+                      ),
                       height: 60,
                       width: double.infinity,
-                      child: FittedBox(
-                        child: Row(children: [
-                          CountnName(count: 02, name: Strings.workPermit),
-                          const VerticalDivider(color: Colors.white),
-                          CountnName(count: 02, name: Strings.workPermit),
-                          const VerticalDivider(),
-                          CountnName(count: 02, name: Strings.workPermit),
-                          const VerticalDivider(),
-                          CountnName(count: 02, name: Strings.workPermit),
-                        ]),
+                      child: Obx(
+                        () => Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CountnName(
+                              count: controller.permitCount.value,
+                              name: Strings.workPermit,
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 30),
+                              child: VerticalDivider(
+                                color: Colors.white,
+                              ),
+                            ),
+                            CountnName(
+                              count: controller.uaucCount.value,
+                              name: Strings.uauc,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   )
@@ -94,18 +106,22 @@ class HomePage extends StatelessWidget {
                       crossAxisSpacing: 4,
                       crossAxisCount: 3),
                   children: [
-                    MyGrid(
+                    if (Strings.roleName == "Execution")
+                      MyGrid(
                         image: Image.asset(Assets.workPermit),
                         activity: Strings.workPermit,
                         onTap: () {
                           Get.toNamed(Routes.workPermitPage);
-                        }),
-                    MyGrid(
+                        },
+                      ),
+                    if (Strings.roleName == "Safety")
+                      MyGrid(
                         image: Image.asset(Assets.training),
                         activity: Strings.safetyTraining,
                         onTap: () {
                           Get.toNamed(Routes.safetyTraining);
-                        }),
+                        },
+                      ),
                     MyGrid(
                         image: Image.asset(Assets.sora),
                         activity: Strings.uauc,
@@ -212,16 +228,17 @@ class CountnName extends StatelessWidget {
         children: [
           FittedBox(
               child: Text(
-            '02',
+            count.toString(),
             style: TextStyle(
                 fontSize: 23,
                 fontWeight: FontWeight.bold,
                 color: Colors.lightBlue.shade200),
           )),
-          const FittedBox(
+          FittedBox(
               child: Text(
-            "Work Permit",
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+            name,
+            style: const TextStyle(
+                fontWeight: FontWeight.bold, color: Colors.white),
           ))
         ],
       ),

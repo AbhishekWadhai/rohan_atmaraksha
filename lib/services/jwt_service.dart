@@ -13,15 +13,25 @@ Future<bool> isTokenValid() async {
     print(role);
     print(Strings.userId);
     List<dynamic> roles = await ApiService().getRequest("role");
+    List<dynamic> user = await ApiService().getRequest("user");
+    var userName = user.firstWhere((e) => e["_id"] == Strings.userId, orElse: () => null);
     print(roles);
     var assignedRole =
         roles.firstWhere((e) => e["_id"] == role, orElse: () => null);
-
+    if (userName != null) {
+      Strings.userName = userName["name"];
+    }
+     print(
+          "---------------------------------------name-----------------------------------------------------");
+    print(Strings.userName);
     if (assignedRole != null) {
       // Store roleName and permissions in variables
       Strings.roleName = assignedRole["roleName"];
       Strings.permisssions = List<String>.from(assignedRole["permissions"]);
       print(Strings.roleName);
+      print(
+          "--------------------------------------------------------------------------------------------");
+      print(Strings.permisssions);
     } else {
       print("Role not found");
     }
