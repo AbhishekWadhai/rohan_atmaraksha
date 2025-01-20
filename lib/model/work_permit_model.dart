@@ -1,42 +1,49 @@
 import 'dart:convert';
 
+import 'package:rohan_suraksha_sathi/model/projects_model.dart';
+import 'package:rohan_suraksha_sathi/model/user_model.dart';
+
 class WorkPermit {
     String id;
-    Area projectName;
-    Area area;
+    Project project;
+    User createdby;
+    Project area;
     PermitTypes permitTypes;
-    String date;
-    String time;
-    List<ToolsAndEquipment> toolsAndEquipment;
-    String toolsTested;
-    String workDescription;
+    String? date;
+    String? startTime;
+    String? endTime;
+    List<Tool> tools;
+    List<MachineTool> machineTools;
+    List<Equipment> equipments;
+    String? toolsTested;
+    String? workDescription;
     List<TypeOfHazard> typeOfHazard;
     List<ApplicablePpe> applicablePpEs;
-    String safetyMeasuresTaken;
-    String undersignDraft;
-    By? createdBy;
-    List<By> verifiedBy;
-    List<By> approvalBy;
+    List<Safety> safetyMeasuresTaken;
+    List<User> verifiedBy;
+    List<User> approvalBy;
     bool verifiedDone;
     bool approvalDone;
-    String geotagging;
+    String? geotagging;
     int v;
 
     WorkPermit({
         required this.id,
-        required this.projectName,
+        required this.project,
+        required this.createdby,
         required this.area,
         required this.permitTypes,
         required this.date,
-        required this.time,
-        required this.toolsAndEquipment,
+        this.startTime,
+        required this.endTime,
+        required this.tools,
+        required this.machineTools,
+        required this.equipments,
         required this.toolsTested,
         required this.workDescription,
         required this.typeOfHazard,
         required this.applicablePpEs,
         required this.safetyMeasuresTaken,
-        required this.undersignDraft,
-        required this.createdBy,
         required this.verifiedBy,
         required this.approvalBy,
         required this.verifiedDone,
@@ -51,21 +58,23 @@ class WorkPermit {
 
     factory WorkPermit.fromJson(Map<String, dynamic> json) => WorkPermit(
         id: json["_id"],
-        projectName: Area.fromJson(json["projectName"]),
-        area: Area.fromJson(json["area"]),
+        project: Project.fromJson(json["project"]),
+        createdby: User.fromJson(json["createdby"]),
+        area: Project.fromJson(json["area"]),
         permitTypes: PermitTypes.fromJson(json["permitTypes"]),
         date: json["date"],
-        time: json["time"],
-        toolsAndEquipment: List<ToolsAndEquipment>.from(json["toolsAndEquipment"].map((x) => ToolsAndEquipment.fromJson(x))),
+        startTime: json["StartTime"],
+        endTime: json["endTime"],
+        tools: List<Tool>.from(json["tools"].map((x) => Tool.fromJson(x))),
+        machineTools: List<MachineTool>.from(json["machineTools"].map((x) => MachineTool.fromJson(x))),
+        equipments: List<Equipment>.from(json["equipments"].map((x) => Equipment.fromJson(x))),
         toolsTested: json["toolsTested"],
         workDescription: json["workDescription"],
         typeOfHazard: List<TypeOfHazard>.from(json["typeOfHazard"].map((x) => TypeOfHazard.fromJson(x))),
         applicablePpEs: List<ApplicablePpe>.from(json["applicablePPEs"].map((x) => ApplicablePpe.fromJson(x))),
-        safetyMeasuresTaken: json["safetyMeasuresTaken"],
-        undersignDraft: json["undersignDraft"],
-        createdBy: json["createdBy"] == null ? null : By.fromJson(json["createdBy"]),
-        verifiedBy: List<By>.from(json["verifiedBy"].map((x) => By.fromJson(x))),
-        approvalBy: List<By>.from(json["approvalBy"].map((x) => By.fromJson(x))),
+        safetyMeasuresTaken: List<Safety>.from(json["safetyMeasuresTaken"].map((x) => Safety.fromJson(x))),
+        verifiedBy: List<User>.from(json["verifiedBy"].map((x) => User.fromJson(x))),
+        approvalBy: List<User>.from(json["approvalBy"].map((x) => User.fromJson(x))),
         verifiedDone: json["verifiedDone"],
         approvalDone: json["approvalDone"],
         geotagging: json["geotagging"],
@@ -74,19 +83,21 @@ class WorkPermit {
 
     Map<String, dynamic> toJson() => {
         "_id": id,
-        "projectName": projectName.toJson(),
+        "project": project.toJson(),
+        "createdby": createdby.toJson(),
         "area": area.toJson(),
         "permitTypes": permitTypes.toJson(),
         "date": date,
-        "time": time,
-        "toolsAndEquipment": List<dynamic>.from(toolsAndEquipment.map((x) => x.toJson())),
+        "StartTime": startTime,
+        "endTime": endTime,
+        "tools": List<dynamic>.from(tools.map((x) => x.toJson())),
+        "machineTools": List<dynamic>.from(machineTools.map((x) => x.toJson())),
+        "equipments": List<dynamic>.from(equipments.map((x) => x.toJson())),
         "toolsTested": toolsTested,
         "workDescription": workDescription,
         "typeOfHazard": List<dynamic>.from(typeOfHazard.map((x) => x.toJson())),
         "applicablePPEs": List<dynamic>.from(applicablePpEs.map((x) => x.toJson())),
-        "safetyMeasuresTaken": safetyMeasuresTaken,
-        "undersignDraft": undersignDraft,
-        "createdBy": createdBy?.toJson(),
+        "safetyMeasuresTaken": List<dynamic>.from(safetyMeasuresTaken.map((x) => x.toJson())),
         "verifiedBy": List<dynamic>.from(verifiedBy.map((x) => x.toJson())),
         "approvalBy": List<dynamic>.from(approvalBy.map((x) => x.toJson())),
         "verifiedDone": verifiedDone,
@@ -124,144 +135,198 @@ class ApplicablePpe {
     };
 }
 
-class By {
+// class Createdby {
+//     String id;
+//     String userId;
+//     String name;
+//     String role;
+//     String emailId;
+//     String password;
+//     String phone;
+//     String address;
+//     bool isActive;
+//     String project;
+//     String createdAt;
+//     String updatedAt;
+//     int v;
+
+//     Createdby({
+//         required this.id,
+//         required this.userId,
+//         required this.name,
+//         required this.role,
+//         required this.emailId,
+//         required this.password,
+//         required this.phone,
+//         required this.address,
+//         required this.isActive,
+//         required this.project,
+//         required this.createdAt,
+//         required this.updatedAt,
+//         required this.v,
+//     });
+
+//     factory Createdby.fromRawJson(String str) => Createdby.fromJson(json.decode(str));
+
+//     String toRawJson() => json.encode(toJson());
+
+//     factory Createdby.fromJson(Map<String, dynamic> json) => Createdby(
+//         id: json["_id"],
+//         userId: json["userId"],
+//         name: json["name"],
+//         role: json["role"],
+//         emailId: json["emailId"],
+//         password: json["password"],
+//         phone: json["phone"],
+//         address: json["address"],
+//         isActive: json["isActive"],
+//         project: json["project"],
+//         createdAt: json["createdAt"],
+//         updatedAt: json["updatedAt"],
+//         v: json["__v"],
+//     );
+
+//     Map<String, dynamic> toJson() => {
+//         "_id": id,
+//         "userId": userId,
+//         "name": name,
+//         "role": role,
+//         "emailId": emailId,
+//         "password": password,
+//         "phone": phone,
+//         "address": address,
+//         "isActive": isActive,
+//         "project": project,
+//         "createdAt": createdAt,
+//         "updatedAt": updatedAt,
+//         "__v": v,
+//     };
+// }
+
+// class Area {
+//     String id;
+//     String projectId;
+//     String projectName;
+//     String siteLocation;
+//     String startDate;
+//     String endDate;
+//     String status;
+//     String? description;
+//     String company;
+//     int v;
+
+//     Area({
+//         required this.id,
+//         required this.projectId,
+//         required this.projectName,
+//         required this.siteLocation,
+//         required this.startDate,
+//         required this.endDate,
+//         required this.status,
+//         this.description,
+//         required this.company,
+//         required this.v,
+//     });
+
+//     factory Area.fromRawJson(String str) => Area.fromJson(json.decode(str));
+
+//     String toRawJson() => json.encode(toJson());
+
+//     factory Area.fromJson(Map<String, dynamic> json) => Area(
+//         id: json["_id"],
+//         projectId: json["projectId"],
+//         projectName: json["projectName"],
+//         siteLocation: json["siteLocation"],
+//         startDate: json["startDate"],
+//         endDate: json["endDate"],
+//         status: json["status"],
+//         description: json["description"],
+//         company: json["company"],
+//         v: json["__v"],
+//     );
+
+//     Map<String, dynamic> toJson() => {
+//         "_id": id,
+//         "projectId": projectId,
+//         "projectName": projectName,
+//         "siteLocation": siteLocation,
+//         "startDate": startDate,
+//         "endDate": endDate,
+//         "status": status,
+//         "description": description,
+//         "company": company,
+//         "__v": v,
+//     };
+// }
+
+class Equipment {
     String id;
-    String userId;
-    String name;
-    String photo;
-    String role;
-    String emailId;
-    String password;
-    String phone;
-    String address;
-    bool isActive;
-    List<String> projectName;
-    DateTime createdAt;
-    DateTime updatedAt;
+    String equipments;
     int v;
 
-    By({
+    Equipment({
         required this.id,
-        required this.userId,
-        required this.name,
-        required this.photo,
-        required this.role,
-        required this.emailId,
-        required this.password,
-        required this.phone,
-        required this.address,
-        required this.isActive,
-        required this.projectName,
-        required this.createdAt,
-        required this.updatedAt,
+        required this.equipments,
         required this.v,
     });
 
-    factory By.fromRawJson(String str) => By.fromJson(json.decode(str));
+    factory Equipment.fromRawJson(String str) => Equipment.fromJson(json.decode(str));
 
     String toRawJson() => json.encode(toJson());
 
-    factory By.fromJson(Map<String, dynamic> json) => By(
+    factory Equipment.fromJson(Map<String, dynamic> json) => Equipment(
         id: json["_id"],
-        userId: json["userId"],
-        name: json["name"],
-        photo: json["photo"],
-        role: json["role"],
-        emailId: json["emailId"],
-        password: json["password"],
-        phone: json["phone"],
-        address: json["address"],
-        isActive: json["isActive"],
-        projectName: List<String>.from(json["projectName"].map((x) => x)),
-        createdAt: DateTime.parse(json["createdAt"]),
-        updatedAt: DateTime.parse(json["updatedAt"]),
+        equipments: json["equipments"],
         v: json["__v"],
     );
 
     Map<String, dynamic> toJson() => {
         "_id": id,
-        "userId": userId,
-        "name": name,
-        "photo": photo,
-        "role": role,
-        "emailId": emailId,
-        "password": password,
-        "phone": phone,
-        "address": address,
-        "isActive": isActive,
-        "projectName": List<dynamic>.from(projectName.map((x) => x)),
-        "createdAt": createdAt.toIso8601String(),
-        "updatedAt": updatedAt.toIso8601String(),
+        "equipments": equipments,
         "__v": v,
     };
 }
 
-class Area {
+class MachineTool {
     String id;
-    String projectId;
-    String projectName;
-    String siteLocation;
-    DateTime startDate;
-    DateTime endDate;
-    String status;
-    String description;
-    String company;
+    String machineTools;
     int v;
 
-    Area({
+    MachineTool({
         required this.id,
-        required this.projectId,
-        required this.projectName,
-        required this.siteLocation,
-        required this.startDate,
-        required this.endDate,
-        required this.status,
-        required this.description,
-        required this.company,
+        required this.machineTools,
         required this.v,
     });
 
-    factory Area.fromRawJson(String str) => Area.fromJson(json.decode(str));
+    factory MachineTool.fromRawJson(String str) => MachineTool.fromJson(json.decode(str));
 
     String toRawJson() => json.encode(toJson());
 
-    factory Area.fromJson(Map<String, dynamic> json) => Area(
+    factory MachineTool.fromJson(Map<String, dynamic> json) => MachineTool(
         id: json["_id"],
-        projectId: json["projectId"],
-        projectName: json["projectName"],
-        siteLocation: json["siteLocation"],
-        startDate: DateTime.parse(json["startDate"]),
-        endDate: DateTime.parse(json["endDate"]),
-        status: json["status"],
-        description: json["description"],
-        company: json["company"],
+        machineTools: json["machineTools"],
         v: json["__v"],
     );
 
     Map<String, dynamic> toJson() => {
         "_id": id,
-        "projectId": projectId,
-        "projectName": projectName,
-        "siteLocation": siteLocation,
-        "startDate": startDate.toIso8601String(),
-        "endDate": endDate.toIso8601String(),
-        "status": status,
-        "description": description,
-        "company": company,
+        "machineTools": machineTools,
         "__v": v,
     };
 }
 
 class PermitTypes {
-    List<dynamic> safetyChecks;
     String id;
     String permitsType;
+    List<Safety> safetyChecks;
+    List<String> typeOfHazard;
     int v;
 
     PermitTypes({
-        required this.safetyChecks,
         required this.id,
         required this.permitsType,
+        required this.safetyChecks,
+        required this.typeOfHazard,
         required this.v,
     });
 
@@ -270,36 +335,66 @@ class PermitTypes {
     String toRawJson() => json.encode(toJson());
 
     factory PermitTypes.fromJson(Map<String, dynamic> json) => PermitTypes(
-        safetyChecks: List<dynamic>.from(json["SafetyChecks"].map((x) => x)),
         id: json["_id"],
         permitsType: json["permitsType"],
+        safetyChecks: List<Safety>.from(json["SafetyChecks"].map((x) => Safety.fromJson(x))),
+        typeOfHazard: List<String>.from(json["typeOfHazard"].map((x) => x)),
         v: json["__v"],
     );
 
     Map<String, dynamic> toJson() => {
-        "SafetyChecks": List<dynamic>.from(safetyChecks.map((x) => x)),
         "_id": id,
         "permitsType": permitsType,
+        "SafetyChecks": List<dynamic>.from(safetyChecks.map((x) => x.toJson())),
+        "typeOfHazard": List<dynamic>.from(typeOfHazard.map((x) => x)),
         "__v": v,
     };
 }
 
-class ToolsAndEquipment {
+class Safety {
+    String checkPoints;
+    String response;
+    String id;
+
+    Safety({
+        required this.checkPoints,
+        required this.response,
+        required this.id,
+    });
+
+    factory Safety.fromRawJson(String str) => Safety.fromJson(json.decode(str));
+
+    String toRawJson() => json.encode(toJson());
+
+    factory Safety.fromJson(Map<String, dynamic> json) => Safety(
+        checkPoints: json["CheckPoints"],
+        response: json["response"],
+        id: json["_id"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "CheckPoints": checkPoints,
+        "response": response,
+        "_id": id,
+    };
+}
+
+class Tool {
     String id;
     String tools;
     int v;
 
-    ToolsAndEquipment({
+    Tool({
         required this.id,
         required this.tools,
         required this.v,
     });
 
-    factory ToolsAndEquipment.fromRawJson(String str) => ToolsAndEquipment.fromJson(json.decode(str));
+    factory Tool.fromRawJson(String str) => Tool.fromJson(json.decode(str));
 
     String toRawJson() => json.encode(toJson());
 
-    factory ToolsAndEquipment.fromJson(Map<String, dynamic> json) => ToolsAndEquipment(
+    factory Tool.fromJson(Map<String, dynamic> json) => Tool(
         id: json["_id"],
         tools: json["tools"],
         v: json["__v"],

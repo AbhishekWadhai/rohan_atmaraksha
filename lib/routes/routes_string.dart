@@ -2,7 +2,7 @@ class Routes {
   static const loginPage = '/loginPage';
   static const homePage = "/homePage";
   static const workPermitPage = "/workPermitPage";
-  static const incidentReportPage = "/incidentReportPage";
+  static const safetyReportPage = "/safetyReportPage";
   static const safetyCheckPage = "/safetyCheckPage";
   static const safetyInductionPage = "/safetyInductionPage";
   static const safetyTraining = "/safetyTraining";
@@ -11,4 +11,5 @@ class Routes {
   static const inductionPage = "/inductionPage";
   static const speceficTrainingPage = "/speceficTrainingPage";
   static const formPage = "/formPage";
+  static const notificationPage = "/notificationPage";
 }

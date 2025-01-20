@@ -2,11 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:rohan_atmaraksha/app_constants/app_strings.dart';
-import 'package:rohan_atmaraksha/model/uauc_model.dart';
-import 'package:rohan_atmaraksha/model/work_permit_model.dart';
-import 'package:rohan_atmaraksha/routes/routes_string.dart';
-import 'package:rohan_atmaraksha/services/api_services.dart';
+import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
+import 'package:rohan_suraksha_sathi/model/uauc_model.dart';
+import 'package:rohan_suraksha_sathi/model/work_permit_model.dart';
+import 'package:rohan_suraksha_sathi/routes/routes_string.dart';
+import 'package:rohan_suraksha_sathi/services/api_services.dart';
+import 'package:rohan_suraksha_sathi/services/load_dropdown_data.dart';
+import 'package:rohan_suraksha_sathi/services/notification_service/notification_handler.dart';
 
 class HomeController extends GetxController {
   RxList<UaUc> uaucList = <UaUc>[].obs;
@@ -19,10 +21,14 @@ class HomeController extends GetxController {
   void onInit() async {
     // TODO: implement onInit
     super.onInit();
+    await NotificationHandler().getNotifications();
+    await loadDropdownData();
     await getPermitData("uauc");
     await getPermitData("workpermit");
 
-    checkPendingActions();
+    print("projectName---------------------------------`");
+    print(Strings.endpointToList["exeuser"]);
+    //checkPendingActions();
   }
 
   @override
@@ -87,7 +93,7 @@ class HomeController extends GetxController {
                   Routes.soraPage,
                 );
               },
-              child: Text("click")));
+              child: const Text("click")));
     } else {
       Get.snackbar("Alert", "No pending actions",
           backgroundColor: Colors.green, isDismissible: true);

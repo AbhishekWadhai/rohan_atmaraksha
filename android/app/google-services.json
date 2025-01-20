@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "513749196603",
+    "project_id": "rohan-e935d",
+    "storage_bucket": "rohan-e935d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:513749196603:android:75b1a9ecb65d1f25d9a11e",
+        "android_client_info": {
+          "package_name": "com.rohanatmaraksha.rohan_suraksha_sathi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLvbls4ym-wJouUf51IJRxvPEVEVvqOfs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:rohan_atmaraksha/app_constants/asset_path.dart';
+import 'package:rohan_suraksha_sathi/app_constants/asset_path.dart';
 
-import 'package:rohan_atmaraksha/widgets/my_drawer.dart';
+import 'package:rohan_suraksha_sathi/widgets/my_drawer.dart';
 
 import '../routes/routes_string.dart';
 
@@ -79,58 +79,69 @@ class TrainingCard extends StatelessWidget {
   final VoidCallback action1;
   final VoidCallback action2;
   final String createAction;
-  const TrainingCard(
-      {super.key,
-      this.moduleName = "",
-      this.imageAsset = Assets.rohanLogo,
-      required this.action1,
-      required this.action2,
-      this.createAction = "Create New"});
+
+  const TrainingCard({
+    super.key,
+    this.moduleName = "",
+    this.imageAsset = "assets/logo.png", // Default asset path
+    required this.action1,
+    required this.action2,
+    this.createAction = "Create New",
+  });
 
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 10,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            GestureDetector(
-              onTap: action1,
-              child: Column(
-                children: [
-                  CircleAvatar(
-                    backgroundColor: Colors.blue,
-                    child: Image.asset(imageAsset),
+            // GestureDetector with expanded space
+            Expanded(
+              child: GestureDetector(
+                onTap: action1,
+                child: Container(
+                  width: double.infinity, // Take full width
+                  color: Colors.transparent, // To ensure it's tappable
+                  child: Column(
+                    mainAxisAlignment:
+                        MainAxisAlignment.center, // Center contents
+                    children: [
+                      CircleAvatar(
+                        backgroundColor: Colors.blue,
+                        child: Image.asset(imageAsset),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(moduleName),
+                    ],
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Text(moduleName),
-                ],
+                ),
               ),
             ),
             const Divider(),
+            // Row for the second action
             GestureDetector(
-                onTap: action2,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        createAction,
-                        overflow: TextOverflow
-                            .ellipsis, // Optional: to prevent text from overflowing
-                      ),
+              onTap: action2,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      createAction,
+                      overflow: TextOverflow.ellipsis, // Prevent overflow
                     ),
-                    const Icon(
-                      Icons.add_circle_outline,
-                      color: Colors.blue,
-                    ),
-                  ],
-                ))
+                  ),
+                  const Icon(
+                    Icons.add_circle_outline,
+                    color: Colors.blue,
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

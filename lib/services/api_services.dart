@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'dart:io'; // Import for File
 import 'package:http/http.dart' as http;
-import 'package:path/path.dart'; // Import for basename
+import 'package:path/path.dart';
+import 'package:rohan_suraksha_sathi/env.dart'; // Import for basename
 
 class ApiService {
-  static const String baseUrl =
-      "https://rohan-sage.vercel.app"; // Replace with your base URL
+  static String baseUrl = AppEnvironment.baseUrl; // Replace with your base URL
 
   // Common method for making GET requests
   Future<dynamic> getRequest(String endpoint) async {
@@ -24,8 +24,7 @@ class ApiService {
   }
 
   // Common method for making POST requests
-  Future<dynamic> postRequest(
-      String endpoint, Map<String, dynamic> data) async {
+  Future<dynamic> postRequest(String endpoint, dynamic data) async {
     final url = Uri.parse('$baseUrl/$endpoint');
 
     try {
@@ -44,7 +43,7 @@ class ApiService {
         print(jsonEncode(response.body));
         return jsonDecode(response.body);
       } else {
-        print("Failed to post data. Status code: ${response.statusCode}");
+        print("Failed to post data. Status code: ${json.encode(response)}");
       }
     } catch (e) {
       print(e);
@@ -53,7 +52,7 @@ class ApiService {
   }
 
   // Update method
-  Future<void> updateData(
+  Future<int> updateData(
       String endpoint, String id, Map<String, dynamic> updatedData) async {
     final url = Uri.parse('$baseUrl/$endpoint/$id');
 
@@ -64,14 +63,17 @@ class ApiService {
         body: jsonEncode(updatedData),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         final responseData = jsonDecode(response.body);
         print('Data updated successfully: $responseData');
+        return response.statusCode;
       } else {
         print('Failed to update data. Status code: ${response.statusCode}');
+        return 0;
       }
     } catch (e) {
       print('Error updating data: $e');
+      return 0;
     }
   }
 

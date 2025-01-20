@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
-import 'package:rohan_atmaraksha/controller/dynamic_form_contoller.dart';
-import 'package:rohan_atmaraksha/controller/sub_form_controller.dart';
+import 'package:rohan_suraksha_sathi/controller/dynamic_form_contoller.dart';
+import 'package:rohan_suraksha_sathi/controller/sub_form_controller.dart';
 
-import 'package:rohan_atmaraksha/model/form_data_model.dart';
+import 'package:rohan_suraksha_sathi/model/form_data_model.dart';
+import 'package:signature/signature.dart';
 
 class SubForm extends StatelessWidget {
   final String pageName;
@@ -22,225 +23,235 @@ class SubForm extends StatelessWidget {
   });
 
   final GlobalKey<FormState> _subformKey = GlobalKey<FormState>();
-  final SubFormController controller = Get.put(SubFormController());
+  final SubFormController controller =
+      Get.put(SubFormController(), permanent: false);
+
   final DynamicFormController mainController =
       Get.find<DynamicFormController>();
-  Timer? _debounce;
 
   @override
   Widget build(BuildContext context) {
     controller.initializeFormData(initialData);
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          Form(
-            key: _subformKey,
-            child: Obx(
-              () {
-                controller.getPageFields(pageName);
-                return GetBuilder<SubFormController>(builder: (controller) {
-                  return SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.all(14.0),
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          double screenWidth =
-                              MediaQuery.of(context).size.width;
+    return SafeArea(
+      child: Scaffold(
+        body: Stack(
+          children: [
+            Form(
+              key: _subformKey,
+              child: Obx(
+                () {
+                  controller.getPageFields(pageName);
+                  return GetBuilder<SubFormController>(builder: (controller) {
+                    return SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.all(14.0),
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            double screenWidth =
+                                MediaQuery.of(context).size.width;
 
-                          // Define breakpoints for responsiveness
-                          if (screenWidth > 1200) {
-                            // Large screen (desktop view)
-                            return Column(
-                              children: [
-                                GridView.builder(
-                                  shrinkWrap: true,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  gridDelegate:
-                                      const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount:
-                                        3, // 3 columns for large screens
-                                    crossAxisSpacing: 20,
-                                    mainAxisSpacing: 20,
-                                    childAspectRatio: 2,
-                                  ),
-                                  itemCount: controller.pageFields.length,
-                                  itemBuilder: (context, index) {
-                                    var field = controller.pageFields[index];
-                                    return Column(
-                                      children: [
-                                        buildFormField(field),
-                                      ],
-                                    );
-                                  },
-                                ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    if (_subformKey.currentState?.validate() ??
-                                        false) {
-                                      if (isEdit) {
-                                        controller.updateData(pageName);
-                                      } else {
-                                        controller.submitForm(pageName);
-                                      }
-                                    } else {
-                                      // Show an error if form is invalid
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Please correct the errors in the form'),
-                                          backgroundColor: Colors.red,
-                                        ),
+                            // Define breakpoints for responsiveness
+                            if (screenWidth > 1200) {
+                              // Large screen (desktop view)
+                              return Column(
+                                children: [
+                                  GridView.builder(
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    gridDelegate:
+                                        const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount:
+                                          3, // 3 columns for large screens
+                                      crossAxisSpacing: 20,
+                                      mainAxisSpacing: 20,
+                                      childAspectRatio: 2,
+                                    ),
+                                    itemCount: controller.pageFields.length,
+                                    itemBuilder: (context, index) {
+                                      var field = controller.pageFields[index];
+                                      return Column(
+                                        children: [
+                                          buildFormField(field),
+                                        ],
                                       );
-                                    }
-                                  },
-                                  child: SizedBox(
-                                    width: MediaQuery.of(context).size.width,
-                                    child: Text(
-                                      isEdit ? 'Update' : 'Submit',
-                                      textAlign: TextAlign.center,
+                                    },
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      if (_subformKey.currentState
+                                              ?.validate() ??
+                                          false) {
+                                        if (isEdit) {
+                                          controller.updateData(pageName);
+                                        } else {
+                                          controller.submitForm(pageName);
+                                        }
+                                      } else {
+                                        // Show an error if form is invalid
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                                'Please correct the errors in the form'),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    child: SizedBox(
+                                      width: MediaQuery.of(context).size.width,
+                                      child: Text(
+                                        isEdit ? 'Update' : 'Submit',
+                                        textAlign: TextAlign.center,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            );
-                          } else if (screenWidth > 600) {
-                            // Medium screen (tablet view)
-                            return Column(
-                              children: [
-                                GridView.builder(
-                                  shrinkWrap: true,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  gridDelegate:
-                                      const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount:
-                                        2, // 2 columns for medium screens
-                                    crossAxisSpacing: 20,
-                                    mainAxisSpacing: 20,
-                                    childAspectRatio: 2.5,
-                                  ),
-                                  itemCount: controller.pageFields.length,
-                                  itemBuilder: (context, index) {
-                                    var field = controller.pageFields[index];
-                                    return Column(
-                                      children: [
-                                        buildFormField(field),
-                                      ],
-                                    );
-                                  },
-                                ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    if (_subformKey.currentState?.validate() ??
-                                        false) {
-                                      if (isEdit) {
-                                        controller.updateData(pageName);
-                                      } else {
-                                        controller.submitForm(pageName);
-                                      }
-                                    } else {
-                                      // Show an error if form is invalid
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Please correct the errors in the form'),
-                                          backgroundColor: Colors.red,
-                                        ),
+                                ],
+                              );
+                            } else if (screenWidth > 600) {
+                              // Medium screen (tablet view)
+                              return Column(
+                                children: [
+                                  GridView.builder(
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    gridDelegate:
+                                        const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount:
+                                          2, // 2 columns for medium screens
+                                      crossAxisSpacing: 20,
+                                      mainAxisSpacing: 20,
+                                      childAspectRatio: 2.5,
+                                    ),
+                                    itemCount: controller.pageFields.length,
+                                    itemBuilder: (context, index) {
+                                      var field = controller.pageFields[index];
+                                      return Column(
+                                        children: [
+                                          buildFormField(field),
+                                        ],
                                       );
-                                    }
-                                  },
-                                  child: SizedBox(
-                                    width: MediaQuery.of(context).size.width,
-                                    child: Text(
-                                      isEdit ? 'Update' : 'Submit',
-                                      textAlign: TextAlign.center,
+                                    },
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      if (_subformKey.currentState
+                                              ?.validate() ??
+                                          false) {
+                                        if (isEdit) {
+                                          controller.updateData(pageName);
+                                        } else {
+                                          controller.submitForm(pageName);
+                                        }
+                                      } else {
+                                        // Show an error if form is invalid
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                                'Please correct the errors in the form'),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    child: SizedBox(
+                                      width: MediaQuery.of(context).size.width,
+                                      child: Text(
+                                        isEdit ? 'Update' : 'Submit',
+                                        textAlign: TextAlign.center,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            );
-                          } else {
-                            // Small screen (mobile view)
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Build form fields dynamically for mobile view
-                                ...controller.pageFields
-                                    .map((field) => Column(
-                                          children: [
-                                            buildFormField(field),
-                                            const SizedBox(height: 10),
-                                          ],
-                                        ))
-                                    .toList(),
+                                ],
+                              );
+                            } else {
+                              // Small screen (mobile view)
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Build form fields dynamically for mobile view
+                                  ...controller.pageFields
+                                      .map((field) => Column(
+                                            children: [
+                                              buildFormField(field),
+                                              const SizedBox(height: 10),
+                                            ],
+                                          ))
+                                      .toList(),
 
-                                const SizedBox(height: 10),
+                                  const SizedBox(height: 10),
 
-                                // Submit button
-                                ElevatedButton(
-                                  onPressed: () {
-                                    if (_subformKey.currentState?.validate() ??
-                                        false) {
-                                      if (isEdit) {
-                                        var result = Map<String, dynamic>.from(
-                                            controller
-                                                .formData); // Copy the data
+                                  // Submit button
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      if (_subformKey.currentState
+                                              ?.validate() ??
+                                          false) {
+                                        if (isEdit) {
+                                          controller.submitForm(pageName);
+                                          // var result = Map<String,
+                                          //         dynamic>.from(
+                                          //     controller
+                                          //         .formData); // Copy the data
 
-                                        // Now you can safely clear the formData
-                                        controller.formData.clear();
+                                          // // Now you can safely clear the formData
+                                          // controller.formData.clear();
 
-                                        // Finally, pass the result back
-                                        Get.back(result: result);
+                                          // // Finally, pass the result back
+                                          // Get.back(result: result);
+                                        } else {
+                                          controller.submitForm(pageName);
+                                          // // First, assign the formData to result before clearing it
+                                          // var result = Map<String,
+                                          //         dynamic>.from(
+                                          //     controller
+                                          //         .formData); // Copy the data
+
+                                          // // Now you can safely clear the formData
+                                          // controller.formData.clear();
+
+                                          // // Finally, pass the result back
+                                          // Get.back(result: result);
+
+                                          // print(
+                                          //     "0000000000000000000000000000000000000000000000000000000000000000000000000000");
+                                          // print(mainController.formData);
+                                        }
                                       } else {
-                                        // First, assign the formData to result before clearing it
-                                        var result = Map<String, dynamic>.from(
-                                            controller
-                                                .formData); // Copy the data
-
-                                        // Now you can safely clear the formData
-                                        controller.formData.clear();
-
-                                        // Finally, pass the result back
-                                        Get.back(result: result);
-
-                                        print(
-                                            "0000000000000000000000000000000000000000000000000000000000000000000000000000");
-                                        print(mainController.formData);
+                                        // Show an error if form is invalid
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                                'Please correct the errors in the form'),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
                                       }
-                                    } else {
-                                      // Show an error if form is invalid
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Please correct the errors in the form'),
-                                          backgroundColor: Colors.red,
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  child: SizedBox(
-                                    width: MediaQuery.of(context).size.width,
-                                    child: Text(
-                                      isEdit ? 'Update' : 'Submit',
-                                      textAlign: TextAlign.center,
+                                    },
+                                    child: SizedBox(
+                                      width: MediaQuery.of(context).size.width,
+                                      child: Text(
+                                        isEdit ? 'Update' : 'Submit',
+                                        textAlign: TextAlign.center,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            );
-                          }
-                        },
+                                ],
+                              );
+                            }
+                          },
+                        ),
                       ),
-                    ),
-                  );
-                });
-              },
+                    );
+                  });
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -252,6 +263,7 @@ class SubForm extends StatelessWidget {
           children: [
             // Image Upload Button
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
                   onPressed: () async {
@@ -259,7 +271,7 @@ class SubForm extends StatelessWidget {
                     await controller.pickAndUploadImage(
                         field.headers, field.endpoint ?? "", "");
                   },
-                  child: const Text('Upload Image from Gallery'),
+                  child: const Text('Gallery'),
                 ),
                 ElevatedButton(
                   onPressed: () async {
@@ -267,7 +279,7 @@ class SubForm extends StatelessWidget {
                     await controller.pickAndUploadImage(
                         field.headers, field.endpoint ?? "", "camera");
                   },
-                  child: const Text('Click and Upload Image'),
+                  child: const Text('Camera'),
                 ),
               ],
             ),
@@ -295,10 +307,13 @@ class SubForm extends StatelessWidget {
             })
           ],
         );
+      // Add this to your controller
+
+// Updated widget code
       case 'CustomTextField':
-        final TextEditingController textController = TextEditingController(
-          text: controller.formData[field.headers]?.toString() ?? '',
-        );
+        // Get or create the TextEditingController for this field
+        final TextEditingController textController =
+            controller.getTextController(field.headers);
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -313,16 +328,64 @@ class SubForm extends StatelessWidget {
               controller: textController,
               decoration: kTextFieldDecoration("Enter ${field.title}"),
               onChanged: (value) {
-                //textController.text = value;
-                _debounce?.cancel();
+                // Cancel the existing timer for this field, if any
+                controller.debounceMap[field.headers]?.cancel();
 
-                // Start a new timer
-                _debounce = Timer(const Duration(milliseconds: 2000), () {
+                // Start a new timer for debounce specific to this field
+                controller.debounceMap[field.headers] =
+                    Timer(const Duration(milliseconds: 2000), () {
+                  // Update the form data after debounce
                   controller.updateFormData(field.headers, value);
                 });
               },
             ),
             const SizedBox(height: 10),
+          ],
+        );
+      case 'signature':
+        String? signatureUrl = controller.formData[field.headers];
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(field.title),
+            isEdit
+                ? (signatureUrl != null && signatureUrl.isNotEmpty
+                    ? Image.network(
+                        signatureUrl,
+                        height: 200,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      )
+                    : const Text("No signature available."))
+                : Obx(
+                    () => Signature(
+                      controller: controller.signatureController.value,
+                      height: 200,
+                      backgroundColor: Colors.grey[200]!,
+                    ),
+                  ),
+            if (!isEdit) // Show buttons only if not in edit mode
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      controller.signatureController.value.clear();
+                    },
+                    child: const Text("Clear"),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      controller.saveSignature(
+                        field.headers,
+                        field.endpoint ?? "",
+                        controller.signatureController.value,
+                      );
+                    },
+                    child: const Text("Save"),
+                  ),
+                ],
+              ),
           ],
         );
       case 'editablechip':

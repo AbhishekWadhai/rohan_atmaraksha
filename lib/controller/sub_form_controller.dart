@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -5,32 +6,105 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:rohan_atmaraksha/services/image_service.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:rohan_suraksha_sathi/services/image_service.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'package:rohan_atmaraksha/model/form_data_model.dart';
-import 'package:rohan_atmaraksha/services/api_services.dart';
-import 'package:rohan_atmaraksha/services/location_service.dart';
+import 'package:rohan_suraksha_sathi/model/form_data_model.dart';
+import 'package:rohan_suraksha_sathi/services/api_services.dart';
+import 'package:rohan_suraksha_sathi/services/location_service.dart';
+import 'package:rohan_suraksha_sathi/widgets/progress_indicators.dart';
+import 'package:signature/signature.dart';
 
 class SubFormController extends GetxController {
-  final ImageService imageUploadService = ImageService();
+  final CameraService imageUploadService = CameraService();
   var formResponse = <ResponseForm>[].obs;
   var isLoading = true.obs;
   RxList<PageField> pageFields = <PageField>[].obs;
   RxMap<String, dynamic> formData = <String, dynamic>{}.obs;
-
+  Map<String, Timer?> debounceMap = {};
   RxMap<String, String> dropdownSelections = <String, String>{}.obs;
   RxMap<String, String> radioSelections = <String, String>{}.obs;
-
+  final Map<String, TextEditingController> _textControllers = {};
   bool fieldsLoaded = false; // Flag to check if fields are loaded
-
+  final signatureController = SignatureController().obs;
   @override
   void onInit() {
     super.onInit();
     loadFormData();
   }
 
+  @override
+  void dispose() {
+    Get.delete<SubFormController>(); // Dispose SubFormController
+    super.dispose();
+  }
+
+  @override
+  void onClose() {
+    super.onClose();
+    print("SubFormController disposed.");
+  }
+
   var selectedChips = <String>[].obs;
+
+  TextEditingController getTextController(String fieldHeader) {
+    if (!_textControllers.containsKey(fieldHeader)) {
+      // Create a new controller if it doesn't exist
+      _textControllers[fieldHeader] = TextEditingController(
+        text: formData[fieldHeader]?.toString() ?? '',
+      );
+    }
+    return _textControllers[fieldHeader]!;
+  }
+
+  saveSignature(String key, String endpoint,
+      SignatureController signatureController) async {
+    File? imageFile;
+
+    if (signatureController.isNotEmpty) {
+      // Show the loading dialog
+      Get.dialog(
+        const Center(
+          child: ImageProgressIndicator(),
+        ),
+        barrierDismissible: false, // Prevent dismissing the dialog
+      );
+
+      try {
+        // Convert the signature to bytes
+        final bytes = await signatureController.toPngBytes();
+        final directory = await getApplicationDocumentsDirectory();
+        imageFile = File('${directory.path}/signature.png');
+
+        // Save the bytes to the file
+        await imageFile.writeAsBytes(bytes!);
+
+        if (imageFile != null) {
+          // Upload the image and get the URL
+          String? imageUrl =
+              await imageUploadService.uploadImage(imageFile, endpoint, true);
+
+          if (imageUrl != null) {
+            // Save the image URL in the formData
+            updateFormData(key, imageUrl);
+            print('Image uploaded successfully: $imageUrl');
+          } else {
+            print('Image upload failed.');
+          }
+        } else {
+          print('No image selected.');
+        }
+      } catch (e) {
+        print("Error: $e");
+      } finally {
+        // Close the loading dialog
+        Get.back();
+      }
+    } else {
+      throw Exception("Signature is empty");
+    }
+  }
 
   // Function to add or remove chips
   void toggleChipSelection(String chipValue) {
@@ -71,29 +145,44 @@ class SubFormController extends GetxController {
 
   Future<dynamic> pickAndUploadImage(
       String key, String endpoint, String source) async {
-    // Pick an image
     File? imageFile;
-    // Pick an image
-    if (source == "camera") {
-      imageFile = await imageUploadService.pickImage(ImageSource.camera);
-    } else {
-      imageFile = await imageUploadService.pickImage(ImageSource.gallery);
-    }
 
-    if (imageFile != null) {
-      // Upload the image and get the URL
-      String? imageUrl =
-          await imageUploadService.uploadImage(imageFile, endpoint);
+    try {
+      // Show loading dialog
+      Get.dialog(
+        const Center(
+          child: ImageProgressIndicator(),
+        ),
+        barrierDismissible: false, // Prevent dismissing the dialog
+      );
 
-      if (imageUrl != null) {
-        // Save the image URL in the formData
-        updateFormData(key, imageUrl);
-        print('Image uploaded successfully: $imageUrl');
+      // Pick an image
+      if (source == "camera") {
+        imageFile = await imageUploadService.captureImage();
       } else {
-        print('Image upload failed.');
+        //imageFile = await imageUploadService.pickImage(ImageSource.gallery);
       }
-    } else {
-      print('No image selected.');
+
+      if (imageFile != null) {
+        // Upload the image and get the URL
+        String? imageUrl =
+            await imageUploadService.uploadImage(imageFile, endpoint, false);
+
+        if (imageUrl != null) {
+          // Save the image URL in the formData
+          updateFormData(key, imageUrl);
+          print('Image uploaded successfully: $imageUrl');
+        } else {
+          print('Image upload failed.');
+        }
+      } else {
+        print('No image selected.');
+      }
+    } catch (e) {
+      print('Error during image upload: $e');
+    } finally {
+      // Close the loading dialog
+      Get.back();
     }
   }
 
@@ -223,41 +312,82 @@ class SubFormController extends GetxController {
   }
 
   Future<void> submitForm(String endpoint) async {
-    isLoading(true);
-    print("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSubmitted Data");
-    print(jsonEncode(formData));
+    // Show a circular progress indicator
+
     try {
-      final response = await ApiService().postRequest(endpoint, formData);
-      if (response == 201) {
-        ScaffoldMessenger.of(Get.context!).showSnackBar(
-          const SnackBar(
-            content: Text('Data Submitted Successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        Get.back(result: true);
-      }
+      Get.dialog(
+        const Center(
+          child: RohanProgressIndicator(),
+        ),
+        barrierDismissible: false, // Prevent dismissing the dialog
+      );
+      // Add a delay to simulate form processing or data initialization
+      await Future.delayed(const Duration(seconds: 2, microseconds: 500));
+
+      // Debugging: Print form data to the console
+      print("Form Submission Started...");
+      print(
+          "Submitted Data:------------------>>>>>>>>>>>>>> ${jsonEncode(formData)}");
+
+      Get.back();
     } catch (e) {
-      print("Error submitting form: $e");
+      print("Error during form submission: $e");
+
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
+      // Show an error message
       ScaffoldMessenger.of(Get.context!).showSnackBar(
         SnackBar(
-          content: Text('Error submitting form: $e'),
+          content: Text('Error: $e'),
           backgroundColor: Colors.red,
         ),
       );
     } finally {
-      isLoading(false);
+      if (Get.isDialogOpen ?? false) {
+        Get.back(result: formData);
+        Get.delete<SubFormController>();
+      }
     }
   }
 
   Future<void> fetchGeolocation(String fieldKey) async {
     try {
+      // Show loading dialog
+      Get.dialog(
+        const LocationProgressIndicator(),
+
+        barrierDismissible: false, // Prevent dismissing the dialog manually
+      );
+
+      // Fetch the user's geolocation
       Position position = await LocationService().determinePosition();
       String latLong = "${position.latitude}, ${position.longitude}";
+
+      // Update the form data with the geolocation
       updateFormData(fieldKey, latLong);
+      print("Geolocation fetched: $latLong");
+
+      // Optional: Notify the user of success
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(
+          content: Text('Geolocation fetched successfully!'),
+          backgroundColor: Colors.green,
+        ),
+      );
     } catch (e) {
       print("Error fetching location: $e");
-      // Handle error, maybe update with a default value or show an error message
+
+      // Optional: Notify the user of the error
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        SnackBar(
+          content: Text('Error fetching geolocation: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      // Close the loading dialog
+      Get.back();
     }
   }
 }

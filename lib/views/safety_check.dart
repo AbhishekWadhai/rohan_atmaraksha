@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:rohan_atmaraksha/routes/routes_string.dart';
-import 'package:rohan_atmaraksha/widgets/my_drawer.dart';
+import 'package:rohan_suraksha_sathi/routes/routes_string.dart';
+import 'package:rohan_suraksha_sathi/widgets/my_drawer.dart';
 
 class SafetyCheckPage extends StatelessWidget {
   const SafetyCheckPage({super.key});

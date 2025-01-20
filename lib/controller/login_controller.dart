@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:rohan_atmaraksha/routes/routes_string.dart';
-import 'package:rohan_atmaraksha/services/api_services.dart';
-import 'package:rohan_atmaraksha/services/jwt_service.dart';
-import 'package:rohan_atmaraksha/services/shared_preferences.dart';
+import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
+import 'package:rohan_suraksha_sathi/routes/routes_string.dart';
+import 'package:rohan_suraksha_sathi/services/api_services.dart';
+import 'package:rohan_suraksha_sathi/services/connection_service.dart';
+import 'package:rohan_suraksha_sathi/services/jwt_service.dart';
+import 'package:rohan_suraksha_sathi/services/shared_preferences.dart';
 
 class LoginController extends GetxController {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  String fcmToken = Strings.fcmToken;
+  var isLoading = false.obs;
+
+  onInit() {
+    super.onInit();
+    ConnectivityService.checkAndShowOfflineSnackbar();
+  }
 
   String? validateUsername(String? value) {
     if (value == null || value.isEmpty) {
@@ -26,11 +35,13 @@ class LoginController extends GetxController {
 
   void handleLogin() async {
     if (formKey.currentState?.validate() ?? false) {
+      isLoading.value = true;
       // If the form is valid, display a snackbar and navigate
       try {
         final a = await ApiService().postRequest("user/login", {
           "emailId": usernameController.text,
-          "password": passwordController.text
+          "password": passwordController.text,
+          "fcmToken": fcmToken
         });
         if (a != null) {
           await SharedPrefService().saveString("token", a["token"]);
@@ -42,8 +53,11 @@ class LoginController extends GetxController {
         }
         print(a);
       } catch (e) {
+        Get.snackbar("Login Failed", "Enter valid credentials, Or Check your Internet Connection",duration: Duration(seconds: 10),
+              backgroundColor: Colors.red, colorText: Colors.white);
         print(e);
-      }
+      } finally {}
+      isLoading.value = false;
     }
   }
 

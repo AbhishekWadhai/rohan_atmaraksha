@@ -1,34 +1,38 @@
 import 'dart:convert';
 
+import 'projects_model.dart';
+
 class TbtMeeting {
     String id;
-    ProjectName projectName;
+    Project project;
+    TbtGivenBy createdby;
     String date;
     String time;
-    TypeOfTopic typeOfTopic;
+    String attendees;
+    String attendeesNos;
+    List<TypeOfTopic> typeOfTopic;
     String documentaryEvidencePhoto;
-    List<FormFilled> formFilled;
+    TbtGivenBy tbtGivenBy;
     String geotagging;
     String commentsBox;
-    int v;
-    int attendeesNos;
     double attendeesHours;
-    String tbtMeetingId;
+    int v;
 
     TbtMeeting({
         required this.id,
-        required this.projectName,
+        required this.project,
+        required this.createdby,
         required this.date,
         required this.time,
+        required this.attendees,
+        required this.attendeesNos,
         required this.typeOfTopic,
         required this.documentaryEvidencePhoto,
-        required this.formFilled,
+        required this.tbtGivenBy,
         required this.geotagging,
         required this.commentsBox,
-        required this.v,
-        required this.attendeesNos,
         required this.attendeesHours,
-        required this.tbtMeetingId,
+        required this.v,
     });
 
     factory TbtMeeting.fromRawJson(String str) => TbtMeeting.fromJson(json.decode(str));
@@ -37,124 +41,108 @@ class TbtMeeting {
 
     factory TbtMeeting.fromJson(Map<String, dynamic> json) => TbtMeeting(
         id: json["_id"],
-        projectName: ProjectName.fromJson(json["projectName"]),
+        project: Project.fromJson(json["project"]),
+        createdby: TbtGivenBy.fromJson(json["createdby"]),
         date: json["date"],
         time: json["time"],
-        typeOfTopic: TypeOfTopic.fromJson(json["typeOfTopic"]),
+        attendees: json["attendees"],
+        attendeesNos: json["attendeesNos"],
+        typeOfTopic: List<TypeOfTopic>.from(json["typeOfTopic"].map((x) => TypeOfTopic.fromJson(x))),
         documentaryEvidencePhoto: json["documentaryEvidencePhoto"],
-        formFilled: List<FormFilled>.from(json["formFilled"].map((x) => FormFilled.fromJson(x))),
+        tbtGivenBy: TbtGivenBy.fromJson(json["TbtGivenBy"]),
         geotagging: json["geotagging"],
         commentsBox: json["commentsBox"],
-        v: json["__v"],
-        attendeesNos: json["attendeesNos"],
         attendeesHours: json["attendeesHours"]?.toDouble(),
-        tbtMeetingId: json["id"],
+        v: json["__v"],
     );
 
     Map<String, dynamic> toJson() => {
         "_id": id,
-        "projectName": projectName.toJson(),
+        "project": project.toJson(),
+        "createdby": createdby.toJson(),
         "date": date,
         "time": time,
-        "typeOfTopic": typeOfTopic.toJson(),
+        "attendees": attendees,
+        "attendeesNos": attendeesNos,
+        "typeOfTopic": List<dynamic>.from(typeOfTopic.map((x) => x.toJson())),
         "documentaryEvidencePhoto": documentaryEvidencePhoto,
-        "formFilled": List<dynamic>.from(formFilled.map((x) => x.toJson())),
+        "TbtGivenBy": tbtGivenBy.toJson(),
         "geotagging": geotagging,
         "commentsBox": commentsBox,
-        "__v": v,
-        "attendeesNos": attendeesNos,
         "attendeesHours": attendeesHours,
-        "id": tbtMeetingId,
+        "__v": v,
     };
 }
 
-class FormFilled {
+class TbtGivenBy {
+    String id;
+    String userId;
     String name;
-    String signature;
-    String id;
-    String formFilledId;
-
-    FormFilled({
-        required this.name,
-        required this.signature,
-        required this.id,
-        required this.formFilledId,
-    });
-
-    factory FormFilled.fromRawJson(String str) => FormFilled.fromJson(json.decode(str));
-
-    String toRawJson() => json.encode(toJson());
-
-    factory FormFilled.fromJson(Map<String, dynamic> json) => FormFilled(
-        name: json["name"],
-        signature: json["signature"],
-        id: json["_id"],
-        formFilledId: json["id"],
-    );
-
-    Map<String, dynamic> toJson() => {
-        "name": name,
-        "signature": signature,
-        "_id": id,
-        "id": formFilledId,
-    };
-}
-
-class ProjectName {
-    String id;
-    String projectId;
-    String projectName;
-    String siteLocation;
-    DateTime startDate;
-    DateTime endDate;
-    String status;
-    String description;
-    String company;
+    String role;
+    String emailId;
+    String password;
+    String phone;
+    String address;
+    bool isActive;
+    String project;
+    String createdAt;
+    String updatedAt;
     int v;
 
-    ProjectName({
+    TbtGivenBy({
         required this.id,
-        required this.projectId,
-        required this.projectName,
-        required this.siteLocation,
-        required this.startDate,
-        required this.endDate,
-        required this.status,
-        required this.description,
-        required this.company,
+        required this.userId,
+        required this.name,
+        required this.role,
+        required this.emailId,
+        required this.password,
+        required this.phone,
+        required this.address,
+        required this.isActive,
+        required this.project,
+        required this.createdAt,
+        required this.updatedAt,
         required this.v,
     });
 
-    factory ProjectName.fromRawJson(String str) => ProjectName.fromJson(json.decode(str));
+    factory TbtGivenBy.fromRawJson(String str) => TbtGivenBy.fromJson(json.decode(str));
 
     String toRawJson() => json.encode(toJson());
 
-    factory ProjectName.fromJson(Map<String, dynamic> json) => ProjectName(
+    factory TbtGivenBy.fromJson(Map<String, dynamic> json) => TbtGivenBy(
         id: json["_id"],
-        projectId: json["projectId"],
-        projectName: json["projectName"],
-        siteLocation: json["siteLocation"],
-        startDate: DateTime.parse(json["startDate"]),
-        endDate: DateTime.parse(json["endDate"]),
-        status: json["status"],
-        description: json["description"],
-        company: json["company"],
+        userId: json["userId"],
+        name: json["name"],
+        role: json["role"],
+        emailId: json["emailId"],
+        password: json["password"],
+        phone: json["phone"],
+        address: json["address"],
+        isActive: json["isActive"],
+        project: json["project"],
+        createdAt: json["createdAt"],
+        updatedAt: json["updatedAt"],
         v: json["__v"],
     );
 
     Map<String, dynamic> toJson() => {
         "_id": id,
-        "projectId": projectId,
-        "projectName": projectName,
-        "siteLocation": siteLocation,
-        "startDate": startDate.toIso8601String(),
-        "endDate": endDate.toIso8601String(),
-        "status": status,
-        "description": description,
-        "company": company,
+        "userId": userId,
+        "name": name,
+        "role": role,
+        "emailId": emailId,
+        "password": password,
+        "phone": phone,
+        "address": address,
+        "isActive": isActive,
+        "project": project,
+        "createdAt": createdAt,
+        "updatedAt": updatedAt,
         "__v": v,
     };
 }
+
+
 
 class TypeOfTopic {
     String id;

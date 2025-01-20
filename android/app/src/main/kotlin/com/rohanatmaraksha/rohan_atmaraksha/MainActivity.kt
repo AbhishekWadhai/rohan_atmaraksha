@@ -1,4 +1,4 @@
-package com.rohanatmaraksha.rohan_atmaraksha
+package com.rohanatmaraksha.rohan_suraksha_sathi
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,14 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:rohan_atmaraksha/routes/routes.dart';
-import 'package:rohan_atmaraksha/routes/routes_string.dart';
-import 'package:rohan_atmaraksha/services/jwt_service.dart';
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  bool isLoggedIn = await isTokenValid();
-  runApp(MyApp(isLoggedIn: isLoggedIn));
-}
+import 'package:rohan_suraksha_sathi/routes/routes.dart';
+import 'package:rohan_suraksha_sathi/routes/routes_string.dart';
 
 class MyApp extends StatelessWidget {
   final bool isLoggedIn;
@@ -19,7 +12,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: '',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue[700]!),
         useMaterial3: false,
       ),
       initialRoute: isLoggedIn ? Routes.homePage : Routes.loginPage,

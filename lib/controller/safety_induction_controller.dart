@@ -2,19 +2,58 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:rohan_atmaraksha/model/induction_model.dart';
-import 'package:rohan_atmaraksha/services/api_services.dart';
+import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
+import 'package:rohan_suraksha_sathi/model/induction_model.dart';
+import 'package:rohan_suraksha_sathi/services/api_services.dart';
 
 class SafetyInductionController extends GetxController
     with GetSingleTickerProviderStateMixin {
   TabController? tabController;
   RxList<Induction> inductionList = <Induction>[].obs;
+  var searchQuery = ''.obs;
+  var currentPage = 0.obs;
+  final int itemsPerPage = 100;
 
   @override
   void onInit() {
     super.onInit();
     print("---------------------On init called---------------------");
     getPermitData();
+  }
+
+  List<Induction> get filteredInductions {
+    return inductionList
+        .where((induction) =>
+            induction.typeOfTopic.topicTypes
+                ?.toLowerCase()
+                .contains(searchQuery.value.toLowerCase()) ??
+            false)
+        .toList();
+  }
+
+  // Paginated inductions
+  List<Induction> get paginatedInductions {
+    int start = currentPage.value * itemsPerPage;
+    int end = start + itemsPerPage;
+    return filteredInductions.sublist(start,
+        end > filteredInductions.length ? filteredInductions.length : end);
+  }
+
+  void updateSearchQuery(String query) {
+    searchQuery.value = query;
+    currentPage.value = 0; // Reset to the first page after a new search
+  }
+
+  void nextPage() {
+    if ((currentPage.value + 1) * itemsPerPage < filteredInductions.length) {
+      currentPage.value++;
+    }
+  }
+
+  void previousPage() {
+    if (currentPage.value > 0) {
+      currentPage.value--;
+    }
   }
 
   getPermitData() async {
@@ -28,10 +67,20 @@ class SafetyInductionController extends GetxController
       // Ensure that the API response is a List of Map<String, dynamic>
       if (meetingtData is List) {
         // Check for any null elements in the list
-        inductionList.value = meetingtData
-            .where((e) => e != null)
-            .map((e) => Induction.fromJson(e as Map<String, dynamic>))
-            .toList();
+        if (Strings.roleName == "Admin") {
+          inductionList.value = meetingtData
+              .where((e) => e != null)
+              .map((e) => Induction.fromJson(e as Map<String, dynamic>))
+              .toList();
+        } else {
+          inductionList.value = meetingtData
+              .where((e) => e != null)
+              .map((e) => Induction.fromJson(e as Map<String, dynamic>))
+              .where((induction) =>
+                  induction.project.id ==
+                  Strings.endpointToList['project']['_id'])
+              .toList();
+        }
         print("---------------------Permit called---------------------");
         print(jsonEncode(inductionList));
       } else {

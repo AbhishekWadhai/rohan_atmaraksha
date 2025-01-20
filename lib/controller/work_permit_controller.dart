@@ -1,14 +1,16 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:rohan_atmaraksha/model/work_permit_model.dart';
-import 'package:rohan_atmaraksha/services/api_services.dart';
-import 'package:rohan_atmaraksha/services/shared_preferences.dart';
+import 'package:rohan_suraksha_sathi/model/work_permit_model.dart';
+import 'package:rohan_suraksha_sathi/services/api_services.dart';
+import 'package:rohan_suraksha_sathi/services/shared_preferences.dart';
 
 class WorkPermitController extends GetxController
     with GetSingleTickerProviderStateMixin {
   RxList<WorkPermit> workPermitList = <WorkPermit>[].obs;
+  var currentPage = 0.obs;
+  final int itemsPerPage = 20;
+  var searchQuery = ''.obs;
 
   @override
   void onInit() {
@@ -16,6 +18,38 @@ class WorkPermitController extends GetxController
     print("---------------------On init called---------------------");
     getData();
     getPermitData();
+  }
+
+  // Get filtered and paginated permits
+  List<dynamic> get paginatedWorkPermits {
+    final filteredList = workPermitList
+        .where((permit) =>
+            (permit.workDescription?.toLowerCase() ?? "")
+                .contains(searchQuery.value.toLowerCase()) ||
+            (permit.date ?? "").contains(searchQuery.value))
+        .toList();
+
+    int start = currentPage.value * itemsPerPage;
+    int end = start + itemsPerPage;
+    return filteredList.sublist(
+        start, end > filteredList.length ? filteredList.length : end);
+  }
+
+  void updateSearchQuery(String query) {
+    searchQuery.value = query;
+    currentPage.value = 0; // Reset to the first page after a new search
+  }
+
+  void nextPage() {
+    if ((currentPage.value + 1) * itemsPerPage < workPermitList.length) {
+      currentPage.value++;
+    }
+  }
+
+  void previousPage() {
+    if (currentPage.value > 0) {
+      currentPage.value--;
+    }
   }
 
   getData() async {

@@ -2,13 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:rohan_atmaraksha/model/incident_report_model.dart';
-import 'package:rohan_atmaraksha/services/api_services.dart';
+import 'package:rohan_suraksha_sathi/model/incident_report_model.dart';
+import 'package:rohan_suraksha_sathi/model/safety_report_model.dart';
+import 'package:rohan_suraksha_sathi/services/api_services.dart';
 
-class IncidentController extends GetxController
+class SafetyReportController extends GetxController
     with GetSingleTickerProviderStateMixin {
   TabController? tabController;
-  RxList<IncidentReport> incidentList = <IncidentReport>[].obs;
+  RxList<SafetyReportModel> reportList = <SafetyReportModel>[].obs;
 
   @override
   void onInit() {
@@ -19,7 +20,7 @@ class IncidentController extends GetxController
 
   getPermitData() async {
     try {
-      final meetingtData = await ApiService().getRequest("incident");
+      final meetingtData = await ApiService().getRequest("safetyreport");
 
       if (meetingtData == null) {
         throw Exception("Received null data from API");
@@ -28,12 +29,12 @@ class IncidentController extends GetxController
       // Ensure that the API response is a List of Map<String, dynamic>
       if (meetingtData is List) {
         // Check for any null elements in the list
-        incidentList.value = meetingtData
+        reportList.value = meetingtData
             .where((e) => e != null)
-            .map((e) => IncidentReport.fromJson(e as Map<String, dynamic>))
+            .map((e) => SafetyReportModel.fromJson(e as Map<String, dynamic>))
             .toList();
         print("---------------------Permit called---------------------");
-        print(jsonEncode(incidentList));
+        print(jsonEncode(reportList));
       } else {
         throw Exception("Unexpected data format");
       }

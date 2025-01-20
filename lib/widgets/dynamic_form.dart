@@ -3,11 +3,17 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
-import 'package:rohan_atmaraksha/controller/dynamic_form_contoller.dart';
+import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
 
-import 'package:rohan_atmaraksha/model/form_data_model.dart';
-import 'package:rohan_atmaraksha/widgets/subform.dart';
+import 'package:rohan_suraksha_sathi/controller/dynamic_form_contoller.dart';
+import 'package:rohan_suraksha_sathi/controller/sub_form_controller.dart';
+
+import 'package:rohan_suraksha_sathi/model/form_data_model.dart';
+import 'package:rohan_suraksha_sathi/views/image_view_page.dart';
+import 'package:rohan_suraksha_sathi/widgets/subform.dart';
+import 'package:signature/signature.dart';
 
 class DynamicForm extends StatelessWidget {
   final String pageName;
@@ -22,15 +28,12 @@ class DynamicForm extends StatelessWidget {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final DynamicFormController controller = Get.put(DynamicFormController());
-  Timer? _debounce;
 
   @override
   Widget build(BuildContext context) {
-    print(
-        "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv");
-    print(initialData);
-
+    controller.initializeFormData(initialData);
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       body: Stack(
         children: [
           Form(
@@ -38,7 +41,6 @@ class DynamicForm extends StatelessWidget {
             child: Builder(builder: (context) {
               return Obx(
                 () {
-                  controller.initializeFormData(initialData);
                   controller.getPageFields(pageName);
 
                   return GetBuilder<DynamicFormController>(
@@ -46,186 +48,62 @@ class DynamicForm extends StatelessWidget {
                     return SingleChildScrollView(
                       child: Padding(
                         padding: const EdgeInsets.all(14.0),
-                        child: LayoutBuilder(
-                          builder: (context, constraints) {
-                            double screenWidth =
-                                MediaQuery.of(context).size.width;
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Filter fields based on view permissions and build form fields dynamically for mobile view
+                            ...controller.pageFields
+                                .where((field) {
+                                  var viewPermissions = List<String>.from(
+                                      field.permissions?.view ?? []);
+                                  return controller.hasViewPermission(
+                                      viewPermissions); // Check if the user has view permission
+                                })
+                                .map((field) => Column(
+                                      children: [
+                                        // Build the form field dynamically and check for edit permissions
+                                        buildFormField(
+                                            field,
+                                            controller.hasEditPermission(
+                                                field.permissions?.edit ?? []),
+                                            context),
+                                        const SizedBox(height: 10),
+                                      ],
+                                    ))
+                                .toList(),
 
-                            // Define breakpoints for responsiveness
-                            if (screenWidth > 1200) {
-                              // Large screen (desktop view)
-                              return Column(
-                                children: [
-                                  GridView.builder(
-                                    shrinkWrap: true,
-                                    physics: NeverScrollableScrollPhysics(),
-                                    gridDelegate:
-                                        const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount:
-                                          3, // 3 columns for large screens
-                                      crossAxisSpacing: 20,
-                                      mainAxisSpacing: 20,
-                                      childAspectRatio: 2,
-                                    ),
-                                    itemCount: controller.pageFields.length,
-                                    itemBuilder: (context, index) {
-                                      var field = controller.pageFields[index];
-                                      return Column(
-                                        children: [
-                                          //buildFormField(field),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      if (_formKey.currentState?.validate() ??
-                                          false) {
-                                        if (isEdit) {
-                                          controller.updateData(pageName);
-                                        } else {
-                                          controller.submitForm(pageName);
-                                        }
-                                      } else {
-                                        // Show an error if form is invalid
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                                'Please correct the errors in the form'),
-                                            backgroundColor: Colors.red,
-                                          ),
-                                        );
-                                      }
-                                    },
-                                    child: SizedBox(
-                                      width: MediaQuery.of(context).size.width,
-                                      child: Text(
-                                        isEdit ? 'Update' : 'Submit',
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            } else if (screenWidth > 600) {
-                              // Medium screen (tablet view)
-                              return Column(
-                                children: [
-                                  GridView.builder(
-                                    shrinkWrap: true,
-                                    physics: NeverScrollableScrollPhysics(),
-                                    gridDelegate:
-                                        const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount:
-                                          2, // 2 columns for medium screens
-                                      crossAxisSpacing: 20,
-                                      mainAxisSpacing: 20,
-                                      childAspectRatio: 2.5,
-                                    ),
-                                    itemCount: controller.pageFields.length,
-                                    itemBuilder: (context, index) {
-                                      var field = controller.pageFields[index];
-                                      return Column(
-                                        children: [
-                                          //buildFormField(field),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      if (_formKey.currentState?.validate() ??
-                                          false) {
-                                        if (isEdit) {
-                                          controller.updateData(pageName);
-                                        } else {
-                                          controller.submitForm(pageName);
-                                        }
-                                      } else {
-                                        // Show an error if form is invalid
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                                'Please correct the errors in the form'),
-                                            backgroundColor: Colors.red,
-                                          ),
-                                        );
-                                      }
-                                    },
-                                    child: SizedBox(
-                                      width: MediaQuery.of(context).size.width,
-                                      child: Text(
-                                        isEdit ? 'Update' : 'Submit',
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            } else {
-                              // Small screen (mobile view)
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Filter fields based on view permissions and build form fields dynamically for mobile view
-                                  ...controller.pageFields
-                                      .where((field) {
-                                        var viewPermissions = List<String>.from(
-                                            field.permissions?.view ?? []);
-                                        return controller.hasViewPermission(
-                                            viewPermissions); // Check if the user has view permission
-                                      })
-                                      .map((field) => Column(
-                                            children: [
-                                              // Build the form field dynamically and check for edit permissions
-                                              buildFormField(
-                                                  field,
-                                                  controller.hasEditPermission(
-                                                      field.permissions?.edit ??
-                                                          [])),
-                                              const SizedBox(height: 10),
-                                            ],
-                                          ))
-                                      .toList(),
+                            const SizedBox(height: 10),
 
-                                  const SizedBox(height: 10),
-
-                                  // Submit button
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      if (_formKey.currentState?.validate() ??
-                                          false) {
-                                        if (isEdit) {
-                                          controller.updateData(pageName);
-                                        } else {
-                                          controller.submitForm(pageName);
-                                        }
-                                      } else {
-                                        // Show an error if form is invalid
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                                'Please correct the errors in the form'),
-                                            backgroundColor: Colors.red,
-                                          ),
-                                        );
-                                      }
-                                    },
-                                    child: SizedBox(
-                                      width: MediaQuery.of(context).size.width,
-                                      child: Text(
-                                        isEdit ? 'Update' : 'Submit',
-                                        textAlign: TextAlign.center,
-                                      ),
+                            // Submit button
+                            ElevatedButton(
+                              onPressed: () {
+                                if (_formKey.currentState?.validate() ??
+                                    false) {
+                                  if (isEdit) {
+                                    controller.updateData(pageName);
+                                  } else {
+                                    controller.submitForm(pageName);
+                                  }
+                                } else {
+                                  // Show an error if form is invalid
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          'Please correct the errors in the form'),
+                                      backgroundColor: Colors.red,
                                     ),
-                                  ),
-                                ],
-                              );
-                            }
-                          },
+                                  );
+                                }
+                              },
+                              child: SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                                child: Text(
+                                  isEdit ? 'Update' : 'Submit',
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     );
@@ -234,17 +112,61 @@ class DynamicForm extends StatelessWidget {
               );
             }),
           ),
+          Obx(() {
+            if (controller.isLoading.value) {
+              return const Center(
+                  child:
+                      CircularProgressIndicator()); // Show the CircularProgressIndicator
+            } else {
+              return SizedBox.shrink(); // Your regular content goes here
+            }
+          })
         ],
       ),
     );
   }
 
-  Widget buildFormField(PageField field, bool isEditable) {
+  Widget buildFormField(
+      PageField field, bool isEditable, BuildContext context) {
     switch (field.type) {
-      case 'CustomTextField':
-        final TextEditingController textController = TextEditingController(
-          text: controller.formData[field.headers]?.toString() ?? '',
-        );
+      case 'defaultField':
+        final dynamic savedValue = controller.formData[field.headers];
+
+        // Skip rendering this field if in edit mode and field.headers is "createdBy"
+        if (isEdit && field.headers == "createdby") {
+          return const SizedBox.shrink(); // Return an empty widget
+        }
+
+        String displayValue = "";
+        String saveValue = "";
+        if (isEdit && savedValue != null) {
+          print(
+              "222222222222Opened in edit mode=======================================");
+          if (savedValue is Map) {
+            print(
+                "222222222222is a Map=======================================");
+            // Handle the case where savedValue is a Map
+            displayValue = savedValue[field.key] ?? "";
+            saveValue = savedValue["_id"] ?? "";
+            controller.updateFormData(field.headers, savedValue);
+          } else if (savedValue is String) {
+            print(
+                "222222222222Opened is A string=======================================");
+            // Handle the case where savedValue is a String
+            displayValue = savedValue;
+            saveValue = savedValue;
+            controller.updateFormData(field.headers, savedValue);
+          }
+        } else {
+          print(
+              "222222222222Opened in create mode=======================================");
+          // Extract the projectName and _id
+          displayValue = Strings.endpointToList[field.endpoint][field.key];
+          saveValue = Strings.endpointToList[field.endpoint]["_id"];
+          controller.updateFormData(field.headers, saveValue);
+        }
+
+        // Store the project ID in formData
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -255,37 +177,196 @@ class DynamicForm extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             TextFormField(
-              // Skip validation if the field is read-only
-              validator: (value) {
-                if (!isEditable) return null; // Don't validate read-only fields
-                return controller.validateTextField(
-                    value); // Apply validation for editable fields
-              },
-
-              controller: textController,
-              decoration: kTextFieldDecoration("Enter ${field.title}"),
-
-              readOnly:
-                  !isEditable, // Make the field read-only if it's not editable
-
-              // Update data only if the field is editable
-              onChanged: isEditable
-                  ? (value) {
-                      _debounce?.cancel();
-
-                      // Start a new timer for debounce
-                      _debounce = Timer(const Duration(milliseconds: 2000), () {
-                        controller.updateFormData(field.headers, value);
-                      });
-                    }
-                  : null, // No action if it's not editable
+              // Display the projectName as the field value
+              controller: TextEditingController(text: displayValue),
+              decoration: kTextFieldDecoration(""),
+              readOnly: true, // Make this field read-only
             ),
             const SizedBox(height: 10),
           ],
         );
 
+      case 'checklist':
+        // Fetch and type-check the checklist
+        final List<Map<String, dynamic>> checkListItems = controller.checkList;
+
+        return ExpansionTile(
+          expandedCrossAxisAlignment: CrossAxisAlignment.start,
+          title: Text(field.title),
+          children: checkListItems.map((checkPoint) {
+            final String checkPointTitle = checkPoint['CheckPoints'] ?? '';
+            final String initialResponse = checkPoint['response'] ?? 'No';
+
+            return Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Display the checkpoint title
+                  Text(
+                    checkPointTitle,
+                    style: const TextStyle(fontSize: 16),
+                    textAlign: TextAlign.start,
+                  ),
+                  const SizedBox(height: 8.0),
+                  // Render radio options
+                  Row(
+                    children: ['Yes', 'No', 'N/A'].map((option) {
+                      return Row(
+                        children: [
+                          Obx(() => Radio<String>(
+                                value: option,
+                                groupValue: controller.formData[field.headers]
+                                        ?.firstWhere(
+                                            (e) =>
+                                                e['CheckPoints'] ==
+                                                checkPointTitle,
+                                            orElse: () => {
+                                                  'CheckPoints':
+                                                      checkPointTitle,
+                                                  'response': initialResponse
+                                                })['response'] ??
+                                    initialResponse,
+                                onChanged: isEditable
+                                    ? (value) {
+                                        // Update safetyMeasuresTaken on selection
+                                        final updatedCheckPoint = {
+                                          'CheckPoints': checkPointTitle,
+                                          'response': value,
+                                        };
+
+                                        // Update formData with new response for the specific checkpoint
+                                        controller.formData.update(
+                                          field.headers,
+                                          (existing) {
+                                            final List<Map<String, dynamic>>
+                                                updatedList =
+                                                List.from(existing);
+                                            final existingIndex =
+                                                updatedList.indexWhere((e) =>
+                                                    e['CheckPoints'] ==
+                                                    checkPointTitle);
+
+                                            if (existingIndex >= 0) {
+                                              // Update the existing response
+                                              updatedList[existingIndex] =
+                                                  updatedCheckPoint;
+                                            } else {
+                                              // Add new checkpoint response if not already present
+                                              updatedList
+                                                  .add(updatedCheckPoint);
+                                            }
+                                            return updatedList;
+                                          },
+                                          ifAbsent: () => [
+                                            updatedCheckPoint
+                                          ], // Default value if no entry exists
+                                        );
+                                      }
+                                    : null,
+                              )),
+                          Text(option),
+                        ],
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        );
+
+      case 'CustomTextField':
+        final TextEditingController textController =
+            controller.getTextController(field.headers);
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              field.title,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            TextFormField(
+              validator: (value) {
+                if (!isEditable)
+                  return null; // Skip validation for read-only fields
+                return controller
+                    .validateTextField(value); // Validate editable fields
+              },
+              controller: textController,
+              decoration: kTextFieldDecoration("Enter ${field.title}"),
+              readOnly: !isEditable,
+              onChanged: isEditable
+                  ? (value) {
+                      controller.debounceMap[field.headers]?.cancel();
+
+                      // Start a new timer for debounce specific to this field
+                      controller.debounceMap[field.headers] =
+                          Timer(const Duration(milliseconds: 2000), () {
+                        // Update the form data after debounce
+                        controller.updateFormData(field.headers, value);
+                      });
+                    }
+                  : null,
+              keyboardType:
+                  field.key == "numeric" ? TextInputType.number : null,
+            ),
+          ],
+        );
+      case 'calculatedField':
+        // Fetch the TextEditingController for this field
+        TextEditingController textController =
+            controller.getTextController(field.headers);
+
+        // Fetch the values from formData
+        String? value1String = controller.formData[field.endpoint];
+        String? value2String = field.key;
+
+        // Debug: Print values to ensure they're being fetched
+        debugPrint("value1: $value1String, value2: $value2String");
+
+        // Parse the values safely
+        final value1 = int.tryParse(value1String ?? '') ?? 0;
+        final value2 = double.tryParse(value2String ?? '') ?? 0.0;
+
+        // Debug: Check parsed values
+        debugPrint("Parsed value1: $value1, value2: $value2");
+
+        // Perform the calculation
+        final result = value1 * value2;
+
+        // Debug: Log the result
+        debugPrint("Calculation result: $result");
+
+        // Update the text controller with the result
+        textController.text = result.toString();
+        controller.updateFormData(field.headers, textController.text);
+        // Return the UI for the calculated field
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              field.title,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            TextFormField(
+              controller: textController,
+              decoration: kTextFieldDecoration("Enter ${field.title}"),
+              readOnly: true, // Dynamically control editability
+              maxLines: null,
+              keyboardType: field.key == "numeric"
+                  ? TextInputType.number
+                  : TextInputType.text,
+            ),
+          ],
+        );
+
       case 'editablechip':
-        return buildEditableChipField(field, isEditable);
+        return buildEditableChipField(field, isEditable, isEdit);
       case 'multiselect':
         return FutureBuilder<List<Map<String, String>>>(
           future:
@@ -307,6 +388,10 @@ class DynamicForm extends StatelessWidget {
                 ],
               );
             } else if (snapshot.hasError) {
+              Get.snackbar(
+                  duration: Duration(seconds: 30),
+                  snapshot.stackTrace.toString(),
+                  snapshot.error.toString());
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -322,8 +407,34 @@ class DynamicForm extends StatelessWidget {
               );
             } else if (snapshot.hasData) {
               final List<Map<String, String>> options = snapshot.data ?? [];
-              final List<String> selectedIds =
-                  (controller.formData[field.headers] as List<String>?) ?? [];
+              final List<String> selectedIds = (controller
+                          .formData[field.headers] as List?)
+                      ?.map((item) {
+                        if (item is String) {
+                          return item; // If item is already a String, return it directly.
+                        } else if (item is Map<String, dynamic> &&
+                            item.containsKey('_id')) {
+                          return item['_id']?.toString() ??
+                              ''; // If it's a Map, extract '_id' as String.
+                        } else {
+                          return ''; // For any unexpected type, return an empty string.
+                        }
+                      })
+                      .where((id) => id.isNotEmpty) // Remove any empty strings.
+                      .toList() ??
+                  [];
+
+              // final List<String> selectedIds = (controller
+              //             .formData[field.headers] as List?)
+              //         ?.where((item) =>
+              //             item is Map<String, dynamic> &&
+              //             item.containsKey('_id'))
+              //         .map((item) =>
+              //             (item as Map<String, dynamic>)['_id']?.toString() ??
+              //             '')
+              //         .where((id) => id.isNotEmpty)
+              //         .toList() ??
+              //     [];
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -378,6 +489,7 @@ class DynamicForm extends StatelessWidget {
                           ),
                         ),
                         decoration: BoxDecoration(
+                          color: Colors.white,
                           border: Border.all(
                               color: isEditable
                                   ? Colors.grey
@@ -409,28 +521,13 @@ class DynamicForm extends StatelessWidget {
             // Image Upload Buttons (conditional on editable state)
             Row(
               children: [
-                ElevatedButton(
-                  onPressed: isEditable
-                      ? () async {
-                          // Call the function to pick and upload the image
-                          await controller.pickAndUploadImage(
-                              field.headers, field.endpoint ?? "", "");
-                        }
-                      : null, // Disable the button if not editable
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isEditable
-                        ? null
-                        : Colors.grey, // Visual feedback if disabled
-                  ),
-                  child: const Text('Gallery'),
-                ),
                 const SizedBox(width: 30),
                 ElevatedButton(
                   onPressed: isEditable
                       ? () async {
                           // Call the function to pick and upload the image from the camera
                           await controller.pickAndUploadImage(
-                              field.headers, field.endpoint ?? "", "camera");
+                              field.headers, field.endpoint ?? "");
                         }
                       : null, // Disable the button if not editable
                   style: ElevatedButton.styleFrom(
@@ -438,7 +535,7 @@ class DynamicForm extends StatelessWidget {
                         ? null
                         : Colors.grey, // Visual feedback if disabled
                   ),
-                  child: const Text('Camera'),
+                  child: const Text('Take Image'),
                 ),
               ],
             ),
@@ -453,12 +550,17 @@ class DynamicForm extends StatelessWidget {
                 return Column(
                   children: [
                     const SizedBox(height: 10),
-                    Image.network(
-                      imageUrl,
-                      height: 150,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Text('Failed to load image');
+                    GestureDetector(
+                      onTap: () {
+                        Get.to(ImageViewPage(imageUrl: imageUrl));
                       },
+                      child: Image.network(
+                        imageUrl,
+                        height: 150,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Text('Failed to load image');
+                        },
+                      ),
                     ), // Display the uploaded image
                     const SizedBox(height: 10),
                     const Text('Image uploaded successfully!'),
@@ -485,167 +587,163 @@ class DynamicForm extends StatelessWidget {
         }
 
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Button to add attendees (only shown if editable)
-            if (isEditable)
-              TextButton(
-                onPressed: () async {
-                  var result = await Get.bottomSheet(
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SubForm(pageName: field.headers),
-                    ),
-                    backgroundColor: Colors.white,
-                  );
-                  if (result != null) {
-                    // Ensure formData[field.headers] is a list before adding
-                    if (controller.formData[field.headers] == null) {
-                      controller.formData[field.headers] = [];
-                    }
+            // Add new attendee section
+            Text(
+              field.title,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
 
-                    // Add result to formData and update subformData
-                    controller.formData[field.headers].add(result);
-                    controller.subformData.value =
-                        (controller.formData[field.headers] as List)
-                            .where((item) => item is Map<String, dynamic>)
-                            .map((item) => item as Map<String, dynamic>)
-                            .toList();
-                  }
-                },
-                child: const Text("Add Attendee's Name"),
+            if (isEditable)
+              ListTile(
+                title: const Text("Add Data"),
+                trailing: IconButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: () async {
+                    // Open a SubForm as a dialog
+                    var result = await Get.dialog(
+                      Dialog(
+                        child: WillPopScope(
+                          onWillPop: () async {
+                            Get.delete<SubFormController>();
+                            return true;
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: SubForm(
+                              pageName: field.headers,
+                            ),
+                          ),
+                        ),
+                      ),
+                      barrierDismissible:
+                          true, // Allow tapping outside to close
+                    );
+                    print(
+                        "{{{{{{{{{{{{{{{{{{{{{{{{{{{{${result}}}}}}}}}}}}}}}}}}}}}}}}}}}}}");
+                    if (result != null) {
+                      if (controller.formData[field.headers] == null) {
+                        controller.formData[field.headers] = [];
+                      }
+
+                      // Add result to formData and update subformData
+                      controller.formData[field.headers].add(result);
+                      controller.subformData.value =
+                          (controller.formData[field.headers] as List)
+                              .where((item) => item is Map<String, dynamic>)
+                              .map((item) => item as Map<String, dynamic>)
+                              .toList();
+                    } else {
+                      print(
+                          "{{{{{{{{{{{{{{{{{{{{{{{{{{{{returning null}}}}}}}}}}}}}}}}}}}}}}}}}}}}");
+                    }
+                  },
+                ),
               ),
 
-            // Displaying the attendees as chips
-            Obx(() => Wrap(
-                  spacing: 8.0, // space between chips
-                  runSpacing: 4.0, // space between rows of chips
-                  children: controller.subformData.map((attendee) {
-                    return InkWell(
-                      onTap: () async {
-                        if (isEditable) {
-                          var result = await Get.bottomSheet(
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        const Text(
-                                          "Details",
-                                          style: TextStyle(
-                                              fontSize: 18,
+            // Display attendees using ExpansionTile
+            Obx(() => ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: controller.subformData.length,
+                  itemBuilder: (context, index) {
+                    final attendee = controller.subformData[index];
+                    return ExpansionTile(
+                      key: ValueKey(attendee),
+                      title: Text(attendee[field.key] ?? ""),
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              ...attendee.entries.map((entry) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 8.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          "${entry.key}: ",
+                                          style: const TextStyle(
                                               fontWeight: FontWeight.bold),
                                         ),
-                                        const Spacer(),
-                                        if (isEditable) // Only show edit button if editable
-                                          IconButton(
-                                            onPressed: () async {
-                                              var result =
-                                                  await Get.bottomSheet(
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: SubForm(
-                                                    pageName: field.headers,
-                                                    initialData: attendee,
-                                                    isEdit: true,
-                                                  ),
-                                                ),
-                                                backgroundColor: Colors.white,
-                                              );
-                                              if (result != null) {
-                                                // Find index of current attendee in the list
-                                                int index = controller
-                                                    .subformData
-                                                    .indexOf(attendee);
-
-                                                if (index != -1) {
-                                                  // Replace the attendee with the updated result
-                                                  controller
-                                                          .subformData[index] =
-                                                      result;
-                                                  controller.formData[
-                                                          field.headers] =
-                                                      List.from(controller
-                                                          .subformData); // Update the main form data
-                                                  print(
-                                                      "Updated attendee: $result");
-                                                }
-                                              }
-                                              Get.back();
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          entry.value?.toString() ?? "N/A",
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                              Row(children: [
+                                if (isEditable)
+                                  TextButton.icon(
+                                    onPressed: () async {
+                                      print(
+                                          "zzzzzzzzzzzzzzzzzzzzzzzzzzz${attendee}");
+                                      var result = await Get.dialog(
+                                        Dialog(
+                                          child: WillPopScope(
+                                            onWillPop: () async {
+                                              Get.delete<SubFormController>();
+                                              return true;
                                             },
-                                            icon: const Icon(Icons.edit),
-                                          )
-                                      ],
-                                    ),
-                                    const SizedBox(height: 16),
-
-                                    // Dynamically create Text widgets for each key-value pair
-                                    ...attendee.entries.map((entry) {
-                                      return Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 18.0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              "${entry.key}: ", // Field key
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: SubForm(
+                                                pageName: field.headers,
+                                                initialData: attendee,
+                                                isEdit: true,
+                                              ),
                                             ),
-                                            Text(entry.value?.toString() ??
-                                                "N/A"),
-                                          ],
+                                          ),
                                         ),
                                       );
-                                    }).toList(),
+                                      if (result != null) {
+                                        controller.subformData[index] = result;
+                                        controller.formData[field.headers] =
+                                            List.from(controller.subformData);
+                                      }
+                                    },
+                                    icon: const Icon(Icons.edit),
+                                    label: const Text("Edit"),
+                                  ),
 
-                                    const SizedBox(height: 16),
-                                  ]),
-                            ),
-                            backgroundColor: Colors.white,
-                          );
-                          if (result != null) {
-                            // Update formData and subformData
-                            if (controller.formData[field.headers] == null) {
-                              controller.formData[field.headers] = [];
-                            }
-                            controller.formData[field.headers].add(result);
-                            controller.subformData.value = (controller
-                                    .formData[field.headers] as List)
-                                .where((item) => item is Map<String, dynamic>)
-                                .map((item) => item as Map<String, dynamic>)
-                                .toList();
-                            print("Updated attendee: $result");
-                          }
-                        }
-                      },
-                      child: Chip(
-                        label: Text(attendee[field.key] ?? ""),
-                        // Only show delete button if editable
-                        onDeleted: isEditable
-                            ? () {
-                                controller.subformData.remove(
-                                    attendee); // Remove the chip from the list
-                                controller.formData[field.headers] =
-                                    controller.subformData;
-                                print(
-                                    "Removed attendee: $attendee"); // Optional: for debugging
-                              }
-                            : null, // Disable deletion when not editable
-                      ),
+                                // Delete attendee button
+                                if (isEditable)
+                                  TextButton.icon(
+                                    onPressed: () {
+                                      controller.subformData.removeAt(index);
+                                      controller.formData[field.headers] =
+                                          List.from(controller.subformData);
+                                    },
+                                    icon: const Icon(Icons.delete),
+                                    label: const Text("Remove"),
+                                  ),
+                              ]),
+                              // Edit attendee button
+                            ],
+                          ),
+                        ),
+                      ],
                     );
-                  }).toList(),
+                  },
                 )),
           ],
         );
 
       case 'dropdown':
         return Obx(() {
-          final selectedValue = controller.formData[field.headers];
+          final selectedValue = (controller.formData[field.headers] is Map)
+              ? controller.formData[field.headers]["_id"].toString()
+              : controller.formData[field.headers]?.toString();
 
           return FutureBuilder<List<Map<String, String>>>(
             future: controller.getDropdownData(
@@ -677,6 +775,9 @@ class DynamicForm extends StatelessWidget {
 
               // Error state
               if (snapshot.hasError) {
+                print(
+                    "dsjbsdjbsjvbsdjbvjsvnnnnnnnnnnnnnnnnnnnnnnn${snapshot.stackTrace}");
+
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -701,6 +802,7 @@ class DynamicForm extends StatelessWidget {
                         child: Container(
                           width: double.infinity, // Occupy full width
                           decoration: BoxDecoration(
+                            color: Colors.white,
                             borderRadius:
                                 BorderRadius.circular(10.0), // Border radius
                             border: Border.all(
@@ -733,6 +835,14 @@ class DynamicForm extends StatelessWidget {
                                 if (newValue != null) {
                                   controller.updateDropdownSelection(
                                       field.headers, newValue);
+                                  if (field.title == "Permit Types") {
+                                    // Find the selected option using `_id` and extract the required field value
+                                    final selectedOption = options.firstWhere(
+                                        (option) => option['_id'] == newValue,
+                                        orElse: () => {});
+                                    controller.getChecklist(
+                                        selectedOption[field.key] ?? '');
+                                  }
                                 }
                               },
                             ),
@@ -792,11 +902,12 @@ class DynamicForm extends StatelessWidget {
         return Obx(() {
           // Ensure initial value is a non-null, valid list of Strings
           List<String> initialSelectedValues =
-              (controller.formData[field.headers] is List<String>)
-                  ? List<String>.from(
-                      controller.formData[field.headers] as List<String>)
-                  : [];
+              (controller.formData[field.headers] as List<dynamic>? ?? [])
+                  .map((e) => e.toString())
+                  .toList();
 
+          print(
+              "--------------multiselect----------------${controller.formData[field.headers].runtimeType}");
           return MultiSelectDialogField<String>(
             dialogHeight: 300,
             items: (field.options != null)
@@ -884,7 +995,7 @@ class DynamicForm extends StatelessWidget {
         return Obx(() {
           final selectedValue = controller.formData[field.headers]?.toString();
           final List<String> options = field.options!;
-
+          print("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww$selectedValue");
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -922,6 +1033,7 @@ class DynamicForm extends StatelessWidget {
       case 'switch':
         return Obx(() {
           final bool isSwitched = controller.formData[field.headers] == true;
+          print("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww${isSwitched}");
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -935,12 +1047,23 @@ class DynamicForm extends StatelessWidget {
               SwitchListTile(
                 title: Text(field.title),
                 value: isSwitched,
-                onChanged: isEditable // Check if it's editable
+                onChanged: isEditable &&
+                        controller.formData[field.endpoint] != null &&
+                        (controller.formData[field.endpoint] as List)
+                            .any((item) {
+                          if (item is String) {
+                            return item == Strings.userName;
+                          } else if (item is Map<String, dynamic>) {
+                            return item.containsValue(Strings.userName);
+                          }
+                          return false; // For any unexpected type, return false.
+                        })
                     ? (bool newValue) {
                         controller.updateSwitchSelection(
                             field.headers, newValue);
                       }
-                    : null, // Disable onChanged if not editable
+                    : null,
+                // Disable onChanged if not editable
                 // Optionally, change the appearance of the disabled switch
                 activeColor: isEditable ? null : Colors.grey,
                 inactiveThumbColor: isEditable ? null : Colors.grey,
@@ -950,6 +1073,53 @@ class DynamicForm extends StatelessWidget {
             ],
           );
         });
+      case 'signature':
+        String? signatureUrl = controller.formData[field.headers];
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              field.title,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            isEdit
+                ? (signatureUrl != null && signatureUrl.isNotEmpty
+                    ? Image.network(
+                        signatureUrl,
+                        height: 200,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      )
+                    : const Text("No signature available."))
+                : Signature(
+                    controller:
+                        controller.getSignatureController(field.headers),
+                    height: 200,
+                    backgroundColor: Colors.grey[200]!,
+                  ),
+            if (!isEdit) // Show buttons only if not in edit mode
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      controller.signatureControllers[field.headers]?.clear();
+                    },
+                    child: const Text("Clear"),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      controller.saveSignature(
+                        field.headers,
+                        field.endpoint ?? "",
+                      );
+                    },
+                    child: const Text("Save"),
+                  ),
+                ],
+              ),
+          ],
+        );
 
       case 'geolocation':
         return Obx(() {
@@ -1063,7 +1233,12 @@ class DynamicForm extends StatelessWidget {
   Widget myDatePicker(PageField field, bool isEditable) {
     // Create a TextEditingController to store and display the picked date
     final TextEditingController dateController = TextEditingController(
-      text: controller.formData[field.headers]?.toString() ?? '',
+      text: controller.formData[field.headers] != null
+          ? DateFormat('d-M-yyyy').format(
+              DateFormat('yyyy-MM-dd')
+                  .parse(controller.formData[field.headers].toString()),
+            )
+          : '', // Provide a fallback value for null, like an empty string
     );
 
     return Column(
@@ -1078,7 +1253,8 @@ class DynamicForm extends StatelessWidget {
           controller: dateController,
           readOnly:
               !isEditable, // Make the TextField read-only based on isEditable
-          decoration: kTextFieldDecoration("Select Date"),
+          decoration: kTextFieldDecoration("Select Date",
+              suffixIcon: Icon(Icons.calendar_month_rounded)),
           onTap: isEditable // Only show date picker if editable
               ? () async {
                   DateTime? pickedDate = await showDatePicker(
@@ -1090,10 +1266,10 @@ class DynamicForm extends StatelessWidget {
                   if (pickedDate != null) {
                     String formattedDate =
                         "${pickedDate.year}-${pickedDate.month}-${pickedDate.day}"; // Format the date
-                    dateController.text =
-                        formattedDate; // Update the TextField with the selected date
-                    controller.updateFormData(
-                        field.headers, formattedDate); // Update the form data
+                    dateController.text = pickedDate
+                        .toString(); // Update the TextField with the selected date
+                    controller.updateFormData(field.headers,
+                        pickedDate.toString()); // Update the form data
                   }
                 }
               : null, // Disable onTap if not editable
@@ -1129,7 +1305,8 @@ class DynamicForm extends StatelessWidget {
           controller: timeController,
           readOnly:
               !isEditable, // Make the TextField read-only based on isEditable
-          decoration: kTextFieldDecoration("Select Time"),
+          decoration: kTextFieldDecoration("Select Time",
+              suffixIcon: Icon(Icons.access_time_filled_sharp)),
           onTap: isEditable // Only show time picker if editable
               ? () async {
                   TimeOfDay? selectedTime = await showTimePicker(
@@ -1148,22 +1325,24 @@ class DynamicForm extends StatelessWidget {
               : null, // Disable onTap if not editable
         ),
         // Display the current time if not editable
-        if (!isEditable)
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Text(
-              controller.formData[field.headers]?.toString() ?? '',
-              style: const TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-          ),
+        // if (!isEditable)
+        //   Padding(
+        //     padding: const EdgeInsets.only(top: 8.0),
+        //     child: Text(
+        //       controller.formData[field.headers] ?? '',
+        //       style: const TextStyle(fontSize: 16, color: Colors.grey),
+        //     ),
+        //   ),
       ],
     );
   }
 
-  Widget buildEditableChipField(PageField field, bool isEditable) {
+  Widget buildEditableChipField(PageField field, bool isEditable, bool isEdit) {
     // Extract existing chips from form data or initialize as an empty list
     List<String> existingChips =
-        (controller.formData[field.headers] as List<String>?) ?? [];
+        (controller.formData[field.headers] as List<dynamic>?)
+                ?.cast<String>() ??
+            [];
     TextEditingController chipController = TextEditingController();
 
     return Column(
@@ -1251,11 +1430,14 @@ class DynamicForm extends StatelessWidget {
   }
 }
 
-InputDecoration kTextFieldDecoration(String hintText) {
+InputDecoration kTextFieldDecoration(String hintText, {Widget? suffixIcon}) {
   return InputDecoration(
+    filled: true,
+    fillColor: Colors.white,
     hintText: hintText,
     border: const OutlineInputBorder(
       borderRadius: BorderRadius.all(Radius.circular(10)),
     ),
+    suffixIcon: suffixIcon, // Add suffixIcon here
   );
 }
