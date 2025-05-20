@@ -3,19 +3,19 @@ import 'dart:convert';
 import 'projects_model.dart';
 
 class TbtMeeting {
-    String id;
-    Project project;
-    TbtGivenBy createdby;
-    String date;
-    String time;
-    String attendees;
-    String attendeesNos;
+    String? id;
+    Project? project;
+    TbtGivenBy? createdby;
+    String? date;
+    String? time;
+    String? attendees;
+    String? attendeesNos;
     List<TypeOfTopic> typeOfTopic;
-    String documentaryEvidencePhoto;
-    TbtGivenBy tbtGivenBy;
-    String geotagging;
-    String commentsBox;
-    double attendeesHours;
+    String? documentaryEvidencePhoto;
+    TbtGivenBy? tbtGivenBy;
+    String? geotagging;
+    String? commentsBox;
+    double? attendeesHours;
     int v;
 
     TbtMeeting({
@@ -58,15 +58,15 @@ class TbtMeeting {
 
     Map<String, dynamic> toJson() => {
         "_id": id,
-        "project": project.toJson(),
-        "createdby": createdby.toJson(),
+        "project": project?.toJson(),
+        "createdby": createdby?.toJson(),
         "date": date,
         "time": time,
         "attendees": attendees,
         "attendeesNos": attendeesNos,
         "typeOfTopic": List<dynamic>.from(typeOfTopic.map((x) => x.toJson())),
         "documentaryEvidencePhoto": documentaryEvidencePhoto,
-        "TbtGivenBy": tbtGivenBy.toJson(),
+        "TbtGivenBy": tbtGivenBy?.toJson(),
         "geotagging": geotagging,
         "commentsBox": commentsBox,
         "attendeesHours": attendeesHours,
@@ -84,7 +84,7 @@ class TbtGivenBy {
     String phone;
     String address;
     bool isActive;
-    String project;
+    List<dynamic> project;
     String createdAt;
     String updatedAt;
     int v;

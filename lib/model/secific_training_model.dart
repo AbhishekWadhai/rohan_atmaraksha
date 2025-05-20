@@ -129,7 +129,7 @@ class Createdby {
   String phone;
   String address;
   bool isActive;
-  String project;
+  List<dynamic> project;
   String createdAt;
   String updatedAt;
   int v;

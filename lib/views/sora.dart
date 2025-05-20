@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
+import 'package:rohan_suraksha_sathi/app_constants/colors.dart';
 import 'package:rohan_suraksha_sathi/controller/uauc_controller.dart';
 import 'package:rohan_suraksha_sathi/model/uauc_model.dart';
 import 'package:rohan_suraksha_sathi/routes/routes_string.dart';
@@ -20,16 +21,17 @@ class UaucPage extends StatelessWidget {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          foregroundColor: Colors.black,
+          foregroundColor: Colors.white,
           title: TextField(
+            style: const TextStyle(color: Colors.white),
             onChanged: (value) => controller.updateSearchQuery(value),
             decoration: InputDecoration(
               hintText: "Search UAUC",
               border: InputBorder.none,
-              hintStyle: TextStyle(color: Colors.grey[600]),
+              hintStyle: TextStyle(color: Colors.white70),
             ),
           ),
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.appMainDark,
           actions: [
             IconButton(
                 icon: const Icon(Icons.refresh_rounded),
@@ -44,19 +46,21 @@ class UaucPage extends StatelessWidget {
             ),
           ],
           elevation: 2,
+          bottom: const TabBar(
+            indicatorColor: Colors.white,
+            labelColor: Colors.white,
+            tabs: [
+              Tab(text: "All"),
+              Tab(text: "Open"),
+              Tab(text: "Closed"),
+            ],
+          ),
         ),
         drawer: const MyDrawer(),
         body: Column(
           children: [
             // TabBar
-            const TabBar(
-              labelColor: Colors.black,
-              tabs: [
-                Tab(text: "All"),
-                Tab(text: "Open"),
-                Tab(text: "Closed"),
-              ],
-            ),
+
             // TabBarView
             Expanded(
               child: Obx(
@@ -246,16 +250,15 @@ Future<dynamic> onTapView(BuildContext context, UaUc data) {
                 ),
                 const SizedBox(height: 16),
                 _buildDetailRow(
-                    'Project Name:', data.project.projectName ?? ""),
+                    'Project Name:', data.project?.projectName ?? ""),
                 _buildDetailRow(
                     'Date:',
                     DateFormat("dd MMM yyyy")
-                            .format(DateTime.parse(data.date)) ??
-                        ""),
+                        .format(DateTime.parse(data.date.toString() ?? ""))),
                 _buildDetailRow('Time:', data.time ?? ""),
                 _buildDetailRow('Observation:', data.observation ?? ""),
-                _buildDetailRow('Types of Hazards:',
-                    data.hazards.map((e) => e.hazards).join(",")),
+                _buildDetailRow(
+                    'Types of Hazards:', data.hazards!.map((e) => e).join(",")),
                 _buildDetailRow('Causes', data.causes ?? ""),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -308,7 +311,7 @@ Future<dynamic> onTapView(BuildContext context, UaUc data) {
                 ),
                 _buildDetailRow('Severity:', data.riskValue?.severity ?? ""),
                 _buildDetailRow('Assigned to:', data.assignedTo?.name ?? ""),
-                _buildDetailRow('Status:', data.status),
+                _buildDetailRow('Status:', data.status ?? ""),
                 _buildDetailRow('Comment:', data.comment ?? ""),
                 const SizedBox(height: 16),
               ],

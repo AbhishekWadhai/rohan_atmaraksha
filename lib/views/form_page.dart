@@ -15,14 +15,13 @@ class FormPage extends StatelessWidget {
     final bool isEditable = Get.arguments[2] ?? false;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         leading: IconButton(
             onPressed: () {
               Get.back();
             },
             icon: Icon(Icons.arrow_back_ios_rounded)),
-        foregroundColor: Colors.black,
+
         title: FlexibleText(
           text: translate(pageTitle),
           baseFontSize: 22,
@@ -30,7 +29,7 @@ class FormPage extends StatelessWidget {
         ),
         //Text(translate(pageTitle), style: TextStyle(fontSize: ),),
         //iconTheme: const IconThemeData(color: Colors.black),
-        backgroundColor: Colors.white,
+       
         elevation: 2,
         actions: [
           PopupMenuButton(

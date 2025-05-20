@@ -24,11 +24,11 @@ class UaucController extends GetxController
   List<dynamic> get paginatedWorkPermits {
     final filteredList = uaucList
         .where((uauc) =>
-            (uauc.project.projectName // Force unwrap
+            (uauc.project?.projectName // Force unwrap
                         ?.toLowerCase() ??
                     "")
                 .contains(searchQuery.value.toLowerCase()) ||
-            uauc.date.contains(searchQuery.value))
+            uauc.date!.contains(searchQuery.value))
         .toList();
 
     int start = currentPage.value * itemsPerPage;

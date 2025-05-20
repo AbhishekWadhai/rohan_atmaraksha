@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:rohan_suraksha_sathi/app_constants/asset_path.dart';
+import 'package:rohan_suraksha_sathi/app_constants/colors.dart';
 
 import 'package:rohan_suraksha_sathi/widgets/my_drawer.dart';
 
@@ -15,8 +16,8 @@ class SafetyTraining extends StatelessWidget {
     return Scaffold(
         drawer: MyDrawer(),
         appBar: AppBar(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
+          backgroundColor: AppColors.appMainDark,
+          foregroundColor: Colors.white,
           title: const Text("Safety Training"),
         ),
         body: Padding(
@@ -42,7 +43,7 @@ class SafetyTraining extends StatelessWidget {
               TrainingCard(
                 createAction: "Create Safety Induction",
                 moduleName: "Safety Induction",
-                imageAsset: Assets.training,
+                imageAsset: Assets.safetyInduction,
                 action1: () {
                   Get.toNamed(Routes.inductionPage);
                 },
@@ -56,7 +57,7 @@ class SafetyTraining extends StatelessWidget {
               TrainingCard(
                 createAction: "Create Job Specific Safety Training",
                 moduleName: "Job Specific Safety Training",
-                imageAsset: Assets.training,
+                imageAsset: Assets.specificTraining,
                 action1: () {
                   Get.toNamed(Routes.speceficTrainingPage);
                 },
@@ -91,13 +92,17 @@ class TrainingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 10,
-      shape: RoundedRectangleBorder(
+    return Container(
+      decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          colors: [AppColors.appMainMid, AppColors.appMainDark],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(10.0),
         child: Column(
           children: [
             // GestureDetector with expanded space
@@ -105,24 +110,38 @@ class TrainingCard extends StatelessWidget {
               child: GestureDetector(
                 onTap: action1,
                 child: Container(
-                  width: double.infinity, // Take full width
-                  color: Colors.transparent, // To ensure it's tappable
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius:
+                        BorderRadius.circular(12), // Optional: Rounded corners
+                  ),
                   child: Column(
-                    mainAxisAlignment:
-                        MainAxisAlignment.center, // Center contents
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       CircleAvatar(
-                        backgroundColor: Colors.blue,
-                        child: Image.asset(imageAsset),
+                        radius: 25,
+                        backgroundColor: Colors.white,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Image.asset(imageAsset),
+                        ),
                       ),
                       const SizedBox(height: 10),
-                      Text(moduleName),
+                      Text(textAlign: TextAlign.center,
+                        
+                        moduleName,
+                        style: const TextStyle(
+                          
+                            color: Colors.white), // Optional: For contrast
+                      ),
                     ],
                   ),
                 ),
               ),
             ),
-            const Divider(),
+            const Divider(
+              color: Colors.white,
+            ),
             // Row for the second action
             GestureDetector(
               onTap: action2,
@@ -132,12 +151,14 @@ class TrainingCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       createAction,
-                      overflow: TextOverflow.ellipsis, // Prevent overflow
+                      overflow: TextOverflow.ellipsis,
+
+                      style: TextStyle(color: Colors.white), // Prevent overflow
                     ),
                   ),
                   const Icon(
                     Icons.add_circle_outline,
-                    color: Colors.blue,
+                    color: Colors.white,
                   ),
                 ],
               ),

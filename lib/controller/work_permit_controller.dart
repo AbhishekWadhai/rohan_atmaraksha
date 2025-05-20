@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:get/get.dart';
+import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
 import 'package:rohan_suraksha_sathi/model/work_permit_model.dart';
 import 'package:rohan_suraksha_sathi/services/api_services.dart';
 import 'package:rohan_suraksha_sathi/services/shared_preferences.dart';
@@ -68,10 +69,24 @@ class WorkPermitController extends GetxController
       // Ensure that the API response is a List of Map<String, dynamic>
       if (permitData is List) {
         // Check for any null elements in the list
-        workPermitList.value = permitData
-            .where((e) => e != null)
-            .map((e) => WorkPermit.fromJson(e as Map<String, dynamic>))
-            .toList();
+        // workPermitList.value = permitData
+        //     .where((e) => e != null)
+        //     .map((e) => WorkPermit.fromJson(e as Map<String, dynamic>))
+        //     .toList();
+        if (Strings.roleName == "Admin") {
+          workPermitList.value = permitData
+              .where((e) => e != null)
+              .map((e) => WorkPermit.fromJson(e as Map<String, dynamic>))
+              .toList();
+        } else {
+          workPermitList.value = permitData
+              .where((e) => e != null)
+              .map((e) => WorkPermit.fromJson(e as Map<String, dynamic>))
+              .where((permit) =>
+                  permit.project?.id ==
+                  Strings.endpointToList['project']['_id'])
+              .toList();
+        }
         print("---------------------Permit called---------------------");
         print(jsonEncode(workPermitList));
       } else {

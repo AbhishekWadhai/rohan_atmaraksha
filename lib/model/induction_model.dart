@@ -3,23 +3,23 @@ import 'dart:convert';
 import 'projects_model.dart';
 
 class Induction {
-  String id;
-  Project project;
-  String date;
-  String time;
-  String inductees;
-  String inducteesName;
+  String? id;
+  Project? project;
+  String? date;
+  String? time;
+  String? inductees;
+  String? inducteesName;
   List<TradeType> tradeTypes;
-  String subContractorName;
-  TypeOfTopic typeOfTopic;
-  String documentaryEvidencePhoto;
-  String anyOthers;
-  Createdby instructionBy;
-  String inducteeSignBy;
-  String inductedSignBy;
-  String geotagging;
-  Createdby createdby;
-  String createdAt;
+  String? subContractorName;
+  TypeOfTopic? typeOfTopic;
+  String? documentaryEvidencePhoto;
+  String? anyOthers;
+  Createdby? instructionBy;
+  String? inducteeSignBy;
+  String? inductedSignBy;
+  String? geotagging;
+  Createdby? createdby;
+  String? createdAt;
   int v;
 
   Induction({
@@ -72,21 +72,21 @@ class Induction {
 
   Map<String, dynamic> toJson() => {
         "_id": id,
-        "project": project.toJson(),
+        "project": project?.toJson(),
         "date": date,
         "time": time,
         "inductees": inductees,
         "inducteesName": inducteesName,
         "tradeTypes": List<dynamic>.from(tradeTypes.map((x) => x.toJson())),
         "subContractorName": subContractorName,
-        "typeOfTopic": typeOfTopic.toJson(),
+        "typeOfTopic": typeOfTopic?.toJson(),
         "documentaryEvidencePhoto": documentaryEvidencePhoto,
         "anyOthers": anyOthers,
-        "instructionBy": instructionBy.toJson(),
+        "instructionBy": instructionBy?.toJson(),
         "inducteeSignBy": inducteeSignBy,
         "inductedSignBy": inductedSignBy,
         "geotagging": geotagging,
-        "createdby": createdby.toJson(),
+        "createdby": createdby?.toJson(),
         "createdAt": createdAt,
         "__v": v,
       };
@@ -102,7 +102,7 @@ class Createdby {
   String phone;
   String address;
   bool isActive;
-  String project;
+  List<dynamic> project;
   String createdAt;
   String updatedAt;
   int v;
@@ -160,62 +160,6 @@ class Createdby {
         "__v": v,
       };
 }
-
-// class Project {
-//     String id;
-//     String projectId;
-//     String projectName;
-//     String siteLocation;
-//     String startDate;
-//     String endDate;
-//     String status;
-//     String description;
-//     String company;
-//     int v;
-
-//     Project({
-//         required this.id,
-//         required this.projectId,
-//         required this.projectName,
-//         required this.siteLocation,
-//         required this.startDate,
-//         required this.endDate,
-//         required this.status,
-//         required this.description,
-//         required this.company,
-//         required this.v,
-//     });
-
-//     factory Project.fromRawJson(String str) => Project.fromJson(json.decode(str));
-
-//     String toRawJson() => json.encode(toJson());
-
-//     factory Project.fromJson(Map<String, dynamic> json) => Project(
-//         id: json["_id"],
-//         projectId: json["projectId"],
-//         projectName: json["projectName"],
-//         siteLocation: json["siteLocation"],
-//         startDate: json["startDate"],
-//         endDate: json["endDate"],
-//         status: json["status"],
-//         description: json["description"],
-//         company: json["company"],
-//         v: json["__v"],
-//     );
-
-//     Map<String, dynamic> toJson() => {
-//         "_id": id,
-//         "projectId": projectId,
-//         "projectName": projectName,
-//         "siteLocation": siteLocation,
-//         "startDate": startDate,
-//         "endDate": endDate,
-//         "status": status,
-//         "description": description,
-//         "company": company,
-//         "__v": v,
-//     };
-// }
 
 class TradeType {
   String id;

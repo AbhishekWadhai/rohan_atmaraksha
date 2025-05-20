@@ -1,16 +1,17 @@
 import 'package:get/get.dart';
 import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
 import 'package:rohan_suraksha_sathi/model/notification_model.dart';
+import 'package:rohan_suraksha_sathi/services/notification_service/notification_handler.dart';
 
 class NotificationController extends GetxController {
   // Sample list of notifications
   RxList<Notification> notifications = <Notification>[].obs;
 
   @override
-  void onInit() {
+  void onInit() async {
     // TODO: implement onInit
     super.onInit();
-
+    await NotificationHandler().getNotifications();
     getNotifications();
   }
 

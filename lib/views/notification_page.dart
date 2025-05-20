@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+
 import 'package:rohan_suraksha_sathi/controller/notification_controller.dart';
 import 'package:rohan_suraksha_sathi/helpers/sixed_boxes.dart';
 import 'package:rohan_suraksha_sathi/model/notification_model.dart' as custom;
@@ -14,41 +15,43 @@ class NotificationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        foregroundColor: Colors.black,
-        backgroundColor: Colors.white,
-        title: const Text("Notifications"),
-        actions: [
-           IconButton(
+        appBar: AppBar(
+          elevation: 0,
+          // foregroundColor: Colors.black,
+          // backgroundColor: Colors.white,
+          title: const Text("Notifications"),
+          actions: [
+            IconButton(
                 icon: const Icon(Icons.refresh_rounded),
                 onPressed: () {
                   notificationController.getNotifications();
                 }),
-        ],
-      ),
-      body: Obx(() {
-        // Using Obx to reactively update the UI when the notifications list changes
-        return notificationController.notifications.isEmpty
-            ? const Center(child: Text("No notifications"))
-            : Column(
-                children: [
-                  sb4,
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: notificationController.notifications.length,
-                      itemBuilder: (context, index) {
-                        return NotificationTile(
-                          notification:
-                              notificationController.notifications[index],
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              );
-      }),
-    );
+          ],
+        ),
+        body: Container(
+          child: Obx(() {
+            // Using Obx to reactively update the UI when the notifications list changes
+            return notificationController.notifications.isEmpty
+                ? const Center(child: Text("No notifications"))
+                : Column(
+                    children: [
+                      sb4,
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount:
+                              notificationController.notifications.length,
+                          itemBuilder: (context, index) {
+                            return NotificationTile(
+                              notification:
+                                  notificationController.notifications[index],
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+          }),
+        ));
   }
 }
 
@@ -90,14 +93,14 @@ class NotificationTile extends StatelessWidget {
               ),
             ),
             title: Text(
-              notification.title ?? 'No Title',
+              notification.title,
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),
             ),
             subtitle: Text(
-              notification.message ?? 'No Message',
+              notification.message,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),

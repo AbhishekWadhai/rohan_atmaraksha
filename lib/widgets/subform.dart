@@ -191,33 +191,8 @@ class SubForm extends StatelessWidget {
                                           false) {
                                         if (isEdit) {
                                           controller.submitForm(pageName);
-                                          // var result = Map<String,
-                                          //         dynamic>.from(
-                                          //     controller
-                                          //         .formData); // Copy the data
-
-                                          // // Now you can safely clear the formData
-                                          // controller.formData.clear();
-
-                                          // // Finally, pass the result back
-                                          // Get.back(result: result);
                                         } else {
                                           controller.submitForm(pageName);
-                                          // // First, assign the formData to result before clearing it
-                                          // var result = Map<String,
-                                          //         dynamic>.from(
-                                          //     controller
-                                          //         .formData); // Copy the data
-
-                                          // // Now you can safely clear the formData
-                                          // controller.formData.clear();
-
-                                          // // Finally, pass the result back
-                                          // Get.back(result: result);
-
-                                          // print(
-                                          //     "0000000000000000000000000000000000000000000000000000000000000000000000000000");
-                                          // print(mainController.formData);
                                         }
                                       } else {
                                         // Show an error if form is invalid

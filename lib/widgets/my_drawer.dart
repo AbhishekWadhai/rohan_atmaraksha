@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
 import 'package:rohan_suraksha_sathi/app_constants/asset_path.dart';
+import 'package:rohan_suraksha_sathi/app_constants/colors.dart';
 import 'package:rohan_suraksha_sathi/app_constants/textstyles.dart';
 import 'package:rohan_suraksha_sathi/helpers/sixed_boxes.dart';
 import 'package:rohan_suraksha_sathi/routes/routes_string.dart';
@@ -35,7 +36,8 @@ class MyDrawer extends StatelessWidget {
                   ),
                   fit: BoxFit.cover,
                   colorFilter: ColorFilter.mode(
-                    Colors.blue.withOpacity(0.1), // Blue tint with opacity
+                    AppColors.appMainDark
+                        .withOpacity(0.6), // Blue tint with opacity
                     BlendMode.overlay, // Overlay mode to apply the tint
                   ),
                 ),
@@ -57,23 +59,25 @@ class MyDrawer extends StatelessWidget {
                       height: 60,
                       child: Center(
                         // Ensures the logo is centered
-                        child: Padding(
-                          padding:
-                              const EdgeInsets.all(0), // Remove default padding
-                          child: Image.asset(
-                            Assets.rohanLogo,
-                            fit: BoxFit
-                                .contain, // Adjusts image fit within the SizedBox
+                        child: CircleAvatar(
+                          backgroundColor: Colors.white,
+                          child: Padding(
+                            padding: const EdgeInsets.all(
+                                0), // Remove default padding
+                            child: Image.asset(
+                              Assets.rohanLogo,
+                              fit: BoxFit
+                                  .contain, // Adjusts image fit within the SizedBox
+                            ),
                           ),
                         ),
                       ),
                     ),
-                    sb14,
                     const Text(
                       "Rohan Suraksha Sathi",
                       style: TextStyle(
                         fontSize: 22,
-                        color: Colors.black,
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -96,9 +100,6 @@ class MyDrawer extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(
-              height: 50,
-            ),
             Expanded(
               child: ListView(
                 children: [
@@ -107,8 +108,11 @@ class MyDrawer extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         CircleAvatar(
-                          backgroundColor: Colors.blue,
-                          child: Image.asset(Assets.workPermit),
+                          backgroundColor: Colors.blue.shade100,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Image.asset(Assets.workPermit),
+                          ),
                         ),
                         sb20,
                         Text(
@@ -127,15 +131,18 @@ class MyDrawer extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         CircleAvatar(
-                          backgroundColor: Colors.blue,
-                          child: Image.asset(Assets.workPermit),
+                          backgroundColor: Colors.blue.shade100,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Image.asset(Assets.tbtMeeting),
+                          ),
                         ),
                         sb20,
                         Text(
                           Strings.tbtMeeting,
                           style: TextStyles.drawerTextStyle,
                         ),
-                        sb20,
+                        sb10,
                       ],
                     ),
                     onTap: () {
@@ -148,19 +155,22 @@ class MyDrawer extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         CircleAvatar(
-                          backgroundColor: Colors.blue,
-                          child: Image.asset(Assets.workPermit),
+                          backgroundColor: Colors.blue.shade100,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Image.asset(Assets.safetyInduction),
+                          ),
                         ),
                         sb20,
                         Text(
                           Strings.safetyInduction,
                           style: TextStyles.drawerTextStyle,
                         ),
-                        sb20,
+                        sb10,
                       ],
                     ),
                     onTap: () {
-                      Get.toNamed(Routes.safetyInductionPage);
+                      Get.toNamed(Routes.inductionPage);
                     },
                   ),
                   const Divider(),
@@ -169,15 +179,18 @@ class MyDrawer extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         CircleAvatar(
-                          backgroundColor: Colors.blue,
-                          child: Image.asset(Assets.sora),
+                          backgroundColor: Colors.blue.shade100,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Image.asset(Assets.uauc),
+                          ),
                         ),
                         sb20,
                         Text(
-                          Strings.uauc,
+                          Strings.uaucs,
                           style: TextStyles.drawerTextStyle,
                         ),
-                        sb20,
+                        sb10,
                       ],
                     ),
                     onTap: () {
@@ -190,15 +203,18 @@ class MyDrawer extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         CircleAvatar(
-                          backgroundColor: Colors.blue,
-                          child: Image.asset(Assets.workPermit),
+                          backgroundColor: Colors.blue.shade100,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Image.asset(Assets.specificTraining),
+                          ),
                         ),
                         sb20,
                         Text(
-                          Strings.safetyTraining,
+                          Strings.specificTraining,
                           style: TextStyles.drawerTextStyle,
                         ),
-                        sb20,
+                        sb10,
                       ],
                     ),
                     onTap: () {
@@ -210,16 +226,19 @@ class MyDrawer extends StatelessWidget {
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        const CircleAvatar(
-                          backgroundColor: Colors.blue,
-                          child: Icon(Icons.feedback_rounded),
+                        CircleAvatar(
+                          backgroundColor: Colors.blue.shade100,
+                          child: Icon(
+                            Icons.feedback_outlined,
+                            color: Colors.black,
+                          ),
                         ),
                         sb20,
                         Text(
                           "Dev. Feedback",
                           style: TextStyles.drawerTextStyle,
                         ),
-                        sb20,
+                        sb10,
                       ],
                     ),
                     onTap: () {
@@ -230,6 +249,32 @@ class MyDrawer extends StatelessWidget {
                     },
                   ),
                   const Divider(),
+                  ListTile(
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: Colors.blue.shade100,
+                          child: Icon(
+                            Icons.vertical_split_outlined,
+                            color: Colors.black,
+                          ),
+                        ),
+                        sb20,
+                        Text(
+                          "App Info",
+                          style: TextStyles.drawerTextStyle,
+                        ),
+                        sb10,
+                      ],
+                    ),
+                    onTap: () {
+                      Get.toNamed(
+                        Routes.packageInfoPage,
+                      );
+                    },
+                  ),
+                  const Divider()
                 ],
               ),
             ),

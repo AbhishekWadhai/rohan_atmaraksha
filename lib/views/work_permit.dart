@@ -7,6 +7,8 @@ import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
 import 'package:rohan_suraksha_sathi/app_constants/colors.dart';
 import 'package:rohan_suraksha_sathi/model/work_permit_model.dart';
 import 'package:rohan_suraksha_sathi/routes/routes_string.dart';
+import 'package:rohan_suraksha_sathi/services/location_service.dart';
+import 'package:rohan_suraksha_sathi/widgets/dynamic_data_view.dart';
 import 'package:rohan_suraksha_sathi/widgets/my_drawer.dart';
 
 import '../controller/work_permit_controller.dart';
@@ -24,16 +26,17 @@ class WorkPermitPage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: AppColors.scaffoldColor,
         appBar: AppBar(
-          foregroundColor: Colors.black,
+          foregroundColor: Colors.white,
           title: TextField(
+            style: const TextStyle(color: Colors.white),
             onChanged: (value) => workPermitController.updateSearchQuery(value),
             decoration: InputDecoration(
               hintText: "Search Work Permits",
               border: InputBorder.none,
-              hintStyle: TextStyle(color: Colors.grey[600]),
+              hintStyle: TextStyle(color: Colors.white70),
             ),
           ),
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.appMainDark,
           actions: [
             IconButton(
                 icon: const Icon(Icons.refresh_rounded),
@@ -48,8 +51,9 @@ class WorkPermitPage extends StatelessWidget {
             ),
           ],
           elevation: 2,
-          bottom: const TabBar(
-            labelColor: Colors.black,
+          bottom: TabBar(
+            indicatorColor: Colors.white,
+            labelColor: Colors.white,
             tabs: [
               Tab(text: "All"),
               Tab(text: "Pending"),
@@ -153,9 +157,11 @@ class WorkPermitPage extends StatelessWidget {
                     },
                     title: Text('Work Description: ${permit.workDescription}'),
                     subtitle: Text(
-                      'Date: ${DateFormat('dd MM yyyy').format(DateTime.parse(permit.date))}',
+                      permit?.date != null && permit!.date!.isNotEmpty
+                          ? 'Date: ${DateFormat('dd MM yyyy').format(DateTime.parse(permit!.date!))}'
+                          : 'Date: -',
                     ),
-                    trailing: permit.createdby == Strings.userId ||
+                    trailing: permit.createdby?.id == Strings.userId ||
                             permit.verifiedBy
                                 .any((item) => item.id == Strings.userId) ||
                             permit.approvalBy
@@ -213,6 +219,7 @@ class WorkPermitPage extends StatelessWidget {
 
 Future<dynamic> onTapView(BuildContext context, WorkPermit permit) {
   return showModalBottomSheet(
+    backgroundColor: AppColors.appMainDark,
     context: context,
     isScrollControlled: true,
     shape: const RoundedRectangleBorder(
@@ -222,69 +229,154 @@ Future<dynamic> onTapView(BuildContext context, WorkPermit permit) {
     ),
     builder: (BuildContext context) {
       final screenHeight = MediaQuery.of(context).size.height;
-      return ConstrainedBox(
-        constraints: BoxConstraints(
-          maxHeight: screenHeight * 0.8, // Limit height to 50% of the screen
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+      return DefaultTabController(
+        length: 2,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: screenHeight * 0.8, // Limit height to 50% of the screen
+          ),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Row(
-                  children: [
-                    const Text(
-                      'Work Permit Details',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  child: Row(
+                    children: [
+                      const Text(
+                        'Work Permit Details',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
                       ),
-                    ),
-                    const Spacer(),
-                    IconButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        icon: const Icon(Icons.close)),
+                      const Spacer(),
+                      IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          icon: const Icon(
+                            Icons.close,
+                            color: Colors.white,
+                          )),
+                    ],
+                  ),
+                ),
+                //const SizedBox(height: 16),
+                const TabBar(
+                  labelColor: Colors.white,
+                  indicatorColor: Colors.white70,
+                  tabs: [
+                    Tab(text: "General"),
+                    Tab(text: "More"),
                   ],
                 ),
-                const SizedBox(height: 16),
-                _buildDetailRow(
-                    'Work Description:', permit.workDescription ?? ""),
-                _buildDetailRow(
-                    'Date:',
-                    DateFormat("dd MMM yyyy")
-                        .format(DateTime.parse(permit.date.toString()))),
-                _buildDetailRow('Start Time:', permit.startTime ?? ""),
-                _buildDetailRow('End Time:', permit.endTime ?? ""),
-                _buildDetailRow(
-                    'Project Name:', permit.project.projectName ?? ""),
-                _buildDetailRow('Area:', permit.area?.siteLocation ?? ""),
-                _buildDetailRow(
-                    'Permit Type:', permit.permitTypes?.permitsType ?? ""),
-                _buildDetailRow('Tools ',
-                    permit.tools.map((tool) => tool.tools).join(", ")),
-                _buildDetailRow(
-                    'Equipments ',
-                    permit.equipments
-                        .map((equp) => equp.equipments)
-                        .join(", ")),
-                _buildDetailRow(
-                    'Machine Tools ',
-                    permit.machineTools
-                        .map((equp) => equp.machineTools)
-                        .join(", ")),
-                _buildDetailRow('Type of Hazard:',
-                    permit.typeOfHazard.map((e) => e.hazards).join(", ")),
-                _buildDetailRow('Applicable PPEs:',
-                    permit.applicablePpEs.map((e) => e.ppes).join(", ")),
-                _buildDetailRow(
-                    'Verified Done:', permit.verifiedDone ? "Yes" : "No"),
-                _buildDetailRow(
-                    'Approval Done:', permit.approvalDone ? "Yes" : "No"),
-                const SizedBox(height: 16),
+                Container(
+                  color: Colors.white,
+                  height: screenHeight * 0.6,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: TabBarView(children: [
+                      SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildDetailRow('Work Description:',
+                                permit.workDescription ?? ""),
+                            _buildDetailRow(
+                                'Date:',
+                                DateFormat("dd MMM yyyy").format(
+                                    DateTime.parse(permit.date.toString()))),
+                            _buildDetailRow(
+                                'Start Time:', permit.startTime ?? ""),
+                            _buildDetailRow('End Time:', permit.endTime ?? ""),
+                            _buildDetailRow('Project Name:',
+                                permit.project?.projectName ?? ""),
+                            _buildDetailRow(
+                                'Area:', permit.area?.siteLocation ?? ""),
+                            _buildDetailRow('Permit Type:',
+                                permit.permitTypes?.permitsType ?? ""),
+                            _buildDetailRow(
+                                'Tools ',
+                                permit.tools
+                                    .map((tool) => tool.tools)
+                                    .join(", ")),
+                            _buildDetailRow(
+                                'Equipments ',
+                                permit.equipments
+                                    .map((equp) => equp.equipments)
+                                    .join(", ")),
+                            _buildDetailRow(
+                                'Machine Tools ',
+                                permit.machineTools
+                                    .map((equp) => equp.machineTools)
+                                    .join(", ")),
+                            _buildDetailRow(
+                                'Type of Hazard:',
+                                permit.typeOfHazard
+                                    .map((e) => e.hazards)
+                                    .join(", ")),
+                            _buildDetailRow(
+                                'Applicable PPEs:',
+                                permit.applicablePpEs
+                                    .map((e) => e.ppes)
+                                    .join(", ")),
+                            _buildDetailRow('Verified Done:',
+                                permit.verifiedDone ? "Yes" : "No"),
+                            _buildDetailRow('Approval Done:',
+                                permit.approvalDone ? "Yes" : "No"),
+                            ExpansionTile(
+                              tilePadding:
+                                  EdgeInsets.zero, // Removes default padding
+                              title: _buildDetailRow(
+                                  'Geolocation', permit.geotagging ?? ""),
+                              // subtitle: Text(
+                              //     permit.geotagging ?? "No geolocation data"),
+                              children: [
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 0.0),
+                                  child: TextButton(
+                                    onPressed: () {
+                                      if (permit.geotagging != null &&
+                                          permit.geotagging!.isNotEmpty) {
+                                        var coordinates =
+                                            permit.geotagging!.split(',');
+                                        double? latitude =
+                                            double.tryParse(coordinates[0]);
+                                        double? longitude =
+                                            double.tryParse(coordinates[1]);
+                    
+                                        if (latitude != null &&
+                                            longitude != null) {
+                                          showGeolocationDialog(
+                                            latitude: latitude,
+                                            longitude: longitude,
+                                          );
+                                        } else {
+                                          Get.snackbar("Error",
+                                              "Invalid geolocation data.");
+                                        }
+                                      } else {
+                                        Get.snackbar("Error",
+                                            "No geolocation data available.");
+                                      }
+                                    },
+                                    child: const Text("View on Map"),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                          ],
+                        ),
+                      ),
+                      DynamicDataPage(
+                          data: permit.customFields ?? {}, fieldKeys: {})
+                    ]),
+                  ),
+                )
               ],
             ),
           ),

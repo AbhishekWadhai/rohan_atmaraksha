@@ -6,6 +6,7 @@ import 'package:rohan_suraksha_sathi/env.dart';
 import 'package:rohan_suraksha_sathi/main.dart';
 import 'package:rohan_suraksha_sathi/services/firebase_service.dart';
 import 'package:rohan_suraksha_sathi/services/jwt_service.dart';
+import 'package:rohan_suraksha_sathi/services/load_dropdown_data.dart';
 import 'package:rohan_suraksha_sathi/services/notification_service/notification_handler.dart';
 import 'package:rohan_suraksha_sathi/services/permission_handler.dart';
 
@@ -33,7 +34,7 @@ Future<void> main() async {
     // Check if the user is logged in
     bool isLoggedIn = await isTokenValid();
     print('Token valid: $isLoggedIn');
-
+    await loadDropdownData();
     // Run the app
     runApp(MyApp(isLoggedIn: isLoggedIn));
   } catch (e) {

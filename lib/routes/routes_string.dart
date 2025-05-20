@@ -12,4 +12,5 @@ class Routes {
   static const speceficTrainingPage = "/speceficTrainingPage";
   static const formPage = "/formPage";
   static const notificationPage = "/notificationPage";
+  static const packageInfoPage = "/packageInfoPage";
 }

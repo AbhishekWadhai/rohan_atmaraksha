@@ -6,6 +6,7 @@ class CardFb2 extends StatelessWidget {
   final String text;
   final String imageUrl;
   final String subtitle;
+  final String totalNo;
   final Function() onPressed;
 
   const CardFb2(
@@ -13,6 +14,7 @@ class CardFb2 extends StatelessWidget {
       required this.imageUrl,
       required this.subtitle,
       required this.onPressed,
+      required this.totalNo,
       Key? key})
       : super(key: key);
 
@@ -32,7 +34,6 @@ class CardFb2 extends StatelessWidget {
               image: AssetImage(Assets.cardBg), // Use AssetImage here
               fit: BoxFit.cover,
             ),
-            color: Colors.grey[100],
             borderRadius: BorderRadius.circular(12.5),
             boxShadow: [
               BoxShadow(
@@ -50,7 +51,7 @@ class CardFb2 extends StatelessWidget {
                 size: 50,
               ),
               sb40,
-              const Text("4",
+              Text(totalNo,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.black,
@@ -71,8 +72,8 @@ class CardFb2 extends StatelessWidget {
                   Text(
                     subtitle,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                        color: Colors.grey,
+                    style:  TextStyle(
+                        color: Colors.grey.shade800,
                         fontWeight: FontWeight.normal,
                         fontSize: 12),
                   ),

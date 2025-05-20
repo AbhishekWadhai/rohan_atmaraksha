@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
+import 'package:rohan_suraksha_sathi/app_constants/colors.dart';
 import 'package:rohan_suraksha_sathi/routes/routes_string.dart';
 import 'package:rohan_suraksha_sathi/views/image_view_page.dart';
 import 'package:rohan_suraksha_sathi/widgets/my_drawer.dart';
@@ -20,16 +21,17 @@ class TBTMeetingPage extends StatelessWidget {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          foregroundColor: Colors.black,
+          foregroundColor: Colors.white,
           title: TextField(
+            style: const TextStyle(color: Colors.white),
             onChanged: (value) => tbtMeetingController.updateSearchQuery(value),
             decoration: InputDecoration(
               hintText: "Search TBT Meetings",
               border: InputBorder.none,
-              hintStyle: TextStyle(color: Colors.grey[600]),
+              hintStyle: TextStyle(color: Colors.white70),
             ),
           ),
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.appMainDark,
           actions: [
             IconButton(
                 icon: const Icon(Icons.refresh_rounded),

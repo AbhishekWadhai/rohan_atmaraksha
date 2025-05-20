@@ -12,22 +12,20 @@ Future<bool> isTokenValid() async {
     Strings.userId = decodedData?["userId"] ?? "";
     String role = decodedData?["role"] ?? "";
 
-    print(role);
-    print(Strings.userId);
     List<dynamic> roles = await ApiService().getRequest("role");
     List<dynamic> users = await ApiService().getRequest("user");
 
     var userName =
         users.firstWhere((e) => e["_id"] == Strings.userId, orElse: () => null);
 
-    print(roles);
     var assignedRole =
         roles.firstWhere((e) => e["_id"] == role, orElse: () => null);
     if (userName != null) {
       Strings.endpointToList["userDetails"] = userName;
       Strings.userName = userName["name"];
       print("dbhjdshbhnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn${userName["project"]}");
-      Strings.endpointToList["project"] = userName["project"];
+      Strings.endpointToList["mappedProjects"] = userName["project"];
+      Strings.endpointToList["project"] = userName["project"][0];
     }
 
     if (assignedRole != null) {

@@ -12,8 +12,6 @@ class ImageViewPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your Image'),
-        backgroundColor: Colors.white60,
-        foregroundColor: Colors.black,
       ),
       body: PhotoViewGallery.builder(
         itemCount: 1,

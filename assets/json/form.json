@@ -262,6 +262,18 @@
         }
       },
       {
+        "Title": "More Details",
+        "Headers": "customFields",
+        "Type": "customFields",
+        "_id": "66b230b6cc8539b4ed3861cca",
+        "endpoint": "customFields",
+        "key": "customFields",
+        "permissions": {
+          "view": ["Workpermit Creation", "UAUC Prevention Action"],
+          "edit": ["Workpermit Creation"]
+        }
+      },
+      {
         "Title": "Created By",
         "Headers": "createdby",
         "Type": "defaultField",
@@ -832,7 +844,7 @@
         }
       },
       {
-        "Title": "Observer",
+        "Title": "Observed By",
         "Headers": "observer",
         "Type": "defaultField",
         "_id": "66b230b6cc8539b4ed3861ccc",
@@ -844,7 +856,7 @@
         }
       },
       {
-        "Title": "Observation",
+        "Title": "Observations",
         "Headers": "observation",
         "Type": "CustomTextField",
         "_id": "66b230b6cc8539b4ed3861cc7",
@@ -866,7 +878,7 @@
       },
 
       {
-        "Title": "Causes",
+        "Title": "Type",
         "Headers": "causes",
         "Type": "simpledropdown",
         "Options": ["Unsafe Condition", "Unsafe Action", "Both"],
@@ -892,7 +904,7 @@
       {
         "Title": "Risk Value",
         "Headers": "riskValue",
-        "Type": "dropdown",
+        "Type": "riskMatrix",
         "_id": "66b230b6cc8539b4ed3861cca",
         "endpoint": "RiskRating",
         "key": "severity",
@@ -906,7 +918,7 @@
         "Headers": "assignedTo",
         "Type": "dropdown",
         "_id": "66b230b6cc8539b4ed3861ccc",
-        "endpoint": "user",
+        "endpoint": "exeuser",
         "key": "name",
         "permissions": {
           "view": ["UAUC Creation", "UAUC Prevention Action"],
@@ -1010,7 +1022,16 @@
           "edit": ["Safety Creation"]
         }
       },
-
+      {
+        "Title": "Date",
+        "Headers": "createdAt",
+        "Type": "datepicker",
+        "_id": "66b230b6cc8539b4ed3861cc4",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
+      },
       {
         "Title": "Total Average Man Power",
         "Headers": "totalAvgManpower",
@@ -1025,9 +1046,10 @@
       {
         "Title": "Total Man Hours Worked",
         "Headers": "totalManHoursWorked",
-        "Type": "CustomTextField",
+        "Type": "calculatedField",
+        "endpoint": "totalAvgManpower",
         "_id": "66b230b6cc8539b4ed3861ccb",
-        "key": "numeric",
+        "key": "10",
         "permissions": {
           "view": ["Safety Creation", "UAUC Prevention Action"],
           "edit": ["Safety Creation"]
@@ -1221,8 +1243,32 @@
         }
       },
       {
+        "Title": "TBT Meeting Attendees",
+        "Headers": "tbtMeetingHours_",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861ccb",
+
+        "key": "numeric",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
+      },
+      {
         "Title": "TBT Meeting Hours",
         "Headers": "tbtMeetingHours",
+        "Type": "calculatedField",
+        "_id": "66b230b6cc8539b4ed3861ccb",
+        "endpoint": "tbtMeetingHours_",
+        "key": "0.166",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
+      },
+      {
+        "Title": "Persons Safety Inducted",
+        "Headers": "personsSafetyInducted_",
         "Type": "CustomTextField",
         "_id": "66b230b6cc8539b4ed3861ccb",
         "key": "numeric",
@@ -1232,8 +1278,20 @@
         }
       },
       {
-        "Title": "Persons Safety Inducted",
+        "Title": "Persons Safety Inducted Hours",
         "Headers": "personsSafetyInducted",
+        "Type": "calculatedField",
+        "_id": "66b230b6cc8539b4ed3861ccb",
+        "endpoint": "personsSafetyInducted_",
+        "key": "1",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
+      },
+      {
+        "Title": "Specific Safety Training Count",
+        "Headers": "specificSafetyTrainingHours_",
         "Type": "CustomTextField",
         "_id": "66b230b6cc8539b4ed3861ccb",
         "key": "numeric",
@@ -1245,9 +1303,10 @@
       {
         "Title": "Specific Safety Training Hours",
         "Headers": "specificSafetyTrainingHours",
-        "Type": "CustomTextField",
+        "Type": "calculatedField",
         "_id": "66b230b6cc8539b4ed3861ccb",
-        "key": "numeric",
+        "endpoint": "specificSafetyTrainingHours_",
+        "key": "2",
         "permissions": {
           "view": ["Safety Creation", "UAUC Prevention Action"],
           "edit": ["Safety Creation"]

@@ -14,7 +14,13 @@ Future<void> loadDropdownData() async {
     "machinetools",
     "hazards",
     "ppe",
-    "trade"
+    "trade",
+    "workpermit",
+    "meeting",
+    "specific",
+    "uauc",
+    "induction",
+    "safetyreport"
   ];
 
   final Map<String, Function> endpointToModelParser = {
@@ -29,6 +35,12 @@ Future<void> loadDropdownData() async {
     "hazards": (List data) => data,
     "ppe": (List data) => data,
     "trade": (List data) => data,
+    "workpermit": (List data) => data,
+    "meeting": (List data) => data,
+    "specific": (List data) => data,
+    "uauc": (List data) => data,
+    "induction": (List data) => data,
+    "safetyreport": (List data) => data,
   };
 
   // Map each endpoint to a Future that calls the API and parses the response
@@ -53,9 +65,9 @@ Future<void> loadDropdownData() async {
             } else {
               // Filter users mapped to the project "Axiomos 1"
               Strings.endpointToList["user"] = parsedData.where((user) {
-                // Assuming user is a Map and has a 'project' field
-                return user['project']['_id'] ==
-                    Strings.endpointToList['project']['_id'];
+                // Ensure user['project'] is a list and check if any project matches the selected one
+                return (user['project'] as List).any((proj) =>
+                    proj['_id'] == Strings.endpointToList['project']['_id']);
               }).toList();
             }
 
@@ -68,9 +80,11 @@ Future<void> loadDropdownData() async {
               return safetyuser['role']['roleName'] == "Management";
             }).toList();
             Strings.endpointToList['exeuser'] = parsedData.where((safetyuser) {
-              return safetyuser['role']['roleName'] == "Execution" && safetyuser['project']['_id'] ==
-                    Strings.endpointToList['project']['_id'];
+              return safetyuser['role']['roleName'] == "Execution" &&
+                  (safetyuser['project'] as List).any((proj) =>
+                      proj['_id'] == Strings.endpointToList['project']['_id']);
             }).toList();
+
             break;
 
           case "topic":
@@ -96,6 +110,32 @@ Future<void> loadDropdownData() async {
           case "trade":
             Strings.endpointToList["trade"] = parsedData;
             break;
+          case "workpermit":
+            Strings.workpermit = parsedData;
+
+            break;
+
+          case "meeting":
+            Strings.meetings = parsedData;
+            break;
+
+          case "specific":
+            Strings.specific = parsedData;
+            break;
+
+          case "uauc":
+            Strings.uauc = parsedData;
+            break;
+
+          case "induction":
+            Strings.induction = parsedData;
+            break;
+          case "safetyreport":
+            Strings.safetyreport = parsedData.where((e) {
+              return e['project']['_id'] ==
+                  Strings.endpointToList['project']['_id'];
+            }).toList();
+            break;
         }
       }
     } catch (error) {
@@ -107,5 +147,5 @@ Future<void> loadDropdownData() async {
   await Future.wait(requests);
 
   print(
-      "==============================================================User dropdown data loaded into Constants. ${Strings.endpointToList['user']}=============================================================================");
+      "==============================================================User dropdown data loaded into Constants. ${Strings.safetyReport}=============================================================================");
 }

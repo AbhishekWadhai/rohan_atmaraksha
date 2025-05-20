@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
+import 'package:rohan_suraksha_sathi/app_constants/colors.dart';
 
 import 'package:rohan_suraksha_sathi/controller/specific_training_controller.dart';
 import 'package:rohan_suraksha_sathi/model/secific_training_model.dart';
@@ -19,15 +20,18 @@ class SpecificTrainingPage extends StatelessWidget {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          foregroundColor: Colors.black,
+          foregroundColor: Colors.white,
           title: TextField(
             onChanged: (value) {
               controller.updateSearchQuery(value);
             },
+            style: const TextStyle(color: Colors.white),
             decoration: const InputDecoration(
-                hintText: "Search Specific Training", border: InputBorder.none),
+                hintText: "Search Specific Training",
+                border: InputBorder.none,
+                hintStyle: TextStyle(color: Colors.white70)),
           ),
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.appMainDark,
           actions: [
             IconButton(
                 icon: const Icon(Icons.refresh_rounded),

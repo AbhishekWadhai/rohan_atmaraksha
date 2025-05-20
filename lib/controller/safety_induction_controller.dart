@@ -24,8 +24,8 @@ class SafetyInductionController extends GetxController
   List<Induction> get filteredInductions {
     return inductionList
         .where((induction) =>
-            induction.typeOfTopic.topicTypes
-                ?.toLowerCase()
+            induction.typeOfTopic?.topicTypes
+                .toLowerCase()
                 .contains(searchQuery.value.toLowerCase()) ??
             false)
         .toList();
@@ -77,7 +77,7 @@ class SafetyInductionController extends GetxController
               .where((e) => e != null)
               .map((e) => Induction.fromJson(e as Map<String, dynamic>))
               .where((induction) =>
-                  induction.project.id ==
+                  induction.project?.id ==
                   Strings.endpointToList['project']['_id'])
               .toList();
         }

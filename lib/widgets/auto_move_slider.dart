@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
 import 'package:rohan_suraksha_sathi/app_constants/asset_path.dart';
+import 'package:rohan_suraksha_sathi/app_constants/colors.dart';
 import 'dart:async';
 
 import 'package:rohan_suraksha_sathi/helpers/custom_card.dart';
+import 'package:rohan_suraksha_sathi/routes/routes_string.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -23,22 +27,41 @@ class _AutoCarouselState extends State<AutoCarousel> {
   // List of images or widgets for the carousel
   final List<Widget> _carouselItems = [
     CardFb2(
+      totalNo: Strings.workpermit.length.toString(),
       text: 'Work Permit',
       imageUrl: Assets.workPermit,
       subtitle: 'Available Work Permit',
-      onPressed: () {},
+      onPressed: () {
+        Get.toNamed(Routes.workPermitPage);
+      },
     ),
     CardFb2(
+      totalNo: Strings.induction.length.toString(),
       text: 'Inductees',
       imageUrl: Assets.workPermit,
       subtitle: 'Total number of inductees',
-      onPressed: () {},
+      onPressed: () {Get.toNamed(Routes.inductionPage);},
     ),
     CardFb2(
+      totalNo: Strings.uauc.length.toString(),
       text: 'UA UC',
       imageUrl: Assets.workPermit,
       subtitle: 'Reported incidents ',
-      onPressed: () {},
+      onPressed: () {Get.toNamed(Routes.soraPage);},
+    ),
+    CardFb2(
+      totalNo: Strings.specific.length.toString(),
+      text: 'Specific Training',
+      imageUrl: Assets.workPermit,
+      subtitle: 'Specific Training Conducted',
+      onPressed: () {Get.toNamed(Routes.speceficTrainingPage);},
+    ),
+    CardFb2(
+      totalNo: Strings.meetings.length.toString(),
+      text: 'TBT Meetings',
+      imageUrl: Assets.workPermit,
+      subtitle: 'TBT Meetings Conducted',
+      onPressed: () {Get.toNamed(Routes.tbtMeetingPage);},
     ),
   ];
 
@@ -46,7 +69,7 @@ class _AutoCarouselState extends State<AutoCarousel> {
   void initState() {
     super.initState();
     // Start the auto-scrolling timer
-    _timer = Timer.periodic(Duration(seconds: 3), _onTimerTick);
+    _timer = Timer.periodic(Duration(seconds: 1000), _onTimerTick);
   }
 
   // Function to move to the next page every 3 seconds
@@ -104,7 +127,7 @@ class _AutoCarouselState extends State<AutoCarousel> {
               height: 8,
               width: 8,
               decoration: BoxDecoration(
-                color: _currentPage == index ? Colors.blue : Colors.grey,
+                color: _currentPage == index ? AppColors.appMainDark : Colors.grey,
                 shape: BoxShape.circle,
               ),
             );

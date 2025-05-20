@@ -18,10 +18,14 @@ import 'package:rohan_suraksha_sathi/widgets/progress_indicators.dart';
 import 'package:signature/signature.dart';
 
 class DynamicFormController extends GetxController {
+  RxInt severity = 1.obs;
+  RxInt likelihood = 1.obs;
+  RxString riskLevel = 'Low'.obs;
   RxList<Map<String, dynamic>> checkList = <Map<String, dynamic>>[].obs;
+  RxList<PageField> additionalFields = <PageField>[].obs;
 
   final CameraService cameraService = CameraService();
-
+  RxMap<String, dynamic> customFields = <String, dynamic>{}.obs;
   // Observable variables
   var formResponse = <ResponseForm>[].obs;
   var isLoading = true.obs;
@@ -47,6 +51,56 @@ class DynamicFormController extends GetxController {
     loadFormData();
   }
 
+  void calculateRiskLevel() {
+    final score = severity.value * likelihood.value;
+    if (score <= 3) {
+      riskLevel.value = 'Low';
+    } else if (score < 8) {
+      riskLevel.value = 'Medium';
+    } else if (score < 12) {
+      riskLevel.value = 'High';
+    } else {
+      riskLevel.value = 'Critical';
+    }
+    final matchedValue = Strings.endpointToList["RiskRating"].firstWhere((e) {
+      print('Comparing: ${e['severity']} with ${riskLevel.value}');
+      return e['severity'] == riskLevel.value;
+    }, orElse: () => null);
+
+    if (matchedValue != null) {
+      formData['riskValue'] = matchedValue['_id'];
+
+      // Parse the alert timeline (in hours)
+      final int timelineHours =
+          int.tryParse(matchedValue['alertTimeline'] ?? '0') ?? 0;
+
+      // Calculate deadline
+      final DateTime deadline =
+          DateTime.now().add(Duration(hours: timelineHours));
+
+      // Format deadline nicely
+      final String formattedDeadline =
+          "${deadline.day.toString().padLeft(2, '0')}/"
+          "${deadline.month.toString().padLeft(2, '0')}/"
+          "${deadline.year} at ${deadline.hour.toString().padLeft(2, '0')}:"
+          "${deadline.minute.toString().padLeft(2, '0')}";
+
+      // Show the dialog
+      Get.defaultDialog(
+        title: "Risk Level: ${riskLevel.value}",
+        middleText:
+            "You have to complete the given action by $formattedDeadline.\n\n"
+            "Severity: ${matchedValue['severity']}\n"
+            "Alert Window: $timelineHours hour(s)",
+        textConfirm: "OK",
+        confirmTextColor: Colors.white,
+        onConfirm: () => Get.back(),
+      );
+    }
+
+    print(formData);
+  }
+
   SignatureController getSignatureController(String fieldKey) {
     if (!signatureControllers.containsKey(fieldKey)) {
       signatureControllers[fieldKey] = SignatureController();
@@ -62,6 +116,37 @@ class DynamicFormController extends GetxController {
       );
     }
     return _textControllers[fieldHeader]!;
+  }
+
+  getCustomFields(String permitKey) {
+    final newFields = Strings.workpermitPageFild;
+    if (newFields != null) {
+      // Find the matching permit by comparing permitsType with checklistKey
+      final matchingFields = newFields.firstWhere(
+        (permit) => permit["permitType"]["permitsType"] == permitKey,
+        orElse: () => null,
+      );
+      if (matchingFields != null) {
+        print(
+            ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::if not null");
+        print(matchingFields);
+        // Assign its SafetyChecks to checkList.value
+        additionalFields.value =
+            (matchingFields["PageFields"] as List<dynamic>?)
+                    ?.map((e) => PageField.fromJson(e as Map<String, dynamic>))
+                    .toList()
+                    .cast<PageField>() ??
+                [];
+        print(
+            ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::if not null");
+        print(additionalFields);
+      } else {
+        // If no match is found, clear the checklist
+        print(
+            ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::if null");
+        print(matchingFields);
+      }
+    }
   }
 
   getChecklist(String checklistKey) {
@@ -141,6 +226,9 @@ class DynamicFormController extends GetxController {
           } else if (value is bool) {
             // Add check for boolean values
             formData[key] = value;
+          } else if (value is Map) {
+            // Add check for boolean values
+            formData[key] = value;
           }
         } else {
           // If no matching pageField is found, store the value as it is
@@ -149,13 +237,17 @@ class DynamicFormController extends GetxController {
         }
       });
     }
+
     checkList.value = (formData["safetyMeasuresTaken"] as List<Object>?)
             ?.map((item) => item is Map<String, dynamic> ? item : {})
             .toList()
             .cast<Map<String, dynamic>>() ??
         [];
+    customFields.value =
+        (formData["customFields"] as Map<String, dynamic>?) ?? {};
+    getCustomFields(formData["permitTypes"]?["permitsType"] ?? "");
 
-    print("Initialized form data: ${jsonEncode(formData)}");
+    print("Initialized form data: ${jsonEncode(formData["customFields"])}");
   }
 
   void updateSwitchSelection(String header, bool newValue) {
@@ -202,7 +294,7 @@ class DynamicFormController extends GetxController {
     }
   }
 
-  saveSignature(
+  Future<String?> saveSignature(
     String key,
     String endpoint,
   ) async {
@@ -233,16 +325,18 @@ class DynamicFormController extends GetxController {
 
           if (imageUrl != null) {
             // Save the image URL in the formData
-            updateFormData(key, imageUrl);
             print('Image uploaded successfully: $imageUrl');
+            return imageUrl;
           } else {
             print('Image upload failed.');
+            return "";
           }
         } else {
           print('No image selected.');
         }
       } catch (e) {
         print("Error: $e");
+        return "";
       } finally {
         // Close the loading dialog
         Get.back();
@@ -250,6 +344,7 @@ class DynamicFormController extends GetxController {
     } else {
       throw Exception("Signature is empty");
     }
+    return null; // Ensures all code paths return a value
   }
 
   // Toggle chip selection for multi-select fields
@@ -356,6 +451,7 @@ class DynamicFormController extends GetxController {
 
   // Form Submission
   Future<void> submitForm(String endpoint) async {
+    formData["customFields"] = customFields;
     final bool isConfirmed = await Get.dialog(
       AlertDialog(
         title: const Text("Confirmation"),
@@ -369,6 +465,7 @@ class DynamicFormController extends GetxController {
           ),
           ElevatedButton(
             onPressed: () {
+              print(jsonEncode(formData));
               Get.back(result: true); // Close the dialog and return true
             },
             child: const Text("Submit"),
@@ -417,6 +514,7 @@ class DynamicFormController extends GetxController {
   // Data Update
 
   Future<void> updateData(String endpoint) async {
+    formData["customFields"] = customFields;
     final isConfirmed = await Get.dialog(
       AlertDialog(
         title: const Text("Confirmation"),
@@ -495,10 +593,12 @@ class DynamicFormController extends GetxController {
       // Fetch the user's geolocation
       Position position = await LocationService().determinePosition();
       String latLong = "${position.latitude}, ${position.longitude}";
+      String? locationName = await LocationService().determineLocationName();
 
       // Update the form data with the geolocation
-      updateFormData(fieldKey, latLong);
-      print("Geolocation fetched: $latLong");
+      String result = "$locationName ($latLong)";
+      updateFormData(fieldKey, result);
+      print("Geolocation fetched: $result");
 
       // Optional: Notify the user of success
       ScaffoldMessenger.of(Get.context!).showSnackBar(

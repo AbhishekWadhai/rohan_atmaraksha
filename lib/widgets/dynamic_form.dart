@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,11 +10,15 @@ import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
 
 import 'package:rohan_suraksha_sathi/controller/dynamic_form_contoller.dart';
 import 'package:rohan_suraksha_sathi/controller/sub_form_controller.dart';
+import 'package:rohan_suraksha_sathi/helpers/sixed_boxes.dart';
 
 import 'package:rohan_suraksha_sathi/model/form_data_model.dart';
+import 'package:rohan_suraksha_sathi/services/location_service.dart';
 import 'package:rohan_suraksha_sathi/views/image_view_page.dart';
+import 'package:rohan_suraksha_sathi/widgets/custom_form.dart';
 import 'package:rohan_suraksha_sathi/widgets/subform.dart';
 import 'package:signature/signature.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DynamicForm extends StatelessWidget {
   final String pageName;
@@ -33,84 +38,92 @@ class DynamicForm extends StatelessWidget {
   Widget build(BuildContext context) {
     controller.initializeFormData(initialData);
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Colors.grey[100],
       body: Stack(
         children: [
-          Form(
-            key: _formKey,
-            child: Builder(builder: (context) {
-              return Obx(
-                () {
-                  controller.getPageFields(pageName);
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(8)),
+              color: Colors.white,
+            ),
+            padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
+            child: Form(
+              key: _formKey,
+              child: Builder(builder: (context) {
+                return Obx(
+                  () {
+                    controller.getPageFields(pageName);
 
-                  return GetBuilder<DynamicFormController>(
-                      builder: (controller) {
-                    return SingleChildScrollView(
-                      child: Padding(
-                        padding: const EdgeInsets.all(14.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Filter fields based on view permissions and build form fields dynamically for mobile view
-                            ...controller.pageFields
-                                .where((field) {
-                                  var viewPermissions = List<String>.from(
-                                      field.permissions?.view ?? []);
-                                  return controller.hasViewPermission(
-                                      viewPermissions); // Check if the user has view permission
-                                })
-                                .map((field) => Column(
-                                      children: [
-                                        // Build the form field dynamically and check for edit permissions
-                                        buildFormField(
-                                            field,
-                                            controller.hasEditPermission(
-                                                field.permissions?.edit ?? []),
-                                            context),
-                                        const SizedBox(height: 10),
-                                      ],
-                                    ))
-                                .toList(),
+                    return GetBuilder<DynamicFormController>(
+                        builder: (controller) {
+                      return SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.all(14.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Filter fields based on view permissions and build form fields dynamically for mobile view
+                              ...controller.pageFields
+                                  .where((field) {
+                                    var viewPermissions = List<String>.from(
+                                        field.permissions?.view ?? []);
+                                    return controller.hasViewPermission(
+                                        viewPermissions); // Check if the user has view permission
+                                  })
+                                  .map((field) => Column(
+                                        children: [
+                                          // Build the form field dynamically and check for edit permissions
+                                          buildFormField(
+                                              field,
+                                              controller.hasEditPermission(
+                                                  field.permissions?.edit ??
+                                                      []),
+                                              context),
+                                          const SizedBox(height: 10),
+                                        ],
+                                      ))
+                                  .toList(),
 
-                            const SizedBox(height: 10),
+                              const SizedBox(height: 10),
 
-                            // Submit button
-                            ElevatedButton(
-                              onPressed: () {
-                                if (_formKey.currentState?.validate() ??
-                                    false) {
-                                  if (isEdit) {
-                                    controller.updateData(pageName);
+                              // Submit button
+                              ElevatedButton(
+                                onPressed: () {
+                                  if (_formKey.currentState?.validate() ??
+                                      false) {
+                                    if (isEdit) {
+                                      controller.updateData(pageName);
+                                    } else {
+                                      controller.submitForm(pageName);
+                                    }
                                   } else {
-                                    controller.submitForm(pageName);
+                                    // Show an error if form is invalid
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                            'Please correct the errors in the form'),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
                                   }
-                                } else {
-                                  // Show an error if form is invalid
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                          'Please correct the errors in the form'),
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  );
-                                }
-                              },
-                              child: SizedBox(
-                                width: MediaQuery.of(context).size.width,
-                                child: Text(
-                                  isEdit ? 'Update' : 'Submit',
-                                  textAlign: TextAlign.center,
+                                },
+                                child: SizedBox(
+                                  width: MediaQuery.of(context).size.width,
+                                  child: Text(
+                                    isEdit ? 'Update' : 'Submit',
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  });
-                },
-              );
-            }),
+                      );
+                    });
+                  },
+                );
+              }),
+            ),
           ),
           Obx(() {
             if (controller.isLoading.value) {
@@ -129,6 +142,134 @@ class DynamicForm extends StatelessWidget {
   Widget buildFormField(
       PageField field, bool isEditable, BuildContext context) {
     switch (field.type) {
+      case 'riskMatrix':
+        final Map<String, int> severityOptions = {
+          'Low': 1,
+          'Medium': 2,
+          'High': 3,
+          'Critical': 4,
+        };
+
+        final Map<String, int> likelihoodOptions = {
+          'Rare': 1,
+          'Possible': 2,
+          'Likely': 3,
+          'Almost Certain': 4,
+        };
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Accident Severity',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      sb10,
+                      Obx(() => InputDecorator(
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10)),
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 0),
+                            ),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<int>(
+                                value: controller.severity.value,
+                                onChanged: (val) {
+                                  controller.severity.value = val ?? 1;
+                                  controller.calculateRiskLevel();
+                                },
+                                items: severityOptions.entries
+                                    .map((entry) => DropdownMenuItem<int>(
+                                          value: entry.value,
+                                          child: Text(entry.key),
+                                        ))
+                                    .toList(),
+                              ),
+                            ),
+                          )),
+                    ],
+                  ),
+                ),
+                sb20,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Accident Likelihood',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      sb10,
+                      Obx(() => InputDecorator(
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10)),
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 0),
+                            ),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<int>(
+                                value: controller.likelihood.value,
+                                onChanged: (val) {
+                                  controller.likelihood.value = val ?? 1;
+                                  controller.calculateRiskLevel();
+                                },
+                                items: likelihoodOptions.entries
+                                    .map((entry) => DropdownMenuItem<int>(
+                                          value: entry.value,
+                                          child: Text(entry.key),
+                                        ))
+                                    .toList(),
+                              ),
+                            ),
+                          )),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Obx(() => Card(
+                  color: Colors.white,
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    child: Text(
+                      'Risk Level: ${controller.riskLevel.value}',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                )),
+            sb32
+          ],
+        );
+
+      case 'customFields':
+        final Map<String, dynamic> customFieldsData = controller.customFields;
+        print("{}}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{");
+        print(customFieldsData);
+        return CustomForm(
+          pageFields: controller.additionalFields, //Strings.workpermitPageFild,
+          parentFormController: controller,
+          formValues: customFieldsData ?? {},
+          reference: pageName,
+        );
+
       case 'defaultField':
         final dynamic savedValue = controller.formData[field.headers];
 
@@ -140,26 +281,17 @@ class DynamicForm extends StatelessWidget {
         String displayValue = "";
         String saveValue = "";
         if (isEdit && savedValue != null) {
-          print(
-              "222222222222Opened in edit mode=======================================");
           if (savedValue is Map) {
-            print(
-                "222222222222is a Map=======================================");
             // Handle the case where savedValue is a Map
             displayValue = savedValue[field.key] ?? "";
             saveValue = savedValue["_id"] ?? "";
             controller.updateFormData(field.headers, savedValue);
           } else if (savedValue is String) {
-            print(
-                "222222222222Opened is A string=======================================");
-            // Handle the case where savedValue is a String
             displayValue = savedValue;
             saveValue = savedValue;
             controller.updateFormData(field.headers, savedValue);
           }
         } else {
-          print(
-              "222222222222Opened in create mode=======================================");
           // Extract the projectName and _id
           displayValue = Strings.endpointToList[field.endpoint][field.key];
           saveValue = Strings.endpointToList[field.endpoint]["_id"];
@@ -620,8 +752,7 @@ class DynamicForm extends StatelessWidget {
                       barrierDismissible:
                           true, // Allow tapping outside to close
                     );
-                    print(
-                        "{{{{{{{{{{{{{{{{{{{{{{{{{{{{${result}}}}}}}}}}}}}}}}}}}}}}}}}}}}}");
+
                     if (result != null) {
                       if (controller.formData[field.headers] == null) {
                         controller.formData[field.headers] = [];
@@ -634,10 +765,7 @@ class DynamicForm extends StatelessWidget {
                               .where((item) => item is Map<String, dynamic>)
                               .map((item) => item as Map<String, dynamic>)
                               .toList();
-                    } else {
-                      print(
-                          "{{{{{{{{{{{{{{{{{{{{{{{{{{{{returning null}}}}}}}}}}}}}}}}}}}}}}}}}}}}");
-                    }
+                    } else {}
                   },
                 ),
               ),
@@ -685,8 +813,6 @@ class DynamicForm extends StatelessWidget {
                                 if (isEditable)
                                   TextButton.icon(
                                     onPressed: () async {
-                                      print(
-                                          "zzzzzzzzzzzzzzzzzzzzzzzzzzz${attendee}");
                                       var result = await Get.dialog(
                                         Dialog(
                                           child: WillPopScope(
@@ -775,9 +901,6 @@ class DynamicForm extends StatelessWidget {
 
               // Error state
               if (snapshot.hasError) {
-                print(
-                    "dsjbsdjbsjvbsdjbvjsvnnnnnnnnnnnnnnnnnnnnnnn${snapshot.stackTrace}");
-
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -841,6 +964,8 @@ class DynamicForm extends StatelessWidget {
                                         (option) => option['_id'] == newValue,
                                         orElse: () => {});
                                     controller.getChecklist(
+                                        selectedOption[field.key] ?? '');
+                                    controller.getCustomFields(
                                         selectedOption[field.key] ?? '');
                                   }
                                 }
@@ -906,8 +1031,6 @@ class DynamicForm extends StatelessWidget {
                   .map((e) => e.toString())
                   .toList();
 
-          print(
-              "--------------multiselect----------------${controller.formData[field.headers].runtimeType}");
           return MultiSelectDialogField<String>(
             dialogHeight: 300,
             items: (field.options != null)
@@ -995,7 +1118,7 @@ class DynamicForm extends StatelessWidget {
         return Obx(() {
           final selectedValue = controller.formData[field.headers]?.toString();
           final List<String> options = field.options!;
-          print("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww$selectedValue");
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1033,7 +1156,6 @@ class DynamicForm extends StatelessWidget {
       case 'switch':
         return Obx(() {
           final bool isSwitched = controller.formData[field.headers] == true;
-          print("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww${isSwitched}");
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1075,6 +1197,7 @@ class DynamicForm extends StatelessWidget {
         });
       case 'signature':
         String? signatureUrl = controller.formData[field.headers];
+        String? imageUrl;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1108,11 +1231,14 @@ class DynamicForm extends StatelessWidget {
                     child: const Text("Clear"),
                   ),
                   ElevatedButton(
-                    onPressed: () {
-                      controller.saveSignature(
+                    onPressed: () async {
+                      imageUrl = await controller.saveSignature(
                         field.headers,
                         field.endpoint ?? "",
                       );
+                      if (imageUrl != null) {
+                        controller.updateFormData(field.headers, imageUrl);
+                      }
                     },
                     child: const Text("Save"),
                   ),
@@ -1126,10 +1252,12 @@ class DynamicForm extends StatelessWidget {
           String? currentLocation = controller.formData[field.headers];
           double? latitude, longitude;
 
-          if (currentLocation != null && currentLocation.isNotEmpty) {
-            var coordinates = currentLocation.split(',');
-            latitude = double.tryParse(coordinates[0]);
-            longitude = double.tryParse(coordinates[1]);
+          RegExp regex = RegExp(r'\(([^,]+),\s*([^)]+)\)');
+          Match? match = regex.firstMatch(currentLocation ?? "");
+
+          if (match != null) {
+            latitude = double.tryParse(match.group(1)!);
+            longitude = double.tryParse(match.group(2)!);
           }
 
           return Column(
@@ -1147,31 +1275,24 @@ class DynamicForm extends StatelessWidget {
                 controller: TextEditingController(
                   text: currentLocation ?? 'Fetching location...',
                 ),
-                readOnly: true, // Make the TextField read-only
+                readOnly: true, // Make the field read-only
                 decoration: kTextFieldDecoration("Location"),
                 onTap: isEditable // Check if it's editable
                     ? () async {
                         await controller.fetchGeolocation(field.headers);
+                        if (latitude != null && longitude != null) {
+                          showGeolocationDialog(
+                            latitude: latitude!,
+                            longitude: longitude!,
+                            onLocationSelected: (LatLng newPosition) {
+                              controller.formData[field.headers] =
+                                  "${newPosition.latitude},${newPosition.longitude}";
+                            },
+                          );
+                        }
                       }
                     : null, // Disable onTap if not editable
               ),
-              const SizedBox(height: 10),
-              if (latitude != null && longitude != null)
-                SizedBox(
-                  height: 200.0,
-                  child: GoogleMap(
-                    initialCameraPosition: CameraPosition(
-                      target: LatLng(latitude, longitude),
-                      zoom: 15.0,
-                    ),
-                    markers: {
-                      Marker(
-                        markerId: const MarkerId("currentLocation"),
-                        position: LatLng(latitude, longitude),
-                      ),
-                    },
-                  ),
-                ),
               // Show a message if not editable
               if (!isEditable)
                 const Padding(
@@ -1260,8 +1381,8 @@ class DynamicForm extends StatelessWidget {
                   DateTime? pickedDate = await showDatePicker(
                     context: Get.context!,
                     initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2101),
+                    firstDate: DateTime.now().subtract(Duration(days: 7)),
+                    lastDate: DateTime.now(),
                   );
                   if (pickedDate != null) {
                     String formattedDate =

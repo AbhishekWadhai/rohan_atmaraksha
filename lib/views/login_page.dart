@@ -30,7 +30,7 @@ class LoginPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 10.0),
                     const Text(
-                      "Rohan",
+                      "Rohan Builders",
                       style:
                           TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                     ),

@@ -11,18 +11,18 @@ abstract class AppEnvironment {
   static setupEnv(Environment env) {
     _environment = env;
     switch (env) {
-      case Environment.dev:
+      case Environment.prod:
         {
           baseUrl = 'https://rohan-sage.vercel.app';
           title = 'Welcome To Suraksha Saathi!';
-          appBarColor = Colors.blue;
+          appBarColor = Colors.white;
           break;
         }
-      case Environment.prod:
+      case Environment.dev:
         {
           baseUrl = 'https://rohan-testing.vercel.app';
           title = 'Welcome To Suraksha Saathi!';
-          appBarColor = Colors.blue;
+          appBarColor = Colors.red;
           break;
         }
     }

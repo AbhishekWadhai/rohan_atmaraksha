@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:rohan_suraksha_sathi/app_constants/colors.dart';
 import 'package:rohan_suraksha_sathi/routes/routes.dart';
 import 'package:rohan_suraksha_sathi/routes/routes_string.dart';
 
@@ -12,7 +14,11 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: '',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue[700]!),
+        appBarTheme: AppBarTheme(
+            backgroundColor: AppColors.appMainDark,
+            foregroundColor: Colors.white),
+        textTheme: GoogleFonts.nunitoTextTheme(),
+        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.appMainDark),
         useMaterial3: false,
       ),
       initialRoute: isLoggedIn ? Routes.homePage : Routes.loginPage,

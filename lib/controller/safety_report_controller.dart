@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:rohan_suraksha_sathi/model/incident_report_model.dart';
+import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
 import 'package:rohan_suraksha_sathi/model/safety_report_model.dart';
 import 'package:rohan_suraksha_sathi/services/api_services.dart';
 
@@ -32,14 +32,21 @@ class SafetyReportController extends GetxController
         reportList.value = meetingtData
             .where((e) => e != null)
             .map((e) => SafetyReportModel.fromJson(e as Map<String, dynamic>))
+            .where((induction) =>
+                induction.project.id ==
+                Strings.endpointToList['project']['_id'])
             .toList();
-        print("---------------------Permit called---------------------");
+        // reportList.value = meetingtData
+        //     .where((e) => e != null)
+        //     .map((e) => SafetyReportModel.fromJson(e as Map<String, dynamic>))
+        //     .toList();
+        print("---------------------Safety Report---------------------");
         print(jsonEncode(reportList));
       } else {
         throw Exception("Unexpected data format");
       }
 
-      print("---------------------Permit called---------------------");
+      print("---------------------Safety Report---------------------");
       print("Permit List Length: ${meetingtData.length}");
     } catch (e) {
       print("Error fetching permit data: $e");

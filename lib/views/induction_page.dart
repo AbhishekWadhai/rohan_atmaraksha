@@ -18,16 +18,15 @@ class InductionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        foregroundColor: Colors.black,
         title: TextField(
+          style: const TextStyle(color: Colors.white),
           onChanged: (value) => controller.updateSearchQuery(value),
           decoration: InputDecoration(
             hintText: "Search Inductions",
             border: InputBorder.none,
-            hintStyle: TextStyle(color: Colors.grey[600]),
+            hintStyle: TextStyle(color: Colors.white70),
           ),
         ),
-        backgroundColor: Colors.white,
         actions: [
           IconButton(
               icon: const Icon(Icons.refresh_rounded),
@@ -60,7 +59,7 @@ class InductionPage extends StatelessWidget {
                       margin: const EdgeInsets.all(8.0),
                       child: ListTile(
                         onLongPress: () {
-                          if (induction.createdby.id == Strings.userId) {
+                          if (induction.createdby?.id == Strings.userId) {
                             showDialog(
                               context: context,
                               builder: (BuildContext context) {
@@ -79,8 +78,8 @@ class InductionPage extends StatelessWidget {
                                     TextButton(
                                       child: const Text('Delete'),
                                       onPressed: () async {
-                                        controller
-                                            .deleteSelection(induction.id);
+                                        controller.deleteSelection(
+                                            induction.id ?? "");
                                         Navigator.of(context)
                                             .pop(); // Delete item
                                       },
@@ -92,7 +91,7 @@ class InductionPage extends StatelessWidget {
                           }
                         },
                         title: Text(
-                            'Topic: ${induction.typeOfTopic.topicTypes ?? ""}'),
+                            'Topic: ${induction.typeOfTopic?.topicTypes ?? ""}'),
                         subtitle: Text(
                           'Date: ${DateFormat('dd MM yyyy').format(DateTime.parse(induction.date ?? ""))}',
                         ),
@@ -202,14 +201,15 @@ Future<dynamic> onTapView(BuildContext context, Induction inductionData) {
                   ],
                 ),
                 const SizedBox(height: 16),
-                _buildDetailRow('Topic:', inductionData.typeOfTopic.topicTypes),
+                _buildDetailRow(
+                    'Topic:', inductionData.typeOfTopic?.topicTypes ?? ""),
                 _buildDetailRow(
                     'Date:',
                     DateFormat("dd MMM yyyy")
-                        .format(DateTime.parse(inductionData.date))),
-                _buildDetailRow('Time:', inductionData.time),
+                        .format(DateTime.parse(inductionData.date ?? ""))),
+                _buildDetailRow('Time:', inductionData.time ?? ""),
                 _buildDetailRow(
-                    'Project Name:', inductionData.project.projectName ?? ""),
+                    'Project Name:', inductionData.project?.projectName ?? ""),
                 _buildDetailRow(
                     'Form Filled:',
                     inductionData.tradeTypes
@@ -264,12 +264,13 @@ Future<dynamic> onTapView(BuildContext context, Induction inductionData) {
                     ),
                   ],
                 ),
-                _buildDetailRow('Inductees:', inductionData.inductees),
-                _buildDetailRow('Inductees Name:', inductionData.inducteesName),
+                _buildDetailRow('Inductees:', inductionData.inductees ?? ""),
                 _buildDetailRow(
-                    'Sub Contractor Name:', inductionData.subContractorName),
+                    'Inductees Name:', inductionData.inducteesName ?? ""),
+                _buildDetailRow('Sub Contractor Name:',
+                    inductionData.subContractorName ?? ""),
                 _buildDetailRow(
-                    'Instruction By:', inductionData.instructionBy.name ?? ""),
+                    'Instruction By:', inductionData.instructionBy?.name ?? ""),
                 const SizedBox(height: 16),
               ],
             ),
