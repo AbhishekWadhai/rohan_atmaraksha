@@ -13,6 +13,14 @@ class SafetyInductionController extends GetxController
   var searchQuery = ''.obs;
   var currentPage = 0.obs;
   final int itemsPerPage = 100;
+  var startDate = Rxn<DateTime>();
+  var endDate = Rxn<DateTime>();
+  final RxList<Map<String, dynamic>> topics =
+      (Strings.endpointToList["topic"] as List?)
+              ?.cast<Map<String, dynamic>>()
+              .obs ??
+          <Map<String, dynamic>>[].obs;
+  var selectedTopics = <String>[].obs;
 
   @override
   void onInit() {
@@ -22,21 +30,40 @@ class SafetyInductionController extends GetxController
   }
 
   List<Induction> get filteredInductions {
-    return inductionList
-        .where((induction) =>
-            induction.typeOfTopic?.topicTypes
-                .toLowerCase()
-                .contains(searchQuery.value.toLowerCase()) ??
-            false)
-        .toList();
+    return inductionList.where((induction) {
+      return induction.typeOfTopic?.any((t) => t.topicTypes
+              .toLowerCase()
+              .contains(searchQuery.value.toLowerCase())) ??
+          false;
+    }).toList();
   }
 
   // Paginated inductions
   List<Induction> get paginatedInductions {
+    final filteredList = filteredInductions.where((induction) {
+      final inductionDate = DateTime.tryParse(induction.date ?? "");
+
+      final matchesDate = (startDate.value == null ||
+              (inductionDate != null &&
+                  (inductionDate.isAtSameMomentAs(startDate.value!) ||
+                      inductionDate.isAfter(startDate.value!)))) &&
+          (endDate.value == null ||
+              (inductionDate != null &&
+                  inductionDate
+                      .isBefore(endDate.value!.add(const Duration(days: 1)))));
+
+      final matchesTopic = selectedTopics.isEmpty ||
+          (induction.typeOfTopic != null &&
+              induction.typeOfTopic!
+                  .any((topic) => selectedTopics.contains(topic.id)));
+
+      return matchesDate && matchesTopic;
+    }).toList();
+
     int start = currentPage.value * itemsPerPage;
     int end = start + itemsPerPage;
-    return filteredInductions.sublist(start,
-        end > filteredInductions.length ? filteredInductions.length : end);
+    return filteredList.sublist(
+        start, end > filteredList.length ? filteredList.length : end);
   }
 
   void updateSearchQuery(String query) {

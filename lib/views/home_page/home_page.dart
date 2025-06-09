@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rohan_suraksha_sathi/app_constants/colors.dart';
 import 'package:rohan_suraksha_sathi/controller/home_controller.dart';
+import 'package:rohan_suraksha_sathi/views/dashboard_view.dart';
 import 'package:rohan_suraksha_sathi/views/home_page/home_view.dart';
 import 'package:rohan_suraksha_sathi/views/notification_page.dart';
 
@@ -12,7 +13,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Widget> views = [
-      Container(),
+      DashboardView(),
       HomeView(controller: controller),
       NotificationPage()
     ];

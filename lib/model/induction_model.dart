@@ -9,9 +9,9 @@ class Induction {
   String? time;
   String? inductees;
   String? inducteesName;
-  List<TradeType> tradeTypes;
+  List<TradeType>? tradeTypes;
   String? subContractorName;
-  TypeOfTopic? typeOfTopic;
+  List<TypeOfTopic>? typeOfTopic;
   String? documentaryEvidencePhoto;
   String? anyOthers;
   Createdby? instructionBy;
@@ -58,7 +58,8 @@ class Induction {
         tradeTypes: List<TradeType>.from(
             json["tradeTypes"].map((x) => TradeType.fromJson(x))),
         subContractorName: json["subContractorName"],
-        typeOfTopic: TypeOfTopic.fromJson(json["typeOfTopic"]),
+        typeOfTopic: List<TypeOfTopic>.from(
+            json["typeOfTopic"].map((x) => TypeOfTopic.fromJson(x))),
         documentaryEvidencePhoto: json["documentaryEvidencePhoto"],
         anyOthers: json["anyOthers"],
         instructionBy: Createdby.fromJson(json["instructionBy"]),
@@ -77,9 +78,11 @@ class Induction {
         "time": time,
         "inductees": inductees,
         "inducteesName": inducteesName,
-        "tradeTypes": List<dynamic>.from(tradeTypes.map((x) => x.toJson())),
+        "tradeTypes":
+            List<dynamic>.from(tradeTypes?.map((x) => x.toJson()) ?? []),
         "subContractorName": subContractorName,
-        "typeOfTopic": typeOfTopic?.toJson(),
+        "typeOfTopic":
+            List<dynamic>.from(typeOfTopic?.map((x) => x.toJson()) ?? []),
         "documentaryEvidencePhoto": documentaryEvidencePhoto,
         "anyOthers": anyOthers,
         "instructionBy": instructionBy?.toJson(),

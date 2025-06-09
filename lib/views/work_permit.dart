@@ -8,8 +8,11 @@ import 'package:rohan_suraksha_sathi/app_constants/colors.dart';
 import 'package:rohan_suraksha_sathi/model/work_permit_model.dart';
 import 'package:rohan_suraksha_sathi/routes/routes_string.dart';
 import 'package:rohan_suraksha_sathi/services/location_service.dart';
+import 'package:rohan_suraksha_sathi/services/pdf_generator/pdf_generator.dart';
+import 'package:rohan_suraksha_sathi/services/translation.dart';
 import 'package:rohan_suraksha_sathi/widgets/dynamic_data_view.dart';
 import 'package:rohan_suraksha_sathi/widgets/my_drawer.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 import '../controller/work_permit_controller.dart';
 
@@ -63,16 +66,98 @@ class WorkPermitPage extends StatelessWidget {
         ),
         drawer: const MyDrawer(),
         body: Obx(
-          () => TabBarView(
+          () => Column(
             children: [
-              _buildWorkPermitList(
-                  workPermitController.paginatedWorkPermits), // All permits
-              _buildWorkPermitList(workPermitController.paginatedWorkPermits
-                  .where((permit) => !permit.verifiedDone)
-                  .toList()), // Pending permits
-              _buildWorkPermitList(workPermitController.paginatedWorkPermits
-                  .where((permit) => permit.verifiedDone)
-                  .toList()), // Completed permits
+              SizedBox(
+                height: 60,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      height: 28, // Half the space
+                      child: TextButton(
+                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                        onPressed: () {
+                          Get.defaultDialog(
+                            title: "Select Date or Date Range",
+                            content: SizedBox(
+                              height: 350,
+                              width: double.maxFinite,
+                              child: SfDateRangePicker(
+                                showActionButtons: true,
+                                selectionMode:
+                                    DateRangePickerSelectionMode.range,
+                                onSubmit: (Object? value) {
+                                  if (value is PickerDateRange) {
+                                    workPermitController.startDate.value =
+                                        value.startDate;
+                                    workPermitController.endDate.value =
+                                        value.endDate;
+                                    Get.back();
+                                  }
+                                },
+                                onCancel: () => Get.back(),
+                              ),
+                            ),
+                          );
+                        },
+                        child: Obx(() => Text(
+                              workPermitController.startDate.value == null ||
+                                      workPermitController.endDate.value == null
+                                  ? "Select Date Range"
+                                  : "${DateFormat('MM/dd').format(workPermitController.startDate.value!)} - ${DateFormat('MM/dd').format(workPermitController.endDate.value!)}",
+                              style: const TextStyle(fontSize: 14),
+                            )),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 30,
+                      child: Obx(() => Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 20.0),
+                            child: DropdownButton<String>(
+                              isExpanded: true,
+                              value: workPermitController
+                                  .selectedPermitTypeId.value,
+                              hint: const Text("Select Permit Type",
+                                  style: TextStyle(fontSize: 14)),
+                              items:
+                                  workPermitController.permitTypes.map((type) {
+                                return DropdownMenuItem<String>(
+                                  value: type['_id'],
+                                  child: Text(type['permitsType'],
+                                      style: const TextStyle(fontSize: 14)),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                workPermitController
+                                    .selectedPermitTypeId.value = value;
+                                workPermitController.currentPage.value = 0;
+                              },
+                              underline:
+                                  SizedBox(), // Remove extra space under dropdown
+                            ),
+                          )),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    _buildWorkPermitList(workPermitController
+                        .paginatedWorkPermits), // All permits
+                    _buildWorkPermitList(workPermitController
+                        .paginatedWorkPermits
+                        .where((permit) => !permit.verifiedDone)
+                        .toList()), // Pending permits
+                    _buildWorkPermitList(workPermitController
+                        .paginatedWorkPermits
+                        .where((permit) => permit.verifiedDone)
+                        .toList()), // Completed permits
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -100,6 +185,9 @@ class WorkPermitPage extends StatelessWidget {
     return RefreshIndicator(
       onRefresh: () async {
         // Trigger the refresh logic
+        workPermitController.startDate = Rxn<DateTime>();
+        workPermitController.endDate = Rxn<DateTime>();
+        workPermitController.selectedPermitTypeId = RxnString();
         await workPermitController.getPermitData();
       },
       child: Column(
@@ -155,11 +243,34 @@ class WorkPermitPage extends StatelessWidget {
                         );
                       }
                     },
-                    title: Text('Work Description: ${permit.workDescription}'),
-                    subtitle: Text(
-                      permit?.date != null && permit!.date!.isNotEmpty
-                          ? 'Date: ${DateFormat('dd MM yyyy').format(DateTime.parse(permit!.date!))}'
-                          : 'Date: -',
+                    title: Text('Type: ${permit.permitTypes.permitsType}'),
+                    subtitle: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            "Description: ${permit.workDescription}",
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(fontSize: 14),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          flex: 1,
+                          child: Text(
+                            permit.date != null && permit.date!.isNotEmpty
+                                ? DateFormat('dd MM yyyy')
+                                    .format(DateTime.parse(permit.date!))
+                                : 'Date: -',
+                            textAlign: TextAlign.end,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(fontSize: 14),
+                          ),
+                        ),
+                      ],
                     ),
                     trailing: permit.createdby?.id == Strings.userId ||
                             permit.verifiedBy
@@ -241,7 +352,8 @@ Future<dynamic> onTapView(BuildContext context, WorkPermit permit) {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 8.0),
                   child: Row(
                     children: [
                       const Text(
@@ -252,6 +364,14 @@ Future<dynamic> onTapView(BuildContext context, WorkPermit permit) {
                             color: Colors.white),
                       ),
                       const Spacer(),
+                      IconButton(
+                          onPressed: () {
+                            saveDynamicDataPdf(permit.toJson(), keysForMap);
+                          },
+                          icon: Icon(
+                            Icons.print,
+                            color: Colors.white,
+                          )),
                       IconButton(
                           onPressed: () {
                             Navigator.of(context).pop();
@@ -300,32 +420,37 @@ Future<dynamic> onTapView(BuildContext context, WorkPermit permit) {
                             _buildDetailRow(
                                 'Tools ',
                                 permit.tools
-                                    .map((tool) => tool.tools)
-                                    .join(", ")),
+                                        ?.map((tool) => tool.tools)
+                                        .join(", ") ??
+                                    ""),
                             _buildDetailRow(
                                 'Equipments ',
                                 permit.equipments
-                                    .map((equp) => equp.equipments)
-                                    .join(", ")),
+                                        ?.map((equp) => equp.equipments)
+                                        .join(", ") ??
+                                    ""),
                             _buildDetailRow(
                                 'Machine Tools ',
                                 permit.machineTools
-                                    .map((equp) => equp.machineTools)
-                                    .join(", ")),
+                                        ?.map((equp) => equp.machineTools)
+                                        .join(", ") ??
+                                    ""),
                             _buildDetailRow(
                                 'Type of Hazard:',
                                 permit.typeOfHazard
-                                    .map((e) => e.hazards)
-                                    .join(", ")),
+                                        ?.map((e) => e.hazards)
+                                        .join(", ") ??
+                                    ""),
                             _buildDetailRow(
                                 'Applicable PPEs:',
                                 permit.applicablePpEs
-                                    .map((e) => e.ppes)
-                                    .join(", ")),
+                                        ?.map((e) => e.ppes)
+                                        .join(", ") ??
+                                    ""),
                             _buildDetailRow('Verified Done:',
-                                permit.verifiedDone ? "Yes" : "No"),
+                                permit.verifiedDone ?? false ? "Yes" : "No"),
                             _buildDetailRow('Approval Done:',
-                                permit.approvalDone ? "Yes" : "No"),
+                                permit.approvalDone ?? false ? "Yes" : "No"),
                             ExpansionTile(
                               tilePadding:
                                   EdgeInsets.zero, // Removes default padding
@@ -335,8 +460,8 @@ Future<dynamic> onTapView(BuildContext context, WorkPermit permit) {
                               //     permit.geotagging ?? "No geolocation data"),
                               children: [
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 0.0),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 0.0),
                                   child: TextButton(
                                     onPressed: () {
                                       if (permit.geotagging != null &&
@@ -347,7 +472,7 @@ Future<dynamic> onTapView(BuildContext context, WorkPermit permit) {
                                             double.tryParse(coordinates[0]);
                                         double? longitude =
                                             double.tryParse(coordinates[1]);
-                    
+
                                         if (latitude != null &&
                                             longitude != null) {
                                           showGeolocationDialog(

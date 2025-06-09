@@ -15,6 +15,14 @@ class SpecificTrainingController extends GetxController
   RxInt currentPage = 0.obs;
   final int itemsPerPage = 20;
   RxString searchQuery = ''.obs;
+  var startDate = Rxn<DateTime>();
+  var endDate = Rxn<DateTime>();
+  final RxList<Map<String, dynamic>> topics =
+      (Strings.endpointToList["topic"] as List?)
+              ?.cast<Map<String, dynamic>>()
+              .obs ??
+          <Map<String, dynamic>>[].obs;
+  var selectedTopics = <String>[].obs;
 
   @override
   void onInit() {
@@ -24,12 +32,34 @@ class SpecificTrainingController extends GetxController
   }
 
   List<SpecificTraining> get paginatedTrainingList {
-    final filteredList = trainingList
-        .where((training) =>
-            (training.project.projectName?.toLowerCase() ?? "")
-                .contains(searchQuery.value.toLowerCase()) ||
-            training.date.contains(searchQuery.value))
-        .toList();
+    final filteredList = trainingList.where((training) {
+      // Search query matching
+      final projectName = training.project.projectName?.toLowerCase() ?? "";
+      final dateText = training.date.toLowerCase();
+      final matchesSearch =
+          projectName.contains(searchQuery.value.toLowerCase()) ||
+              dateText.contains(searchQuery.value.toLowerCase());
+
+      // Parse training date
+      final trainingDate = DateTime.tryParse(training.date);
+
+      // Date range filtering
+      final matchesDate = (startDate.value == null ||
+              (trainingDate != null &&
+                  (trainingDate.isAtSameMomentAs(startDate.value!) ||
+                      trainingDate.isAfter(startDate.value!)))) &&
+          (endDate.value == null ||
+              (trainingDate != null &&
+                  trainingDate
+                      .isBefore(endDate.value!.add(const Duration(days: 1)))));
+
+      final matchesTopic = selectedTopics.isEmpty ||
+          (training.typeOfTopic != null &&
+              training.typeOfTopic!
+                  .any((topic) => selectedTopics.contains(topic.id)));
+
+      return matchesSearch && matchesDate && matchesTopic;
+    }).toList();
 
     int start = currentPage.value * itemsPerPage;
     int end = start + itemsPerPage;

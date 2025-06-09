@@ -1,20 +1,20 @@
 import 'dart:convert';
 
-import 'package:rohan_suraksha_sathi/model/projects_model.dart';
+//import 'package:rohan_suraksha_sathi/model/projects_model.dart';
 
 class SpecificTraining {
   String id;
   Project project;
-  Createdby createdby;
+  Createdby? createdby;
   String date;
   String time;
-  TypeOfTopic typeOfTopic;
+  List<TypeOfTopic>? typeOfTopic;
   List<String> attendees;
-  List<AttendeesName> attendeesName;
-  Createdby instructionBy;
-  String documentaryEvidencePhoto;
-  String geotagging;
-  String commentsBox;
+  List<AttendeesName>? attendeesName;
+  Createdby? instructionBy;
+  String? documentaryEvidencePhoto;
+  String? geotagging;
+  String? commentsBox;
   int attendance;
   int attendanceHours;
   int v;
@@ -46,14 +46,19 @@ class SpecificTraining {
       SpecificTraining(
         id: json["_id"],
         project: Project.fromJson(json["project"]),
-        createdby: Createdby.fromJson(json["createdby"]),
+        createdby: json["createdby"] == null
+            ? null
+            : Createdby.fromJson(json["createdby"]),
         date: json["date"],
         time: json["time"],
-        typeOfTopic: TypeOfTopic.fromJson(json["typeOfTopic"]),
+        typeOfTopic: List<TypeOfTopic>.from(
+            json["typeOfTopic"].map((x) => TypeOfTopic.fromJson(x))),
         attendees: List<String>.from(json["attendees"].map((x) => x)),
         attendeesName: List<AttendeesName>.from(
             json["attendeesName"].map((x) => AttendeesName.fromJson(x))),
-        instructionBy: Createdby.fromJson(json["instructionBy"]),
+        instructionBy: json["instructionBy"] == null
+            ? null
+            : Createdby.fromJson(json["instructionBy"]),
         documentaryEvidencePhoto: json["documentaryEvidencePhoto"],
         geotagging: json["geotagging"],
         commentsBox: json["commentsBox"],
@@ -65,14 +70,15 @@ class SpecificTraining {
   Map<String, dynamic> toJson() => {
         "_id": id,
         "project": project.toJson(),
-        "createdby": createdby.toJson(),
+        "createdby": createdby?.toJson(),
         "date": date,
         "time": time,
-        "typeOfTopic": typeOfTopic.toJson(),
+        "typeOfTopic":
+            List<dynamic>.from(typeOfTopic?.map((x) => x.toJson()) ?? []),
         "attendees": List<dynamic>.from(attendees.map((x) => x)),
         "attendeesName":
-            List<dynamic>.from(attendeesName.map((x) => x.toJson())),
-        "instructionBy": instructionBy.toJson(),
+            List<dynamic>.from(attendeesName?.map((x) => x.toJson()) ?? []),
+        "instructionBy": instructionBy?.toJson(),
         "documentaryEvidencePhoto": documentaryEvidencePhoto,
         "geotagging": geotagging,
         "commentsBox": commentsBox,
@@ -82,11 +88,71 @@ class SpecificTraining {
       };
 }
 
+class Project {
+  String? workpermitAllow;
+  String? id;
+  String? projectId;
+  String? projectName;
+  String? siteLocation;
+  String? startDate;
+  String? endDate;
+  String? status;
+  String? description;
+  String? company;
+  int v;
+
+  Project({
+    required this.workpermitAllow,
+    required this.id,
+    required this.projectId,
+    required this.projectName,
+    required this.siteLocation,
+    required this.startDate,
+    required this.endDate,
+    required this.status,
+    required this.description,
+    required this.company,
+    required this.v,
+  });
+
+  factory Project.fromRawJson(String str) => Project.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory Project.fromJson(Map<String, dynamic> json) => Project(
+        workpermitAllow: json["workpermitAllow"],
+        id: json["_id"],
+        projectId: json["projectId"],
+        projectName: json["projectName"],
+        siteLocation: json["siteLocation"],
+        startDate: json["startDate"],
+        endDate: json["endDate"],
+        status: json["status"],
+        description: json["description"],
+        company: json["company"],
+        v: json["__v"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "workpermitAllow": workpermitAllow,
+        "_id": id,
+        "projectId": projectId,
+        "projectName": projectName,
+        "siteLocation": siteLocation,
+        "startDate": startDate,
+        "endDate": endDate,
+        "status": status,
+        "description": description,
+        "company": company,
+        "__v": v,
+      };
+}
+
 class AttendeesName {
-  String name;
-  String subcontractorName;
-  String signature;
-  String designation;
+  String? name;
+  String? subcontractorName;
+  String? signature;
+  String? designation;
   String id;
 
   AttendeesName({
@@ -120,18 +186,18 @@ class AttendeesName {
 }
 
 class Createdby {
-  String id;
-  String userId;
-  String name;
-  String role;
-  String emailId;
-  String password;
-  String phone;
-  String address;
-  bool isActive;
+  String? id;
+  String? userId;
+  String? name;
+  String? role;
+  String? emailId;
+  String? password;
+  String? phone;
+  String? address;
+  bool? isActive;
   List<dynamic> project;
-  String createdAt;
-  String updatedAt;
+  String? createdAt;
+  String? updatedAt;
   int v;
 
   Createdby({
@@ -188,65 +254,9 @@ class Createdby {
       };
 }
 
-// class Project {
-//     String id;
-//     String projectId;
-//     String projectName;
-//     String siteLocation;
-//     String startDate;
-//     String endDate;
-//     String status;
-//     String description;
-//     String company;
-//     int v;
-
-//     Project({
-//         required this.id,
-//         required this.projectId,
-//         required this.projectName,
-//         required this.siteLocation,
-//         required this.startDate,
-//         required this.endDate,
-//         required this.status,
-//         required this.description,
-//         required this.company,
-//         required this.v,
-//     });
-
-//     factory Project.fromRawJson(String str) => Project.fromJson(json.decode(str));
-
-//     String toRawJson() => json.encode(toJson());
-
-//     factory Project.fromJson(Map<String, dynamic> json) => Project(
-//         id: json["_id"],
-//         projectId: json["projectId"],
-//         projectName: json["projectName"],
-//         siteLocation: json["siteLocation"],
-//         startDate: json["startDate"],
-//         endDate: json["endDate"],
-//         status: json["status"],
-//         description: json["description"],
-//         company: json["company"],
-//         v: json["__v"],
-//     );
-
-//     Map<String, dynamic> toJson() => {
-//         "_id": id,
-//         "projectId": projectId,
-//         "projectName": projectName,
-//         "siteLocation": siteLocation,
-//         "startDate": startDate,
-//         "endDate": endDate,
-//         "status": status,
-//         "description": description,
-//         "company": company,
-//         "__v": v,
-//     };
-// }
-
 class TypeOfTopic {
-  String id;
-  String topicTypes;
+  String? id;
+  String? topicTypes;
   int v;
 
   TypeOfTopic({

@@ -43,10 +43,35 @@ final Map<String, String> translationMap = {
   "description": "Description",
   "tradeTypes": "Trade Type",
   "meeting": "TBT Meeting",
-  
+  "project": ""
 
   // Add more key-value pairs as needed
 };
 String translate(String key) {
   return translationMap[key] ?? key;
 }
+
+final Map<String, dynamic> keysForMap = {
+  "role": "roleName",
+  "project": "projectName",
+  "typeOfHazard": "hazards",
+  "SafetyChecks": "CheckPoints",
+  "escalationAlert": "roleName",
+  "createdby": "name",
+  "permitTypes": "permitsType",
+  "typeOfTopic": "topicTypes",
+  "riskValue": "value",
+  "assignedTo": "name",
+  "actionTakenBy": "name",
+  "tools": "tools",
+  "machineTools": "machineTools",
+  "equipments": "equipments",
+  "area": "siteLocation",
+  "verifiedBy": "name",
+  "approvalBy": "name",
+  "applicablePPEs": "ppes",
+  "safetyMeasuresTaken": "CheckPoints",
+  "TbtGivenBy": "name",
+  "instructionBy": "name",
+  "tradeTypes": "tradeTypes"
+};

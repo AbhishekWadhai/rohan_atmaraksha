@@ -40,14 +40,15 @@ class ApiService {
         return response.statusCode;
       } else if (response.statusCode == 200) {
         print("API post successfully");
-        print(jsonEncode(response.body));
+        //print(jsonEncode(response.body));
         return jsonDecode(response.body);
       } else {
-        print("Failed to post data. Status code: ${json.encode(response)}");
+        print(
+            "Failed to post data. Status code: ------${response.statusCode}-------------------");
       }
     } catch (e) {
       print(e);
-      throw Exception('Error: $e');
+      throw Exception('Error here: $e');
     }
   }
 

@@ -16,6 +16,10 @@ class UaUc {
   AssignedTo? assignedTo;
   String? status;
   String? comment;
+  String? correctivePreventiveAction;
+  String? actionTakenPhoto;
+  AssignedTo? actionTakenBy;
+  String? geotagging;
   int? v;
 
   UaUc({
@@ -34,6 +38,10 @@ class UaUc {
     this.assignedTo,
     this.status,
     this.comment,
+    this.correctivePreventiveAction,
+    this.actionTakenPhoto,
+    this.actionTakenBy,
+    this.geotagging,
     this.v,
   });
 
@@ -69,6 +77,13 @@ class UaUc {
             : AssignedTo.fromJson(json["assignedTo"]),
         status: json["status"] as String?,
         comment: json["comment"] as String?,
+        correctivePreventiveAction:
+            json["correctivePreventiveAction"] as String?,
+        actionTakenPhoto: json["actionTakenPhoto"] as String?,
+        actionTakenBy: json["actionTakenBy"] == null
+            ? null
+            : AssignedTo.fromJson(json["actionTakenBy"]),
+        geotagging: json["geotagging"] as String?,
         v: json["__v"] as int?,
       );
 
@@ -88,6 +103,10 @@ class UaUc {
         "assignedTo": assignedTo?.toJson(),
         "status": status,
         "comment": comment,
+        "actionTakenBy": actionTakenBy?.toJson(),
+        "actionTakenPhoto": actionTakenPhoto,
+        "correctivePreventiveAction": correctivePreventiveAction,
+        "geotagging": geotagging,
         "__v": v,
       };
 }

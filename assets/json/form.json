@@ -584,7 +584,7 @@
       {
         "Title": "Topic Discussed",
         "Headers": "typeOfTopic",
-        "Type": "dropdown",
+        "Type": "multiselect",
         "_id": "66b230b6cc8539b4ed3861cc1",
         "endpoint": "topic",
         "key": "topicTypes",
@@ -703,7 +703,7 @@
       {
         "Title": "Training Topic",
         "Headers": "typeOfTopic",
-        "Type": "dropdown",
+        "Type": "multiselect",
         "endpoint": "topic",
         "key": "topicTypes",
         "_id": "66b230b6cc8539b4ed3861cc4",
@@ -712,7 +712,6 @@
           "edit": ["Safety Creation"]
         }
       },
-
       {
         "Title": "Attendees",
         "Headers": "attendees",

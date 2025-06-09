@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rohan_suraksha_sathi/app_constants/colors.dart';
+import 'package:rohan_suraksha_sathi/controller/home_controller.dart';
 import 'package:rohan_suraksha_sathi/controller/safety_report_controller%20copy.dart';
 import 'package:rohan_suraksha_sathi/helpers/sixed_boxes.dart';
 import 'package:rohan_suraksha_sathi/widgets/new_bar_chart.dart';
 
 class DashboardPage extends StatefulWidget {
-  const DashboardPage({super.key});
-
+  DashboardPage({super.key, required this.homeController});
+  final HomeController homeController;
   @override
   State<DashboardPage> createState() => _DashboardPageState();
 }
@@ -34,56 +35,77 @@ class _DashboardPageState extends State<DashboardPage> {
   List<Widget> getCharts({bool showLegend = false}) {
     return [
       DynamicChart(
-        data: safetyReportController1.tbtMeeting,
-        title: "TBT Meeting Hours",
-        legendName: "Meeting Hours",
-        showLegend: showLegend,
-        chartType: ChartType.column,
-      ),
-      DynamicChart(
-        data: safetyReportController1.safetyInduction,
-        title: "Safety Induction Hours",
-        legendName: "Induction",
-        showLegend: showLegend,
-        chartType: ChartType.pie,
-      ),
-      DynamicChart(
-        data: safetyReportController1.specificTraining,
-        title: "Specific Training Hours",
-        legendName: "Training Hours",
-        showLegend: showLegend,
-        chartType: ChartType.doughnut,
-      ),
-      DynamicChart(
-        data: safetyReportController1.safetyTraining,
-        title: "Total Safety Training Hours",
-        legendName: "Total Hours",
-        showLegend: showLegend,
-        chartType: ChartType.area,
-      ),
-      DynamicChart(
         data: safetyReportController1.avgManPowers,
         title: "Avg. Manpower",
         legendName: "Manpower",
         showLegend: showLegend,
-        chartType: ChartType.bar,
+        chartType: ChartType.column,
+        textColor: Colors.white,
       ),
       DynamicChart(
-        title: "Injury Incident",
+        data: safetyReportController1.totalManHoursWorkedinM,
+        title: "Avg. Manhours Worked",
+        legendName: "Avg. Manhours Worked",
+        showLegend: showLegend,
+        chartType: ChartType.column,
+        textColor: Colors.white,
+      ),
+      DynamicChart(
+        data: safetyReportController1.safetyTraining,
+        title: "Safety Training Target(%)",
+        legendName: "Percentages of Trainees",
+        showLegend: showLegend,
+        chartType: ChartType.doughnut,
+        textColor: Colors.white,
+      ),
+      DynamicChart(
+        title: "Frequency Rate(FR) and Severity Rate(SR)",
         groupedData: [
-          safetyReportController1.fatality,
-          safetyReportController1.ltiCases,
-          safetyReportController1.mtiCases,
-          safetyReportController1.fac
+          safetyReportController1.fr,
+          safetyReportController1.sr,
         ],
         legendNames: const [
-          "Fatal",
-          "LTI",
-          "MTI",
-          "FAC",
+          "FR",
+          "SR",
         ],
         showLegend: showLegend,
         chartType: ChartType.groupedColumn,
+        textColor: Colors.white,
+      ),
+      DynamicChart(
+        data: safetyReportController1.uaucResolved,
+        title: "UAUC Rectified(%)",
+        legendName: "UAUC",
+        showLegend: showLegend,
+        chartType: ChartType.bar,
+        textColor: Colors.white,
+      ),
+      DynamicChart(
+        data: safetyReportController1.safetyInduction,
+        title: "No. of Persons Safety Inducted",
+        legendName: "Training Hours",
+        showLegend: showLegend,
+        chartType: ChartType.bar,
+        textColor: Colors.white,
+      ),
+      DynamicChart(
+        data: safetyReportController1.safetyCommitteeMeetings,
+        title: "Safety Committee Meetings",
+        legendName: "Training Hours",
+        showLegend: showLegend,
+        chartType: ChartType.column,
+        textColor: Colors.white,
+      ),
+      DynamicChart(
+        title: "Safety Audit",
+        groupedData: [
+          safetyReportController1.externalAudits,
+          safetyReportController1.internalAudits,
+        ],
+        legendNames: const ["External", "Internal"],
+        showLegend: showLegend,
+        chartType: ChartType.groupedColumn,
+        textColor: Colors.white,
       ),
       DynamicChart(
         title: "Non-Injury Incident",
@@ -103,6 +125,20 @@ class _DashboardPageState extends State<DashboardPage> {
         ],
         showLegend: showLegend,
         chartType: ChartType.groupedColumn,
+        textColor: Colors.white,
+      ),
+      DynamicChart(
+        title: "Injury Incident",
+        groupedData: [
+          safetyReportController1.fatality,
+          safetyReportController1.ltiCases,
+          safetyReportController1.mtiCases,
+          safetyReportController1.fac
+        ],
+        legendNames: const ["Fatal", "LTI", "MTI", "FAC"],
+        showLegend: showLegend,
+        chartType: ChartType.groupedColumn,
+        textColor: Colors.white,
       )
     ];
   }
@@ -131,20 +167,23 @@ class _DashboardPageState extends State<DashboardPage> {
           final chartIndex = index % charts.length;
 
           return GestureDetector(
-            onTap: () => _showFullScreenChart(
-              chartIndex,
-              context,
-              safetyReportController1,
-              getCharts,
-              selectedFilter,
-              (newFilter) {
-                // Add this callback
-                setState(() {
-                  selectedFilter = newFilter;
-                  updateCharts(); // Update charts when filter changes
-                });
-              },
-            ), // Open full-screen chart
+            onTap: () => widget.homeController
+                .changeTabIndex(0), // Navigate to Dashboard
+
+            //  _showFullScreenChart(
+            //   chartIndex,
+            //   context,
+            //   safetyReportController1,
+            //   getCharts,
+            //   selectedFilter,
+            //   (newFilter) {
+            //     // Add this callback
+            //     setState(() {
+            //       selectedFilter = newFilter;
+            //       updateCharts(); // Update charts when filter changes
+            //     });
+            //   },
+            // ), // Open full-screen chart
             child: AnimatedScale(
               scale: _currentPage == chartIndex ? 1.05 : 1.0,
               duration: const Duration(milliseconds: 200),
@@ -158,7 +197,6 @@ class _DashboardPageState extends State<DashboardPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Row(
-
                         children: [
                           Text(
                             "$selectedFilter observations",
@@ -169,7 +207,7 @@ class _DashboardPageState extends State<DashboardPage> {
                           ),
                           Spacer(),
                           CircleAvatar(
-                            radius: 12,
+                              radius: 12,
                               backgroundColor: Colors.white,
                               child: Icon(
                                 Icons.more_horiz_rounded,
@@ -212,7 +250,6 @@ void _showFullScreenChart(
               mainAxisSize: MainAxisSize.min,
               children: [
                 DropdownButton<String>(
-
                   style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,

@@ -1,17 +1,23 @@
-import 'package:get/get.dart';
-import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
+import 'dart:convert';
 
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
 import 'package:rohan_suraksha_sathi/model/safety_report_model.dart';
+import 'package:rohan_suraksha_sathi/services/formatters.dart';
 import 'package:rohan_suraksha_sathi/widgets/new_bar_chart.dart';
 
 class SafetyReportChartController extends GetxController {
   RxList<SafetyReportModel> safetyReportData = <SafetyReportModel>[].obs;
+  RxList<SafetyReportModel> ltiCasesData = <SafetyReportModel>[].obs;
+  RxList<ChartData> safetyManHoursWorked = <ChartData>[].obs;
   RxList<ChartData> avgManPowers = <ChartData>[].obs;
   RxList<ChartData> tbtMeeting = <ChartData>[].obs;
   RxList<ChartData> safetyTraining = <ChartData>[].obs;
   RxList<ChartData> uaucResolved = <ChartData>[].obs;
   RxList<ChartData> safetyInduction = <ChartData>[].obs;
   RxList<ChartData> specificTraining = <ChartData>[].obs;
+
   RxList<ChartData> totalManHoursWorked = <ChartData>[].obs;
   RxList<ChartData> fatality = <ChartData>[].obs;
   RxList<ChartData> ltiCases = <ChartData>[].obs;
@@ -41,18 +47,78 @@ class SafetyReportChartController extends GetxController {
   RxList<ChartData> awardsAndAppreciations = <ChartData>[].obs;
   RxList<ChartData> safetyAwardRatingHighest = <ChartData>[].obs;
   RxList<ChartData> safetyAwardRatingLowest = <ChartData>[].obs;
+  RxList<ChartData> totalManHoursWorkedinM = <ChartData>[].obs;
 
   bool isOpen = false;
   int openedChart = 0;
+  String selectedProject = "All";
+  RxString selectedYear = "2025".obs;
+  RxString selectedQuarter = "Quarter 1".obs;
+  RxInt selectedMonth = 1.obs;
+  DateTime? startDate;
+  DateTime? endDate;
+
+  //RxString selectedWeek = ''.obs;
+  Map<String, dynamic>? selectedWeek;
 
   @override
   void onInit() {
     super.onInit();
-    print("------------------getting safety data");
     safetyReportData.value =
         Strings.safetyreport.map((e) => SafetyReportModel.fromJson(e)).toList();
-    print("------------------${Strings.safetyreport}");
     _populateChartData();
+    getLticases();
+  }
+
+  List<Map<String, dynamic>> getWeeksOfYear(int year) {
+    List<Map<String, dynamic>> weeks = [];
+
+    DateTime current = DateTime(year, 1, 1);
+    DateTime endOfYear = DateTime(year, 12, 31);
+    DateFormat formatter = DateFormat('dd MMM');
+
+    int weekNumber = 1;
+
+    // First week: Jan 1 to the first Sunday
+    DateTime endOfWeek = current.add(Duration(days: 7 - current.weekday));
+    if (endOfWeek.isAfter(endOfYear)) endOfWeek = endOfYear;
+
+    weeks.add({
+      'week': weekNumber++,
+      'start': current,
+      'end': endOfWeek,
+      'label':
+          'Week 1 (${formatter.format(current)} - ${formatter.format(endOfWeek)})'
+    });
+
+    current = endOfWeek.add(Duration(days: 1));
+
+    // Following weeks: Monday to Sunday
+    while (current.isBefore(endOfYear)) {
+      DateTime startOfWeek = current;
+      endOfWeek = startOfWeek.add(Duration(days: 6));
+      if (endOfWeek.isAfter(endOfYear)) endOfWeek = endOfYear;
+
+      weeks.add({
+        'week': weekNumber,
+        'start': startOfWeek,
+        'end': endOfWeek,
+        'label':
+            'Week $weekNumber (${formatter.format(startOfWeek)} - ${formatter.format(endOfWeek)})'
+      });
+
+      weekNumber++;
+      current = endOfWeek.add(Duration(days: 1));
+    }
+
+    return weeks;
+  }
+
+  getLticases() {
+    ltiCasesData.value = safetyReportData.where((e) {
+      return e.ltiCases > 0;
+    }).toList();
+    print("----------------------------------------------");
   }
 
   void _populateChartData() {
@@ -60,12 +126,94 @@ class SafetyReportChartController extends GetxController {
     _updateChartData(safetyReportData);
   }
 
+  double roundToTwoDecimals(double value) {
+    return double.parse(value.toStringAsFixed(2));
+  }
+  // Inside SafetyReportController class
+
+// Method to get sums filtered by project name
+  Map<String, double> getSummedData({String? projectId}) {
+    // Filter data if project ID is provided (and not "All")
+    List<SafetyReportModel> filteredData =
+        projectId == null || projectId == "All"
+            ? safetyReportData
+            : safetyReportData
+                .where((report) => report.project.id == projectId)
+                .toList();
+
+    // Calculate sums for all metrics
+    return {
+      'avgManPowers': filteredData.fold(
+          0.0, (sum, report) => sum + report.totalAvgManpower),
+      'tbtMeeting': double.parse((filteredData
+          .fold<double>(
+              0.0,
+              (double sum, SafetyReportModel report) =>
+                  sum + (report.tbtMeetingHours ?? 0.0))
+          .toStringAsFixed(2))),
+      'safetyTraining': filteredData.fold(
+          0.0, (sum, report) => sum + report.totalTrainingHours),
+      'uaucResolved': filteredData.fold(
+          0.0, (sum, report) => sum + report.uaUcReportedClosed),
+      'totalManHoursWorked': filteredData.fold(
+          0.0, (sum, report) => sum + report.totalManHoursWorked),
+      'fatality':
+          filteredData.fold(0.0, (sum, report) => sum + report.fatality),
+      'ltiCases':
+          filteredData.fold(0.0, (sum, report) => sum + report.ltiCases),
+      'mtiCases':
+          filteredData.fold(0.0, (sum, report) => sum + report.mtiCases),
+      'fac': filteredData.fold(0.0, (sum, report) => sum + report.fac),
+      'majorEnvironmentalCases': filteredData.fold(
+          0.0, (sum, report) => sum + report.majorEnvironmentalCases),
+      'animalAndInsectBiteCases': filteredData.fold(
+          0.0, (sum, report) => sum + report.animalAndInsectBiteCases),
+      'dangerousOccurrences': filteredData.fold(
+          0.0, (sum, report) => sum + report.dangerousOccurrences),
+      'nearMissIncidents': filteredData.fold(
+          0.0, (sum, report) => sum + report.nearMissIncidents),
+      'fireCases':
+          filteredData.fold(0.0, (sum, report) => sum + report.fireCases),
+      'manDaysLost':
+          filteredData.fold(0.0, (sum, report) => sum + report.manDaysLost),
+      'fr': filteredData.fold(0.0, (sum, report) => sum + report.fr),
+      'sr': filteredData.fold(0.0, (sum, report) => sum + report.sr),
+      'safeLtiFreeDays':
+          filteredData.fold(0.0, (sum, report) => sum + report.safeLtiFreeDays),
+      'safeLtiFreeManHours': filteredData.fold(
+          0.0, (sum, report) => sum + report.safeLtiFreeManHours),
+      'ncrPenaltyWarnings': filteredData.fold(
+          0.0, (sum, report) => sum + report.ncrPenaltyWarnings),
+      'suggestionsReceived': filteredData.fold(
+          0.0, (sum, report) => sum + report.suggestionsReceived),
+      'safetyInduction': filteredData.fold(
+          0.0, (sum, report) => sum + report.personsSafetyInducted),
+      'specificTraining': filteredData.fold(
+          0.0, (sum, report) => sum + report.specificSafetyTrainingHours),
+      'safetyItemsInspections': filteredData.fold(
+          0.0, (sum, report) => sum + report.safetyItemsInspections),
+      'safetyCommitteeMeetings': filteredData.fold(
+          0.0, (sum, report) => sum + report.safetyCommitteeMeetings),
+      'internalAudits':
+          filteredData.fold(0.0, (sum, report) => sum + report.internalAudits),
+      'externalAudits':
+          filteredData.fold(0.0, (sum, report) => sum + report.externalAudits),
+      'awardsAndAppreciations': filteredData.fold(
+          0.0, (sum, report) => sum + report.awardsAndAppreciations),
+      'safetyAwardRatingHighest': filteredData.fold(
+          0.0, (sum, report) => sum + report.safetyAwardRatingHighest),
+      'safetyAwardRatingLowest': filteredData.fold(
+          0.0, (sum, report) => sum + report.safetyAwardRatingLowest),
+      'totalManHoursWorkedinM': filteredData.fold(
+          0.0, (sum, report) => sum + report.totalManHoursWorked),
+    };
+  }
+
   void _updateChartData(List<SafetyReportModel> data) {
     avgManPowers.value =
         _aggregateData(data, (report) => report.totalAvgManpower.toDouble());
     tbtMeeting.value = _aggregateData(data, (report) => report.tbtMeetingHours);
-    safetyTraining.value =
-        _aggregateData(data, (report) => report.totalTrainingHours.toDouble());
+
     uaucResolved.value =
         _aggregateData(data, (report) => report.uaUcReportedClosed.toDouble());
     safetyInduction.value = _aggregateData(
@@ -75,6 +223,7 @@ class SafetyReportChartController extends GetxController {
 
     totalManHoursWorked.value =
         _aggregateData(data, (report) => report.totalManHoursWorked.toDouble());
+
     fatality.value =
         _aggregateData(data, (report) => report.fatality.toDouble());
     ltiCases.value =
@@ -118,6 +267,102 @@ class SafetyReportChartController extends GetxController {
         data, (report) => report.safetyAwardRatingHighest.toDouble());
     safetyAwardRatingLowest.value = _aggregateData(
         data, (report) => report.safetyAwardRatingLowest.toDouble());
+
+    safetyTraining.value = computeDerivedChart(
+        inputs: {
+          'inductions': safetyInduction,
+          'tbt': tbtMeetingHours,
+          'specific': specificSafetyTrainingHours,
+          'totalhrs': totalManHoursWorked
+        },
+        formula: (values) {
+          final inductions = values['inductions'] ?? 0;
+          final tbt = values['tbt'] ?? 0;
+          final specific = values['specific'] ?? 0;
+          final totalhrs = values['totalhrs'] ?? 0;
+
+          return ((inductions + tbt + specific) / totalhrs) * 100;
+        });
+
+    fr.value = computeDerivedChart(
+        inputs: {'lti': ltiCases, 'totalhrs': totalManHoursWorked},
+        formula: (values) {
+          final lti = values['lti'] ?? 0;
+          final totalhrs = values['totalhrs'] ?? 0;
+          return (lti * 1000000) / totalhrs;
+        });
+    sr.value = computeDerivedChart(
+        inputs: {'mdl': manDaysLost, 'totalhrs': totalManHoursWorked},
+        formula: (values) {
+          final mdl = values['mdl'] ?? 0;
+          final totalhrs = values['totalhrs'] ?? 0;
+          return (mdl * 1000000) / totalhrs;
+        });
+    totalManHoursWorkedinM.value = computeDerivedChart(
+        inputs: {"totalManHoursWorked": totalManHoursWorked},
+        formula: (values) {
+          final totalManHoursWorked = values["totalManHoursWorked"] ?? 0;
+
+          return totalManHoursWorked/1000000;
+        });
+  }
+
+  void updateDataForCustomDateRange(DateTime startDate, DateTime endDate) {
+    final filteredData = Strings.safetyreport
+        .map((e) => SafetyReportModel.fromJson(e))
+        .where((report) =>
+            report.createdAt.isAfter(startDate.subtract(Duration(days: 1))) &&
+            report.createdAt.isBefore(endDate.add(Duration(days: 1))))
+        .toList();
+
+    _updateChartData(filteredData);
+  }
+
+  void filterSafetyReportsByProject(String? projectId) {
+    if (projectId == "All") {
+      // Show all reports if no project is selected
+      safetyReportData.value = Strings.safetyreport
+          .map((e) => SafetyReportModel.fromJson(e))
+          .toList();
+      _populateChartData();
+    } else {
+      // Filter reports by projectId
+      safetyReportData.value = Strings.safetyreport
+          .map((e) => SafetyReportModel.fromJson(e))
+          .where((report) => report.project.id == projectId)
+          .toList();
+    }
+
+    // safetyReportData.value = filteredReports; // Update filtered data
+    _populateChartData(); // Update charts with the filtered data
+  }
+
+  List<ChartData> computeDerivedChart({
+    required Map<String, List<ChartData>> inputs,
+    required double Function(Map<String, double> values) formula,
+  }) {
+    // Convert each ChartData list to a Map<category, value>
+    final Map<String, Map<String, double>> categoryToValues = {};
+
+    inputs.forEach((sourceKey, chartList) {
+      for (var chart in chartList) {
+        categoryToValues.putIfAbsent(chart.category, () => {});
+        categoryToValues[chart.category]![sourceKey] = chart.value;
+      }
+    });
+
+    final List<ChartData> result = [];
+
+    categoryToValues.forEach((category, values) {
+      try {
+        double computed = double.parse(formula(values).toStringAsFixed(2));
+        result.add(ChartData(category, computed));
+      } catch (e) {
+        result.add(ChartData(category, 0)); // fallback on error
+      }
+    });
+
+    return result;
   }
 
   /// Aggregates data by summing values for a specific period
@@ -128,41 +373,70 @@ class SafetyReportChartController extends GetxController {
     final Map<String, double> aggregatedData = {};
 
     for (var report in data) {
-      String periodKey = _getPeriodKey(report.createdAt);
+      String? periodKey = _getPeriodKey(report.createdAt);
+      if (periodKey == null) continue; // Skip if periodKey is null
+
       aggregatedData[periodKey] =
           (aggregatedData[periodKey] ?? 0) + valueSelector(report);
     }
 
     return aggregatedData.entries
-        .map((entry) => ChartData(entry.key, entry.value))
+        .map((entry) =>
+            ChartData(entry.key, double.parse(entry.value.toStringAsFixed(2))))
         .toList();
   }
 
   /// Returns the period key (e.g., "2023-01 (Monthly)" or "2023-Q1 (Quarterly)")
-  String _getPeriodKey(DateTime date) {
+  String? _getPeriodKey(DateTime date) {
     switch (_selectedFilter) {
       case "Weekly":
-        final weekStart = date.subtract(Duration(days: date.weekday - 1));
-        final weekNumber =
-            ((date.day - 1) ~/ 7) + 1; // Calculate the week number in the month
-        return "Week $weekNumber ";
+        if (selectedWeek != null &&
+            selectedWeek!.containsKey('start') &&
+            selectedWeek!.containsKey('end')) {
+          final start = selectedWeek!['start'] as DateTime;
+          final end = selectedWeek!['end'] as DateTime;
+
+          if (date.isAfter(start.subtract(Duration(days: 1))) &&
+              date.isBefore(end.add(Duration(days: 1)))) {
+            return "${date.day}-${date.month}-${date.year}";
+          }
+        }
+        return null;
+
       case "Monthly":
-        final monthName = _getMonthName(date.month); // Get month name
-        return "$monthName, ${date.year}";
+        if (date.year.toString() == selectedYear.value &&
+            selectedMonth.value == date.month) {
+          return "${date.day}-${date.month}-${date.year}";
+        }
+        return null;
+
       case "Quarterly":
         final quarter = ((date.month - 1) ~/ 3) + 1;
-        return "Q-$quarter";
+        final startMonth = (quarter - 1) * 3 + 1;
+        final startOfQuarter = DateTime(date.year, startMonth, 1);
+        final weekNumber = ((date.difference(startOfQuarter).inDays) ~/ 7) + 1;
+        if (date.year.toString() == selectedYear.value &&
+            selectedQuarter.value == "Quarter $quarter") {
+          return "Q$quarter - Week $weekNumber";
+        }
+        return null;
+
       case "Yearly":
-        return "${date.year}";
+        if (date.year.toString() == selectedYear.value) {
+          return "${getMonthName(date.month)} $selectedYear";
+        }
+        return null;
+
       case "Recent":
         return _formatDate(date);
+
       default:
-        final monthName = _getMonthName(date.month);
+        final monthName = getMonthName(date.month);
         return "$monthName, ${date.year}";
     }
   }
 
-  String _getMonthName(int month) {
+  String getMonthName(int month) {
     const monthNames = [
       "Jan",
       "Feb",
@@ -182,7 +456,7 @@ class SafetyReportChartController extends GetxController {
 
   /// Formats date as 'YYYY-MM-DD'
   String _formatDate(DateTime date) {
-    return "${_getMonthName(date.month)} ${date.day.toString().padLeft(2, '0')}";
+    return IndianDateFormatters.formatDate1(date);
   }
 
   /// Updates chart data based on the selected filter

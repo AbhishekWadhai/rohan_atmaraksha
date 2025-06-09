@@ -18,5 +18,5 @@ class TextStyles {
   static TextStyle get chartTitle => TextStyle(
       fontSize: 12,
       fontWeight: FontWeight.bold,
-      color: Colors.white);
+      color: Colors.orange);
 }

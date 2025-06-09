@@ -10,6 +10,14 @@ class TBTMeetingController extends GetxController {
   RxInt currentPage = 0.obs;
   final int itemsPerPage = 20;
   var searchQuery = ''.obs;
+  var startDate = Rxn<DateTime>();
+  var endDate = Rxn<DateTime>();
+  final RxList<Map<String, dynamic>> topics =
+      (Strings.endpointToList["topic"] as List?)
+              ?.cast<Map<String, dynamic>>()
+              .obs ??
+          <Map<String, dynamic>>[].obs;
+  var selectedTopics = <String>[].obs;
 
   @override
   void onInit() {
@@ -18,28 +26,41 @@ class TBTMeetingController extends GetxController {
   }
 
   List<TbtMeeting> get paginatedTBTMeetings {
-    // Explicitly cast tbtMeetingList to List<TbtMeeting> to ensure proper typing
     final List<TbtMeeting> filteredList =
         (tbtMeetingList as List<TbtMeeting>).where((TbtMeeting meeting) {
-      // Check if `typeOfTopic` contains the search query in any `topicTypes`
+      // Check if typeOfTopic contains the search query
       bool typeMatches = meeting.typeOfTopic!.any((TypeOfTopic topic) => topic
           .topicTypes
           .toLowerCase()
           .contains(searchQuery.value.toLowerCase()));
 
-      // Check if the search query matches the `date`
-      bool dateMatches =
+      // Check if date contains search query
+      bool dateMatches = meeting.date != null &&
           meeting.date!.toLowerCase().contains(searchQuery.value.toLowerCase());
 
-      // Return true if either condition matches
-      return typeMatches || dateMatches;
+      // Parse the meeting date to DateTime
+      final meetingDate = DateTime.tryParse(meeting.date ?? "");
+
+      // Check if within date range
+      final isWithinDateRange = (startDate.value == null ||
+              (meetingDate != null &&
+                  !meetingDate.isBefore(startDate.value!))) &&
+          (endDate.value == null ||
+              (meetingDate != null &&
+                  !meetingDate.isAfter(
+                      endDate.value!.add(Duration(days: 1))))); // ✅ Inclusive
+
+      final matchesTopic = selectedTopics.isEmpty ||
+          (meeting.typeOfTopic != null &&
+              meeting.typeOfTopic!
+                  .any((topic) => selectedTopics.contains(topic.id)));
+
+      return (typeMatches || dateMatches) && isWithinDateRange && matchesTopic;
     }).toList();
 
-    // Calculate the start and end indices for pagination
+    // Pagination logic (if you use it)
     int start = currentPage.value * itemsPerPage;
     int end = start + itemsPerPage;
-
-    // Return the paginated sublist
     return filteredList.sublist(
         start, end > filteredList.length ? filteredList.length : end);
   }

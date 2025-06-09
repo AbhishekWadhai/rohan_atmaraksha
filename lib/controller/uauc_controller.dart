@@ -13,23 +13,42 @@ class UaucController extends GetxController
   var currentPage = 0.obs;
   final int itemsPerPage = 100; // You can change this to your preferred number
   var searchQuery = ''.obs;
+  var startDate = Rxn<DateTime>();
+  var endDate = Rxn<DateTime>();
+  final RxList<String> selectedSeverities = <String>[].obs;
+
   @override
   void onInit() {
     super.onInit();
-    print("---------------------On init called---------------------");
 
     getPermitData();
   }
 
+  void updateDateRange(DateTime? start, DateTime? end) {
+    startDate.value = start;
+    endDate.value = end;
+    currentPage.value = 0;
+  }
+
   List<dynamic> get paginatedWorkPermits {
-    final filteredList = uaucList
-        .where((uauc) =>
-            (uauc.project?.projectName // Force unwrap
-                        ?.toLowerCase() ??
-                    "")
-                .contains(searchQuery.value.toLowerCase()) ||
-            uauc.date!.contains(searchQuery.value))
-        .toList();
+    final filteredList = uaucList.where((uauc) {
+      final projectName = uauc.project?.projectName?.toLowerCase() ?? "";
+      final matchesSearch =
+          projectName.contains(searchQuery.value.toLowerCase()) ||
+              (uauc.date?.contains(searchQuery.value) ?? false);
+
+      final uaucDate = DateTime.tryParse(uauc.date ?? "");
+
+      final matchesDate = (startDate.value == null ||
+              (uaucDate != null && !uaucDate.isBefore(startDate.value!))) &&
+          (endDate.value == null ||
+              (uaucDate != null && !uaucDate.isAfter(endDate.value!)));
+
+      final matchSeverity = selectedSeverities.isEmpty ||
+          selectedSeverities.contains(uauc.riskValue?.severity);
+
+      return matchesSearch && matchesDate && matchSeverity;
+    }).toList();
 
     int start = currentPage.value * itemsPerPage;
     int end = start + itemsPerPage;
@@ -79,13 +98,12 @@ class UaucController extends GetxController
                   Strings.endpointToList['project']['_id'])
               .toList();
         }
-        print("---------------------Permit called---------------------");
+
         print(jsonEncode(uaucList));
       } else {
         throw Exception("Unexpected data format");
       }
 
-      print("---------------------Permit called---------------------");
       print("Permit List Length: ${meetingtData.length}");
     } catch (e) {
       print("Error fetching permit data: $e");

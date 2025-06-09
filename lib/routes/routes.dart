@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:rohan_suraksha_sathi/routes/routes_string.dart';
+import 'package:rohan_suraksha_sathi/views/action_view.dart';
 import 'package:rohan_suraksha_sathi/views/app_infor.dart';
 import 'package:rohan_suraksha_sathi/views/home_page/home_page.dart';
 import 'package:rohan_suraksha_sathi/views/safety_report.dart';
@@ -29,6 +30,13 @@ class AppRoutes {
         name: Routes.speceficTrainingPage, page: () => SpecificTrainingPage()),
     GetPage(name: Routes.formPage, page: () => FormPage()),
     GetPage(name: Routes.notificationPage, page: () => NotificationPage()),
+    GetPage(
+      name: Routes.actionView,
+      page: () {
+        final args = Get.arguments as Map<String, dynamic>;
+        return ActionView(title: args['title']);
+      },
+    ),
     GetPage(name: Routes.packageInfoPage, page: () => PackageInfoPage()),
   ];
 }

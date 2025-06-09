@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
 import 'package:rohan_suraksha_sathi/model/uauc_model.dart';
@@ -9,6 +10,7 @@ import 'package:rohan_suraksha_sathi/model/work_permit_model.dart';
 import 'package:rohan_suraksha_sathi/routes/routes_string.dart';
 import 'package:rohan_suraksha_sathi/services/api_services.dart';
 import 'package:rohan_suraksha_sathi/services/load_dropdown_data.dart';
+import 'package:rohan_suraksha_sathi/widgets/gradient_button.dart';
 import 'package:rohan_suraksha_sathi/widgets/progress_indicators.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -34,6 +36,7 @@ class HomeController extends GetxController {
     super.onInit();
     checkForUpdate();
     getFormField();
+
     // await loadDropdownData();
     await getPermitData("uauc");
     await getPermitData("workpermit");
@@ -181,10 +184,64 @@ class HomeController extends GetxController {
     Get.dialog(
       AlertDialog(
         title: Text("Update Available"),
-        content: Text("New version $latestVersion is available."),
+        content: Text(
+            "Please Update to latest version $latestVersion for seamless experience"),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: Text("Later")),
-          TextButton(onPressed: launchUpdateLink, child: Text("Update")),
+          TextButton(
+            onPressed: () {
+              // Show a warning dialog when "Later" is pressed
+              Get.back(); // Close the first dialog
+              _showLaterWarningDialog();
+            },
+            child: Text("Later"),
+          ),
+          Container(
+              child: GradientButton(height: 30, width: 90, onTap: launchUpdateLink, text: "Update", shadowColor: Colors.transparent,)),
+        ],
+      ),
+      barrierDismissible: false,
+    );
+  }
+
+  void _showLaterWarningDialog() {
+    Get.dialog(
+      AlertDialog(
+        title: Center(
+            child: Text(
+          "WARNING",
+          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+        )),
+        content: Column(
+          mainAxisSize: MainAxisSize.min, // 👈 keeps dialog compact
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Align(
+              alignment: Alignment.center, // 👈 center Lottie without expanding
+              child: Lottie.asset(
+                'assets/animations_josn/warning.json',
+                height: 100,
+                width: 100,
+                repeat: true,
+                fit: BoxFit.contain,
+              ),
+            ),
+            SizedBox(height: 16),
+            Text(
+              "Skipping the update might cause issues. Are you sure?",
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: Text("Still Skip")),
+          TextButton(
+            onPressed: () {
+              Get.back(); // Close warning dialog
+              _showUpdateDialog();
+            },
+            child: Text("Cancel"),
+          ),
         ],
       ),
       barrierDismissible: false,

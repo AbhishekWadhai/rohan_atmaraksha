@@ -129,7 +129,9 @@ class HomeView extends StatelessWidget {
                           color: AppColors.appMainMid,
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                         ),
-                        child: DashboardPage(),
+                        child: DashboardPage(
+                          homeController: controller,
+                        ),
                       ),
                     ],
                   ),
@@ -421,6 +423,14 @@ class AppBarContent extends StatelessWidget {
                                   Get.toNamed(Routes.safetyReportPage);
                                 },
                               ),
+                              // MyGrid(
+                              //   avatarColor: Colors.orange[100]!,
+                              //   image: Image.asset(Assets.safetyReport),
+                              //   activity: "Checklist",
+                              //   onTap: () {
+                              //     Get.toNamed(Routes.actionView);
+                              //   },
+                              // ),
                             ],
                           ),
                         ],

@@ -5,10 +5,13 @@ import 'package:intl/intl.dart';
 import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
 import 'package:rohan_suraksha_sathi/app_constants/colors.dart';
 import 'package:rohan_suraksha_sathi/controller/uauc_controller.dart';
+import 'package:rohan_suraksha_sathi/helpers/sixed_boxes.dart';
 import 'package:rohan_suraksha_sathi/model/uauc_model.dart';
 import 'package:rohan_suraksha_sathi/routes/routes_string.dart';
 import 'package:rohan_suraksha_sathi/views/image_view_page.dart';
+import 'package:rohan_suraksha_sathi/widgets/helper_widgets/risk_color_switch.dart';
 import 'package:rohan_suraksha_sathi/widgets/my_drawer.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class UaucPage extends StatelessWidget {
   UaucPage({super.key});
@@ -64,15 +67,80 @@ class UaucPage extends StatelessWidget {
             // TabBarView
             Expanded(
               child: Obx(
-                () => TabBarView(
+                () => Column(
                   children: [
-                    _buildListView(controller.paginatedWorkPermits), // All
-                    _buildListView(controller.paginatedWorkPermits
-                        .where((uauc) => uauc.status == "Open")
-                        .toList()), // Open
-                    _buildListView(controller.paginatedWorkPermits
-                        .where((uauc) => uauc.status == "Closed")
-                        .toList()), // Closed
+                    Column(
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            Get.defaultDialog(
+                              title: "Select Date or Date Range",
+                              content: SizedBox(
+                                height: 350, // Give a fixed height
+                                width: double
+                                    .maxFinite, // Allow it to expand horizontally
+                                child: SfDateRangePicker(
+                                  showActionButtons: true,
+                                  selectionMode:
+                                      DateRangePickerSelectionMode.range,
+                                  onSubmit: (Object? value) {
+                                    if (value is PickerDateRange) {
+                                      controller.startDate.value =
+                                          value.startDate;
+                                      controller.endDate.value = value.endDate;
+
+                                      // Optional: Close dialog or update UI
+                                      Get.back();
+                                    }
+                                  },
+                                  onCancel: () {
+                                    // Optional: handle cancel action
+                                    Get.back();
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            controller.startDate.value == null ||
+                                    controller.endDate.value == null
+                                ? "Select Date Range"
+                                : "${DateFormat('MMMM d, y').format(controller.startDate.value!)} - ${DateFormat('MMMM d, y').format(controller.endDate.value!)}",
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            severityCheckbox(
+                                "Critical", Colors.red, controller),
+                            severityCheckbox("High", Colors.orange, controller),
+                            severityCheckbox(
+                                "Medium", Colors.amber, controller),
+                            severityCheckbox("Low", Colors.green, controller),
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Divider(
+                            thickness: 2,
+                          ),
+                        )
+                      ],
+                    ),
+                    Expanded(
+                      child: TabBarView(
+                        children: [
+                          _buildListView(
+                              controller.paginatedWorkPermits), // All
+                          _buildListView(controller.paginatedWorkPermits
+                              .where((uauc) => uauc.status == "Open")
+                              .toList()), // Open
+                          _buildListView(controller.paginatedWorkPermits
+                              .where((uauc) => uauc.status == "Closed")
+                              .toList()), // Closed
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -103,6 +171,9 @@ class UaucPage extends StatelessWidget {
   Widget _buildListView(List<dynamic> uaucList) {
     return RefreshIndicator(
       onRefresh: () async {
+        controller.selectedSeverities.clear();
+        controller.startDate = Rxn<DateTime>();
+        controller.endDate = Rxn<DateTime>();
         await controller.getPermitData();
       },
       child: Column(
@@ -150,11 +221,31 @@ class UaucPage extends StatelessWidget {
                         );
                       }
                     },
-                    title: Text(
-                      'Project Name: ${specificUauc.project.projectName}',
+                    minLeadingWidth: 0,
+                    leading: Container(
+                      decoration: BoxDecoration(
+                        color: getRiskColor(
+                            specificUauc.riskValue?.severity ?? ""),
+                        borderRadius: BorderRadius.circular(
+                            10), // Adjust the radius as needed
+                      ),
+                      width: 3,
                     ),
-                    subtitle: Text(
-                      'Date: ${DateFormat('dd MM yyyy').format(DateTime.parse(specificUauc.date ?? ""))}',
+                    title: Text(
+                        '${specificUauc.observation[0].toUpperCase()}${specificUauc.observation.substring(1)}',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: const TextStyle(fontSize: 16)),
+                    subtitle: Row(
+                      children: [
+                        Text(
+                          'Date: ${DateFormat('dd MM yyyy').format(DateTime.parse(specificUauc.date ?? ""))}',
+                        ),
+                        const Spacer(),
+                        Text(
+                          'Time: ${specificUauc.time}',
+                        ),
+                      ],
                     ),
                     trailing: specificUauc.assignedTo?.id == Strings.userId ||
                             Strings.roleName == "Safety"
@@ -208,6 +299,49 @@ class UaucPage extends StatelessWidget {
   }
 }
 
+Widget severityCheckbox(String label, Color color, UaucController controller) {
+  return Obx(() {
+    final isChecked = controller.selectedSeverities.contains(label);
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Theme(
+          data: ThemeData(
+            unselectedWidgetColor: color, // For border when unchecked
+            checkboxTheme: CheckboxThemeData(
+              fillColor: MaterialStateProperty.resolveWith((states) {
+                // Always show color background
+                if (states.contains(MaterialState.selected)) {
+                  return color;
+                } else {
+                  return color.withOpacity(0.9); // Lighter shade for unchecked
+                }
+              }),
+              checkColor: MaterialStateProperty.all(Colors.white), // Tick color
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(2),
+              ),
+              side: BorderSide.none, // Removes default border
+            ),
+          ),
+          child: Checkbox(
+            value: isChecked,
+            onChanged: (val) {
+              if (val == true) {
+                controller.selectedSeverities.add(label);
+              } else {
+                controller.selectedSeverities.remove(label);
+              }
+            },
+          ),
+        ),
+        Text(label),
+      ],
+    );
+  });
+}
+
 Future<dynamic> onTapView(BuildContext context, UaUc data) {
   return showModalBottomSheet(
     context: context,
@@ -219,7 +353,8 @@ Future<dynamic> onTapView(BuildContext context, UaUc data) {
     ),
     builder: (BuildContext context) {
       final screenHeight = MediaQuery.of(context).size.height;
-      String imageUrl = data.photo ?? "";
+      String imageUrl1 = data.photo ?? "";
+      String imageUrl2 = data.actionTakenPhoto ?? "";
       return ConstrainedBox(
         constraints: BoxConstraints(
           maxHeight: screenHeight * 0.8, // Limit height to 50% of the screen
@@ -276,7 +411,7 @@ Future<dynamic> onTapView(BuildContext context, UaUc data) {
                     const Spacer(),
                     GestureDetector(
                       onTap: () {
-                        Get.to(ImageViewPage(imageUrl: imageUrl));
+                        Get.to(ImageViewPage(imageUrl: imageUrl1));
                       },
                       child: SizedBox(
                         height: 200,
@@ -284,7 +419,7 @@ Future<dynamic> onTapView(BuildContext context, UaUc data) {
                         child: FittedBox(
                           fit: BoxFit.contain,
                           child: Image.network(
-                            imageUrl,
+                            imageUrl1,
                             loadingBuilder: (context, child, progress) {
                               if (progress == null) return child;
                               return const Center(
@@ -312,7 +447,68 @@ Future<dynamic> onTapView(BuildContext context, UaUc data) {
                 _buildDetailRow('Severity:', data.riskValue?.severity ?? ""),
                 _buildDetailRow('Assigned to:', data.assignedTo?.name ?? ""),
                 _buildDetailRow('Status:', data.status ?? ""),
-                _buildDetailRow('Comment:', data.comment ?? ""),
+                _buildDetailRow(
+                    'Geotagging:', data.geotagging ?? "No Location Data"),
+                _buildDetailRow(
+                    'Corrective Preventive Actions:',
+                    data.correctivePreventiveAction ??
+                        "No Actions Suggested yet"),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Flexible(
+                      child: Text(
+                        "Action Photo",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () {
+                        Get.to(ImageViewPage(imageUrl: imageUrl2));
+                      },
+                      child: SizedBox(
+                        height: 200,
+                        width: 200,
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: Image.network(
+                            imageUrl2,
+                            loadingBuilder: (context, child, progress) {
+                              if (progress == null) return child;
+                              return const Center(
+                                child: Padding(
+                                  padding: EdgeInsets.all(16.0),
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Center(
+                                  child: Column(
+                                children: [
+                                  Icon(Icons.image_not_supported_rounded),
+                                  Text(
+                                    "No Image Provided",
+                                    style: TextStyle(fontSize: 4),
+                                  ),
+                                ],
+                              ));
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                // _buildDetailRow('Comment:', data ?? ""),
+                _buildDetailRow(
+                    'Action Taken By:', data.actionTakenBy?.name ?? ""),
+
                 const SizedBox(height: 16),
               ],
             ),

@@ -12,7 +12,15 @@ class WorkPermitController extends GetxController
   var currentPage = 0.obs;
   final int itemsPerPage = 20;
   var searchQuery = ''.obs;
+  var startDate = Rxn<DateTime>();
+  var endDate = Rxn<DateTime>();
+  final RxList<Map<String, dynamic>> permitTypes =
+      (Strings.endpointToList["permitstype"] as List?)
+              ?.cast<Map<String, dynamic>>()
+              .obs ??
+          <Map<String, dynamic>>[].obs;
 
+  RxnString selectedPermitTypeId = RxnString(); // Stores selected _id
   @override
   void onInit() {
     super.onInit();
@@ -23,15 +31,31 @@ class WorkPermitController extends GetxController
 
   // Get filtered and paginated permits
   List<dynamic> get paginatedWorkPermits {
-    final filteredList = workPermitList
-        .where((permit) =>
-            (permit.workDescription?.toLowerCase() ?? "")
-                .contains(searchQuery.value.toLowerCase()) ||
-            (permit.date ?? "").contains(searchQuery.value))
-        .toList();
+    final filteredList = workPermitList.where((permit) {
+      final workDesc = permit.workDescription?.toLowerCase() ?? "";
+      final query = searchQuery.value.toLowerCase();
+      final dateStr = permit.date ?? "";
+
+      final matchesSearch =
+          workDesc.contains(query) || dateStr.contains(searchQuery.value);
+
+      final permitDate = DateTime.tryParse(dateStr);
+      final matchesStartDate = startDate.value == null ||
+          (permitDate != null && !permitDate.isBefore(startDate.value!));
+      final matchesEndDate = endDate.value == null ||
+          (permitDate != null && !permitDate.isAfter(endDate.value!));
+
+      final matchesType = selectedPermitTypeId.value == null ||
+          permit.permitTypes?.id == selectedPermitTypeId.value;
+
+      return matchesSearch && matchesStartDate && matchesEndDate && matchesType;
+    }).toList();
 
     int start = currentPage.value * itemsPerPage;
     int end = start + itemsPerPage;
+
+    if (start >= filteredList.length) return [];
+
     return filteredList.sublist(
         start, end > filteredList.length ? filteredList.length : end);
   }

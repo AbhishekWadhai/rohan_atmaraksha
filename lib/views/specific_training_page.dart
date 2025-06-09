@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
 import 'package:rohan_suraksha_sathi/app_constants/colors.dart';
 
@@ -9,6 +10,7 @@ import 'package:rohan_suraksha_sathi/model/secific_training_model.dart';
 import 'package:rohan_suraksha_sathi/routes/routes_string.dart';
 import 'package:rohan_suraksha_sathi/views/image_view_page.dart';
 import 'package:rohan_suraksha_sathi/widgets/my_drawer.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class SpecificTrainingPage extends StatelessWidget {
   final controller = Get.put(SpecificTrainingController());
@@ -50,10 +52,80 @@ class SpecificTrainingPage extends StatelessWidget {
         drawer: const MyDrawer(),
         body: RefreshIndicator(
           onRefresh: () async {
+            controller.startDate = Rxn<DateTime>();
+            controller.endDate = Rxn<DateTime>();
+            controller.selectedTopics.clear();
             await controller.getPermitData();
           },
           child: Column(
             children: [
+              Obx(() => Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          Get.defaultDialog(
+                            title: "Select Date or Date Range",
+                            content: SizedBox(
+                              height: 350,
+                              width: double.maxFinite,
+                              child: SfDateRangePicker(
+                                showActionButtons: true,
+                                selectionMode:
+                                    DateRangePickerSelectionMode.range,
+                                onSubmit: (Object? value) {
+                                  if (value is PickerDateRange) {
+                                    controller.startDate.value =
+                                        value.startDate;
+                                    controller.endDate.value = value.endDate;
+                                    Get.back();
+                                  }
+                                },
+                                onCancel: () {
+                                  Get.back();
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          controller.startDate.value == null ||
+                                  controller.endDate.value == null
+                              ? "Select Date Range"
+                              : "${DateFormat('MMMM d, y').format(controller.startDate.value!)} - ${DateFormat('MMMM d, y').format(controller.endDate.value!)}",
+                        ),
+                      ),
+                      Flexible(
+                        child: Obx(() => Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20.0),
+                              child: MultiSelectDialogField<String>(
+                                items: controller.topics
+                                    .map((type) => MultiSelectItem<String>(
+                                        type['_id'], type['topicTypes']))
+                                    .toList(),
+                                title: const Text("Select Topics"),
+                                buttonText: const Text(
+                                  "Select Topics",
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                                initialValue: controller.selectedTopics,
+                                onConfirm: (selectedValues) {
+                                  controller.selectedTopics.value =
+                                      selectedValues;
+                                  controller.currentPage.value = 0;
+                                },
+                                chipDisplay: MultiSelectChipDisplay(
+                                  textStyle: const TextStyle(fontSize: 14),
+                                  scroll: true,
+                                  scrollBar: HorizontalScrollBar(),
+                                ),
+                                searchable: true,
+                              ),
+                            )),
+                      ),
+                    ],
+                  )),
               // Training list
               Expanded(
                 child: Obx(
@@ -68,7 +140,7 @@ class SpecificTrainingPage extends StatelessWidget {
                             onTapView(context, training);
                           },
                           onLongPress: () {
-                            if (training.createdby.id == Strings.userId) {
+                            if (training.createdby?.id == Strings.userId) {
                               showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
@@ -98,7 +170,11 @@ class SpecificTrainingPage extends StatelessWidget {
                               );
                             }
                           },
-                          title: Text('Topic: ${training.project.projectName}'),
+                          title: Text(
+                              "Topic: ${training.typeOfTopic?.map((topic) => topic.topicTypes).join(', ') ?? ""}",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: const TextStyle(fontSize: 16)),
                           subtitle: Text(
                             'Date: ${DateFormat('dd MM yyyy').format(DateTime.parse(training.date ?? ""))}',
                           ),
@@ -211,7 +287,12 @@ Future<dynamic> onTapView(BuildContext context, SpecificTraining training) {
                   ],
                 ),
                 const SizedBox(height: 16),
-                _buildDetailRow('Topic:', training.typeOfTopic.topicTypes),
+                _buildDetailRow(
+                    'Topic:',
+                    training.typeOfTopic
+                            ?.map((topic) => topic.topicTypes)
+                            .join(', ') ??
+                        ""),
                 _buildDetailRow(
                     'Date:',
                     DateFormat("dd MMM yyyy")
@@ -222,7 +303,7 @@ Future<dynamic> onTapView(BuildContext context, SpecificTraining training) {
                 _buildDetailRow('Attendees Name:',
                     training.attendees.map((e) => e).join(",")),
                 _buildDetailRow('Attendees Name:',
-                    training.attendeesName.map((e) => e?.name ?? "").join(",")),
+                    training.attendeesName?.map((e) => e.name).join(",") ?? ""),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -272,7 +353,7 @@ Future<dynamic> onTapView(BuildContext context, SpecificTraining training) {
                     ),
                   ],
                 ),
-                _buildDetailRow('Comment Box:', training.commentsBox),
+                _buildDetailRow('Comment Box:', training.commentsBox ?? ""),
                 const SizedBox(height: 16),
               ],
             ),

@@ -3,12 +3,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
 import 'package:rohan_suraksha_sathi/controller/safety_induction_controller.dart';
 import 'package:rohan_suraksha_sathi/model/induction_model.dart';
 import 'package:rohan_suraksha_sathi/routes/routes_string.dart';
 import 'package:rohan_suraksha_sathi/views/image_view_page.dart';
 import 'package:rohan_suraksha_sathi/widgets/my_drawer.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class InductionPage extends StatelessWidget {
   InductionPage({super.key});
@@ -45,10 +47,84 @@ class InductionPage extends StatelessWidget {
       drawer: const MyDrawer(),
       body: RefreshIndicator(
         onRefresh: () async {
+          controller.startDate = Rxn<DateTime>();
+          controller.endDate = Rxn<DateTime>();
+          controller.selectedTopics.clear();
           await controller.getPermitData();
         },
         child: Column(
           children: [
+            Obx(
+              () => Column(
+                mainAxisSize:
+                    MainAxisSize.min, // important to avoid unbounded height
+                children: [
+                  Flexible(
+                    // instead of Expanded
+                    fit: FlexFit.loose,
+                    child: TextButton(
+                      onPressed: () {
+                        Get.defaultDialog(
+                          title: "Select Date or Date Range",
+                          content: SizedBox(
+                            height: 350,
+                            width: double.maxFinite,
+                            child: SfDateRangePicker(
+                              showActionButtons: true,
+                              selectionMode: DateRangePickerSelectionMode.range,
+                              onSubmit: (Object? value) {
+                                if (value is PickerDateRange) {
+                                  controller.startDate.value = value.startDate;
+                                  controller.endDate.value = value.endDate;
+                                  Get.back();
+                                }
+                              },
+                              onCancel: () {
+                                Get.back();
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        controller.startDate.value == null ||
+                                controller.endDate.value == null
+                            ? "Select Date Range"
+                            : "${DateFormat('MMMM d, y').format(controller.startDate.value!)} - ${DateFormat('MMMM d, y').format(controller.endDate.value!)}",
+                      ),
+                    ),
+                  ),
+                  Flexible(
+                    fit: FlexFit.loose,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: MultiSelectDialogField<String>(
+                        items: controller.topics
+                            .map((type) => MultiSelectItem<String>(
+                                type['_id'], type['topicTypes']))
+                            .toList(),
+                        title: const Text("Select Topics"),
+                        buttonText: const Text(
+                          "Select Topics",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        initialValue: controller.selectedTopics,
+                        onConfirm: (selectedValues) {
+                          controller.selectedTopics.value = selectedValues;
+                          controller.currentPage.value = 0;
+                        },
+                        chipDisplay: MultiSelectChipDisplay(
+                          textStyle: const TextStyle(fontSize: 14),
+                          scroll: true,
+                          scrollBar: HorizontalScrollBar(),
+                        ),
+                        searchable: true,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             Expanded(
               child: Obx(
                 () => ListView.builder(
@@ -91,7 +167,11 @@ class InductionPage extends StatelessWidget {
                           }
                         },
                         title: Text(
-                            'Topic: ${induction.typeOfTopic?.topicTypes ?? ""}'),
+                          "Topic: ${induction.typeOfTopic?.map((topic) => topic.topicTypes).join(', ')}",
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: const TextStyle(fontSize: 16),
+                        ),
                         subtitle: Text(
                           'Date: ${DateFormat('dd MM yyyy').format(DateTime.parse(induction.date ?? ""))}',
                         ),
@@ -202,7 +282,11 @@ Future<dynamic> onTapView(BuildContext context, Induction inductionData) {
                 ),
                 const SizedBox(height: 16),
                 _buildDetailRow(
-                    'Topic:', inductionData.typeOfTopic?.topicTypes ?? ""),
+                    'Topic:',
+                    inductionData.typeOfTopic
+                            ?.map((topic) => topic.topicTypes)
+                            .join(', ') ??
+                        ""),
                 _buildDetailRow(
                     'Date:',
                     DateFormat("dd MMM yyyy")
@@ -213,8 +297,9 @@ Future<dynamic> onTapView(BuildContext context, Induction inductionData) {
                 _buildDetailRow(
                     'Form Filled:',
                     inductionData.tradeTypes
-                        .map((e) => e.tradeTypes)
-                        .join(",")),
+                            ?.map((e) => e.tradeTypes)
+                            .join(",") ??
+                        ""),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

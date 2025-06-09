@@ -29,17 +29,19 @@ class DynamicChart extends StatelessWidget {
   final List<String>? legendNames; // For grouped column chart
   final bool showLegend;
   final ChartType chartType;
+  final Color textColor;
 
-  const DynamicChart({
-    Key? key,
-    required this.title,
-    this.data,
-    this.groupedData,
-    this.legendName,
-    this.legendNames,
-    required this.showLegend,
-    required this.chartType,
-  }) : super(key: key);
+  DynamicChart(
+      {Key? key,
+      required this.title,
+      this.data,
+      this.groupedData,
+      this.legendName,
+      this.legendNames,
+      required this.showLegend,
+      required this.chartType,
+      required this.textColor})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -74,15 +76,15 @@ class DynamicChart extends StatelessWidget {
       margin: const EdgeInsets.all(10),
       title: ChartTitle(text: title, textStyle: TextStyles.chartTitle),
       primaryXAxis: CategoryAxis(
-        labelStyle: TextStyle(color: Colors.white),
+        labelStyle: TextStyle(color: textColor),
         majorGridLines: const MajorGridLines(width: 0),
       ),
       primaryYAxis: NumericAxis(
-        labelStyle: TextStyle(color: Colors.white),
+        labelStyle: TextStyle(color: textColor),
         axisLine: const AxisLine(width: 0),
         majorGridLines: MajorGridLines(
           width: 0.5,
-          color: Colors.white24,
+          color: textColor,
         ),
       ),
       legend: Legend(isVisible: showLegend),
@@ -107,11 +109,11 @@ class DynamicChart extends StatelessWidget {
 
   Widget _buildLineChart() {
     return SfCartesianChart(
-      primaryXAxis: const CategoryAxis(
-        labelStyle: TextStyle(color: Colors.white),
+      primaryXAxis: CategoryAxis(
+        labelStyle: TextStyle(color: textColor),
       ),
       primaryYAxis: CategoryAxis(
-        labelStyle: TextStyle(color: Colors.white),
+        labelStyle: TextStyle(color: textColor),
       ),
       title: ChartTitle(text: title, textStyle: TextStyles.chartTitle),
       legend: Legend(isVisible: showLegend),
@@ -144,17 +146,17 @@ class DynamicChart extends StatelessWidget {
 
     return SfCartesianChart(
       title: ChartTitle(text: title, textStyle: TextStyles.chartTitle),
-      primaryXAxis: const CategoryAxis(
-        labelStyle: TextStyle(color: Colors.white),
+      primaryXAxis: CategoryAxis(
+        labelStyle: TextStyle(color: textColor),
       ),
       primaryYAxis: CategoryAxis(
-        labelStyle: TextStyle(color: Colors.white),
+        labelStyle: TextStyle(color: textColor),
       ),
       legend: Legend(isVisible: showLegend),
       tooltipBehavior: TooltipBehavior(enable: true),
       series: <CartesianSeries<dynamic, dynamic>>[
         BarSeries<dynamic, dynamic>(
-          color: Colors.white,
+          color: textColor,
           dataSource: data,
           xValueMapper: (dynamic sales, _) => sales.category,
           yValueMapper: (dynamic sales, _) => sales.value,
@@ -186,11 +188,11 @@ class DynamicChart extends StatelessWidget {
 
   Widget _buildAreaChart() {
     return SfCartesianChart(
-      primaryXAxis: const CategoryAxis(
-        labelStyle: TextStyle(color: Colors.white),
+      primaryXAxis: CategoryAxis(
+        labelStyle: TextStyle(color: textColor),
       ),
       primaryYAxis: CategoryAxis(
-        labelStyle: TextStyle(color: Colors.white),
+        labelStyle: TextStyle(color: textColor),
       ),
       title: ChartTitle(text: title, textStyle: TextStyles.chartTitle),
       legend: Legend(isVisible: showLegend),
@@ -209,10 +211,12 @@ class DynamicChart extends StatelessWidget {
 
   Widget _buildScatterChart() {
     return SfCartesianChart(
-      primaryXAxis: const CategoryAxis(
-        labelStyle: TextStyle(color: Colors.white),
+      primaryXAxis: CategoryAxis(
+        labelStyle: TextStyle(color: textColor),
       ),
-      primaryYAxis: CategoryAxis(labelStyle: TextStyle(color: Colors.white),),
+      primaryYAxis: CategoryAxis(
+        labelStyle: TextStyle(color: textColor),
+      ),
       title: ChartTitle(text: title, textStyle: TextStyles.chartTitle),
       legend: Legend(isVisible: showLegend),
       tooltipBehavior: TooltipBehavior(enable: true),
@@ -253,8 +257,10 @@ class DynamicChart extends StatelessWidget {
     }
 
     return SfCartesianChart(
-      primaryXAxis: const CategoryAxis(labelStyle: TextStyle(color: Colors.white),),
-      // primaryYAxis: CategoryAxis(labelStyle: TextStyle(color: Colors.white),),
+      primaryXAxis: CategoryAxis(
+        labelStyle: TextStyle(color: textColor),
+      ),
+      // primaryYAxis: CategoryAxis(labelStyle: TextStyle(color: textColor),),
       title: ChartTitle(text: title, textStyle: TextStyles.chartTitle),
       legend: Legend(isVisible: showLegend),
       tooltipBehavior: TooltipBehavior(enable: true),

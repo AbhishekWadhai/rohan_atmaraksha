@@ -1,19 +1,19 @@
 import 'dart:convert';
 
 class WorkPermit {
-  Map<String, dynamic> customFields;
-  String id;
-  List<Tool> tools;
-  List<MachineTool> machineTools;
-  List<Equipment> equipments;
-  List<TypeOfHazard> typeOfHazard;
-  List<ApplicablePpe> applicablePpEs;
-  List<ApprovalBy> verifiedBy;
-  List<ApprovalBy> approvalBy;
-  bool verifiedDone;
-  bool approvalDone;
-  List<Safety> safetyMeasuresTaken;
-  int v;
+  Map<String, dynamic>? customFields;
+  String? id;
+  List<Tool>? tools;
+  List<MachineTool>? machineTools;
+  List<Equipment>? equipments;
+  List<TypeOfHazard>? typeOfHazard;
+  List<ApplicablePpe>? applicablePpEs;
+  List<ApprovalBy>? verifiedBy;
+  List<ApprovalBy>? approvalBy;
+  bool? verifiedDone;
+  bool? approvalDone;
+  List<Safety>? safetyMeasuresTaken;
+  int? v;
   Area? project;
   ApprovalBy? createdby;
   Area? area;
@@ -57,7 +57,7 @@ class WorkPermit {
   String toRawJson() => json.encode(toJson());
 
   factory WorkPermit.fromJson(Map<String, dynamic> json) => WorkPermit(
-        customFields: json["customFields"],
+        customFields: Map<String, dynamic>.from(json["customFields"] ?? {}),
         id: json["_id"],
         tools: List<Tool>.from(json["tools"].map((x) => Tool.fromJson(x))),
         machineTools: List<MachineTool>.from(
@@ -78,16 +78,16 @@ class WorkPermit {
             json["safetyMeasuresTaken"].map((x) => Safety.fromJson(x))),
         v: json["__v"],
         project:
-            json["project"] == null ? null : Area.fromJson(json["project"]),
-        createdby: json["createdby"] == null
-            ? null
-            : ApprovalBy.fromJson(json["createdby"]),
-        area: json["area"] == null ? null : Area.fromJson(json["area"]),
-        permitTypes: json["permitTypes"] == null
-            ? null
-            : PermitTypes.fromJson(json["permitTypes"]),
+            json["project"] != null ? Area.fromJson(json["project"]) : null,
+        createdby: json["createdby"] != null
+            ? ApprovalBy.fromJson(json["createdby"])
+            : null,
+        area: json["area"] != null ? Area.fromJson(json["area"]) : null,
+        permitTypes: json["permitTypes"] != null
+            ? PermitTypes.fromJson(json["permitTypes"])
+            : null,
         date: json["date"],
-        startTime: json["StartTime"],
+        startTime: json["startTime"],
         endTime: json["endTime"],
         toolsTested: json["toolsTested"],
         workDescription: json["workDescription"],
@@ -95,21 +95,18 @@ class WorkPermit {
       );
 
   Map<String, dynamic> toJson() => {
-        "customFields": customFields,
         "_id": id,
-        "tools": List<dynamic>.from(tools.map((x) => x.toJson())),
-        "machineTools": List<dynamic>.from(machineTools.map((x) => x.toJson())),
-        "equipments": List<dynamic>.from(equipments.map((x) => x.toJson())),
-        "typeOfHazard": List<dynamic>.from(typeOfHazard.map((x) => x.toJson())),
-        "applicablePPEs":
-            List<dynamic>.from(applicablePpEs.map((x) => x.toJson())),
-        "verifiedBy": List<dynamic>.from(verifiedBy.map((x) => x.toJson())),
-        "approvalBy": List<dynamic>.from(approvalBy.map((x) => x.toJson())),
+        "tools": tools?.map((x) => x.toJson()).toList() ?? [],
+        "machineTools": machineTools?.map((x) => x.toJson()).toList() ?? [],
+        "equipments": equipments?.map((x) => x.toJson()).toList() ?? [],
+        "typeOfHazard": typeOfHazard?.map((x) => x.toJson()).toList() ?? [],
+        "applicablePPEs": applicablePpEs?.map((x) => x.toJson()).toList() ?? [],
+        "verifiedBy": verifiedBy?.map((x) => x.toJson()).toList() ?? [],
+        "approvalBy": approvalBy?.map((x) => x.toJson()).toList() ?? [],
+        "safetyMeasuresTaken":
+            safetyMeasuresTaken?.map((x) => x.toJson()).toList() ?? [],
         "verifiedDone": verifiedDone,
         "approvalDone": approvalDone,
-        "safetyMeasuresTaken":
-            List<dynamic>.from(safetyMeasuresTaken.map((x) => x.toJson())),
-        "__v": v,
         "project": project?.toJson(),
         "createdby": createdby?.toJson(),
         "area": area?.toJson(),
@@ -124,9 +121,9 @@ class WorkPermit {
 }
 
 class ApplicablePpe {
-  String id;
-  String ppes;
-  int v;
+  String? id;
+  String? ppes;
+  int? v;
 
   ApplicablePpe({
     required this.id,
@@ -140,9 +137,9 @@ class ApplicablePpe {
   String toRawJson() => json.encode(toJson());
 
   factory ApplicablePpe.fromJson(Map<String, dynamic> json) => ApplicablePpe(
-        id: json["_id"],
-        ppes: json["ppes"],
-        v: json["__v"],
+        id: json["_id"] ?? "",
+        ppes: json["ppes"] ?? "",
+        v: json["__v"] ?? "",
       );
 
   Map<String, dynamic> toJson() => {
@@ -153,19 +150,19 @@ class ApplicablePpe {
 }
 
 class ApprovalBy {
-  String id;
-  String userId;
-  String name;
-  String role;
-  String emailId;
-  String password;
-  String phone;
-  String address;
-  bool isActive;
-  List<dynamic> project;
-  String createdAt;
-  String updatedAt;
-  int v;
+  String? id;
+  String? userId;
+  String? name;
+  String? role;
+  String? emailId;
+  String? password;
+  String? phone;
+  String? address;
+  bool? isActive;
+  List<dynamic>? project;
+  String? createdAt;
+  String? updatedAt;
+  int? v;
 
   ApprovalBy({
     required this.id,
@@ -189,19 +186,19 @@ class ApprovalBy {
   String toRawJson() => json.encode(toJson());
 
   factory ApprovalBy.fromJson(Map<String, dynamic> json) => ApprovalBy(
-        id: json["_id"],
-        userId: json["userId"],
-        name: json["name"],
-        role: json["role"],
-        emailId: json["emailId"],
-        password: json["password"],
-        phone: json["phone"],
-        address: json["address"],
-        isActive: json["isActive"],
-        project: json["project"],
-        createdAt: json["createdAt"],
-        updatedAt: json["updatedAt"],
-        v: json["__v"],
+        id: json["_id"] as String?,
+        userId: json["userId"] as String?,
+        name: json["name"] as String?,
+        role: json["role"] as String?,
+        emailId: json["emailId"] as String?,
+        password: json["password"] as String?,
+        phone: json["phone"] as String?,
+        address: json["address"] as String?,
+        isActive: json["isActive"] as bool?,
+        project: json["project"] as List<dynamic>?,
+        createdAt: json["createdAt"] as String?,
+        updatedAt: json["updatedAt"] as String?,
+        v: json["__v"] as int?,
       );
 
   Map<String, dynamic> toJson() => {
@@ -222,17 +219,17 @@ class ApprovalBy {
 }
 
 class Area {
-  String id;
-  String projectId;
-  String projectName;
-  String siteLocation;
-  String startDate;
-  String endDate;
-  String status;
-  String description;
-  String company;
-  int v;
-  String workpermitAllow;
+  String? id;
+  String? projectId;
+  String? projectName;
+  String? siteLocation;
+  String? startDate;
+  String? endDate;
+  String? status;
+  String? description;
+  String? company;
+  int? v;
+  String? workpermitAllow;
 
   Area({
     required this.id,
@@ -253,17 +250,17 @@ class Area {
   String toRawJson() => json.encode(toJson());
 
   factory Area.fromJson(Map<String, dynamic> json) => Area(
-        id: json["_id"],
-        projectId: json["projectId"],
-        projectName: json["projectName"],
-        siteLocation: json["siteLocation"],
-        startDate: json["startDate"],
-        endDate: json["endDate"],
-        status: json["status"],
-        description: json["description"],
-        company: json["company"],
-        v: json["__v"],
-        workpermitAllow: json["workpermitAllow"],
+        id: json["_id"] as String?,
+        projectId: json["projectId"] as String?,
+        projectName: json["projectName"] as String?,
+        siteLocation: json["siteLocation"] as String?,
+        startDate: json["startDate"] as String?,
+        endDate: json["endDate"] as String?,
+        status: json["status"] as String?,
+        description: json["description"] as String?,
+        company: json["company"] as String?,
+        v: json["__v"] as int?,
+        workpermitAllow: json["workpermitAllow"] as String?,
       );
 
   Map<String, dynamic> toJson() => {
@@ -282,8 +279,8 @@ class Area {
 }
 
 class Equipment {
-  String id;
-  String equipments;
+  String? id;
+  String? equipments;
   int v;
 
   Equipment({
@@ -298,8 +295,8 @@ class Equipment {
   String toRawJson() => json.encode(toJson());
 
   factory Equipment.fromJson(Map<String, dynamic> json) => Equipment(
-        id: json["_id"],
-        equipments: json["equipments"],
+        id: json["_id"] as String?,
+        equipments: json["equipments"] as String?,
         v: json["__v"],
       );
 
@@ -311,8 +308,8 @@ class Equipment {
 }
 
 class MachineTool {
-  String id;
-  String machineTools;
+  String? id;
+  String? machineTools;
   int v;
 
   MachineTool({
@@ -327,8 +324,8 @@ class MachineTool {
   String toRawJson() => json.encode(toJson());
 
   factory MachineTool.fromJson(Map<String, dynamic> json) => MachineTool(
-        id: json["_id"],
-        machineTools: json["machineTools"],
+        id: json["_id"] as String?,
+        machineTools: json["machineTools"] as String?,
         v: json["__v"],
       );
 
@@ -340,10 +337,10 @@ class MachineTool {
 }
 
 class PermitTypes {
-  String id;
-  String permitsType;
-  List<Safety> safetyChecks;
-  List<String> typeOfHazard;
+  String? id;
+  String? permitsType;
+  List<Safety>? safetyChecks;
+  List<String>? typeOfHazard;
   int v;
 
   PermitTypes({
@@ -371,15 +368,17 @@ class PermitTypes {
   Map<String, dynamic> toJson() => {
         "_id": id,
         "permitsType": permitsType,
-        "SafetyChecks": List<dynamic>.from(safetyChecks.map((x) => x.toJson())),
-        "typeOfHazard": List<dynamic>.from(typeOfHazard.map((x) => x)),
+        "SafetyChecks": List<dynamic>.from(
+            safetyChecks?.map((x) => x.toJson()).toList() ?? []),
+        "typeOfHazard":
+            List<dynamic>.from(typeOfHazard?.map((x) => x).toList() ?? []),
         "__v": v,
       };
 }
 
 class Safety {
-  String checkPoints;
-  String response;
+  String? checkPoints;
+  String? response;
   String id;
 
   Safety({
@@ -393,8 +392,8 @@ class Safety {
   String toRawJson() => json.encode(toJson());
 
   factory Safety.fromJson(Map<String, dynamic> json) => Safety(
-        checkPoints: json["CheckPoints"],
-        response: json["response"],
+        checkPoints: json["CheckPoints"] as String?,
+        response: json["response"] ?? "No",
         id: json["_id"],
       );
 
@@ -406,8 +405,8 @@ class Safety {
 }
 
 class Tool {
-  String id;
-  String tools;
+  String? id;
+  String? tools;
   int v;
 
   Tool({
@@ -421,8 +420,8 @@ class Tool {
   String toRawJson() => json.encode(toJson());
 
   factory Tool.fromJson(Map<String, dynamic> json) => Tool(
-        id: json["_id"],
-        tools: json["tools"],
+        id: json["_id"] as String?,
+        tools: json["tools"] as String?,
         v: json["__v"],
       );
 
@@ -434,8 +433,8 @@ class Tool {
 }
 
 class TypeOfHazard {
-  String id;
-  String hazards;
+  String? id;
+  String? hazards;
   int v;
 
   TypeOfHazard({
@@ -450,8 +449,8 @@ class TypeOfHazard {
   String toRawJson() => json.encode(toJson());
 
   factory TypeOfHazard.fromJson(Map<String, dynamic> json) => TypeOfHazard(
-        id: json["_id"],
-        hazards: json["hazards"],
+        id: json["_id"] as String?,
+        hazards: json["hazards"] as String?,
         v: json["__v"],
       );
 

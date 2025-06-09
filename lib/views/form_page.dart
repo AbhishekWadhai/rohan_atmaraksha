@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rohan_suraksha_sathi/controller/dynamic_form_contoller.dart';
 import 'package:rohan_suraksha_sathi/services/load_dropdown_data.dart';
 import 'package:rohan_suraksha_sathi/services/translation.dart';
 import 'package:rohan_suraksha_sathi/widgets/dynamic_form.dart';
 import 'package:rohan_suraksha_sathi/widgets/helper_widgets/flexibleText.dart';
 
 class FormPage extends StatelessWidget {
-  const FormPage({super.key});
-
+  FormPage({super.key});
+  final DynamicFormController controller = Get.put(DynamicFormController());
   @override
   Widget build(BuildContext context) {
     final dynamic pageTitle = Get.arguments[0];
@@ -29,15 +30,16 @@ class FormPage extends StatelessWidget {
         ),
         //Text(translate(pageTitle), style: TextStyle(fontSize: ),),
         //iconTheme: const IconThemeData(color: Colors.black),
-       
+
         elevation: 2,
         actions: [
           PopupMenuButton(
               icon: const Icon(Icons.more_vert), // Three-dot icon
               onSelected: (value) async {
                 if (value == 'refresh') {
+                  controller.refreshDropdownData();
                   // Call the refresh logic here
-                  await loadDropdownData();
+                  //await loadDropdownData();
                   // You can pass this refresh action to the controller or a function in DynamicForm
                 }
               },

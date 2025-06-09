@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rohan_suraksha_sathi/app_constants/colors.dart';
 import 'package:rohan_suraksha_sathi/controller/login_controller.dart';
 import 'package:rohan_suraksha_sathi/env.dart';
+import 'package:rohan_suraksha_sathi/widgets/dynamic_form.dart';
 import 'package:rohan_suraksha_sathi/widgets/progress_indicators.dart';
 
 import '../widgets/custom_textfield.dart';
@@ -67,9 +69,17 @@ class LoginPage extends StatelessWidget {
                             validator: loginController.validatePassword,
                           ),
                           const SizedBox(height: 20),
-                          const Align(
+                          Align(
                             alignment: Alignment.centerLeft,
-                            child: Text("Forgot Password ?"),
+                            child: GestureDetector(
+                                onTap: () {
+                                  print("clicked forget password");
+                                  Get.dialog(ForgotPasswordDialog());
+                                },
+                                child: Text(
+                                  "Forgot Password ?",
+                                  style: TextStyle(color: AppColors.appMainMid),
+                                )),
                           ),
                           const SizedBox(height: 20),
                           SizedBox(
@@ -77,7 +87,7 @@ class LoginPage extends StatelessWidget {
                             height: 50,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.black),
+                                  backgroundColor: AppColors.appMainDark),
                               onPressed: loginController.handleLogin,
                               child: const Text(
                                 'Login',
@@ -114,5 +124,83 @@ class LoginPage extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class ForgotPasswordDialog extends StatelessWidget {
+  final ForgotPasswordController controller =
+      Get.put(ForgotPasswordController());
+
+  ForgotPasswordDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() => AlertDialog(
+          title: Text(
+            "Forgot Password",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: controller.isLoading.value
+              ? SizedBox(
+                  height: 100,
+                  width: 100,
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              : Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 300,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (!controller.isOtpSent.value) ...[
+                          CustomTextField(
+                            fieldName: "Email",
+                            labelText: "Enter email",
+                            controller: controller.emailController,
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            "OTP to reset password will be sent on the email provided by you",
+                            style: TextStyle(fontSize: 12),
+                          ),
+                          SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: controller.sendOtp,
+                            child: Text("Generate OTP"),
+                          ),
+                        ] else ...[
+                          CustomTextField(
+                            fieldName: 'OTP',
+                            controller: controller.otpController,
+                            labelText: 'Enter Password',
+
+                            //validator: loginController.validatePassword,
+                          ),
+                          SizedBox(height: 16),
+                          CustomTextField(
+                            fieldName: 'New Password',
+                            controller: controller.passwordController,
+                            labelText: 'Enter New Password',
+                            isPassword: true,
+                            //validator: loginController.validatePassword,
+                          ),
+                          // TextField(
+                          //   controller: controller.passwordController,
+                          //   obscureText: true,
+                          //   decoration:
+                          //       kTextFieldDecoration("Enter New Password"),
+                          // ),
+                          SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: controller.resetPassword,
+                            child: Text("Reset Password"),
+                          ),
+                        ]
+                      ],
+                    ),
+                  ),
+                ),
+        ));
   }
 }

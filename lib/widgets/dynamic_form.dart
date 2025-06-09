@@ -16,6 +16,7 @@ import 'package:rohan_suraksha_sathi/model/form_data_model.dart';
 import 'package:rohan_suraksha_sathi/services/location_service.dart';
 import 'package:rohan_suraksha_sathi/views/image_view_page.dart';
 import 'package:rohan_suraksha_sathi/widgets/custom_form.dart';
+import 'package:rohan_suraksha_sathi/widgets/helper_widgets/risk_color_switch.dart';
 import 'package:rohan_suraksha_sathi/widgets/subform.dart';
 import 'package:signature/signature.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -32,7 +33,7 @@ class DynamicForm extends StatelessWidget {
       this.isEdit = false});
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final DynamicFormController controller = Get.put(DynamicFormController());
+  DynamicFormController controller = Get.find<DynamicFormController>();
 
   @override
   Widget build(BuildContext context) {
@@ -250,7 +251,7 @@ class DynamicForm extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: getRiskColor(controller.riskLevel.value),
                       ),
                     ),
                   ),
@@ -329,6 +330,33 @@ class DynamicForm extends StatelessWidget {
             final String checkPointTitle = checkPoint['CheckPoints'] ?? '';
             final String initialResponse = checkPoint['response'] ?? 'No';
 
+            // ✅ Save default value to formData if not already present
+            controller.formData.update(
+              field.headers,
+              (existing) {
+                final List<Map<String, dynamic>> updatedList =
+                    List.from(existing);
+                final existingIndex = updatedList.indexWhere(
+                  (e) => e['CheckPoints'] == checkPointTitle,
+                );
+
+                if (existingIndex == -1) {
+                  updatedList.add({
+                    'CheckPoints': checkPointTitle,
+                    'response': initialResponse,
+                  });
+                }
+
+                return updatedList;
+              },
+              ifAbsent: () => [
+                {
+                  'CheckPoints': checkPointTitle,
+                  'response': initialResponse,
+                }
+              ],
+            );
+
             return Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -342,67 +370,65 @@ class DynamicForm extends StatelessWidget {
                     textAlign: TextAlign.start,
                   ),
                   const SizedBox(height: 8.0),
+
                   // Render radio options
-                  Row(
-                    children: ['Yes', 'No', 'N/A'].map((option) {
-                      return Row(
-                        children: [
-                          Obx(() => Radio<String>(
-                                value: option,
-                                groupValue: controller.formData[field.headers]
-                                        ?.firstWhere(
-                                            (e) =>
-                                                e['CheckPoints'] ==
-                                                checkPointTitle,
-                                            orElse: () => {
-                                                  'CheckPoints':
-                                                      checkPointTitle,
-                                                  'response': initialResponse
-                                                })['response'] ??
-                                    initialResponse,
-                                onChanged: isEditable
-                                    ? (value) {
-                                        // Update safetyMeasuresTaken on selection
-                                        final updatedCheckPoint = {
-                                          'CheckPoints': checkPointTitle,
-                                          'response': value,
-                                        };
+                  Obx(() {
+                    final String currentResponse =
+                        controller.formData[field.headers]?.firstWhere(
+                              (e) => e['CheckPoints'] == checkPointTitle,
+                              orElse: () => {
+                                'CheckPoints': checkPointTitle,
+                                'response': initialResponse,
+                              },
+                            )['response'] ??
+                            initialResponse;
 
-                                        // Update formData with new response for the specific checkpoint
-                                        controller.formData.update(
-                                          field.headers,
-                                          (existing) {
-                                            final List<Map<String, dynamic>>
-                                                updatedList =
-                                                List.from(existing);
-                                            final existingIndex =
-                                                updatedList.indexWhere((e) =>
-                                                    e['CheckPoints'] ==
-                                                    checkPointTitle);
+                    return Row(
+                      children: ['Yes', 'No', 'N/A'].map((option) {
+                        return Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Radio<String>(
+                              value: option,
+                              groupValue: currentResponse,
+                              onChanged: isEditable
+                                  ? (value) {
+                                      final updatedCheckPoint = {
+                                        'CheckPoints': checkPointTitle,
+                                        'response': value,
+                                      };
 
-                                            if (existingIndex >= 0) {
-                                              // Update the existing response
-                                              updatedList[existingIndex] =
-                                                  updatedCheckPoint;
-                                            } else {
-                                              // Add new checkpoint response if not already present
-                                              updatedList
-                                                  .add(updatedCheckPoint);
-                                            }
-                                            return updatedList;
-                                          },
-                                          ifAbsent: () => [
-                                            updatedCheckPoint
-                                          ], // Default value if no entry exists
-                                        );
-                                      }
-                                    : null,
-                              )),
-                          Text(option),
-                        ],
-                      );
-                    }).toList(),
-                  ),
+                                      controller.formData.update(
+                                        field.headers,
+                                        (existing) {
+                                          final List<Map<String, dynamic>>
+                                              updatedList = List.from(existing);
+                                          final existingIndex =
+                                              updatedList.indexWhere((e) =>
+                                                  e['CheckPoints'] ==
+                                                  checkPointTitle);
+
+                                          if (existingIndex >= 0) {
+                                            updatedList[existingIndex] =
+                                                updatedCheckPoint;
+                                          } else {
+                                            updatedList.add(updatedCheckPoint);
+                                          }
+
+                                          return updatedList;
+                                        },
+                                        ifAbsent: () => [updatedCheckPoint],
+                                      );
+                                    }
+                                  : null,
+                            ),
+                            Text(option),
+                            const SizedBox(width: 10),
+                          ],
+                        );
+                      }).toList(),
+                    );
+                  }),
                 ],
               ),
             );
@@ -431,18 +457,18 @@ class DynamicForm extends StatelessWidget {
               controller: textController,
               decoration: kTextFieldDecoration("Enter ${field.title}"),
               readOnly: !isEditable,
-              onChanged: isEditable
-                  ? (value) {
-                      controller.debounceMap[field.headers]?.cancel();
+              // onChanged: isEditable
+              //     ? (value) {
+              //         controller.debounceMap[field.headers]?.cancel();
 
-                      // Start a new timer for debounce specific to this field
-                      controller.debounceMap[field.headers] =
-                          Timer(const Duration(milliseconds: 2000), () {
-                        // Update the form data after debounce
-                        controller.updateFormData(field.headers, value);
-                      });
-                    }
-                  : null,
+              //         // Start a new timer for debounce specific to this field
+              //         controller.debounceMap[field.headers] =
+              //             Timer(const Duration(milliseconds: 2000), () {
+              //           // Update the form data after debounce
+              //           controller.updateFormData(field.headers, value);
+              //         });
+              //       }
+              //     : null,
               keyboardType:
                   field.key == "numeric" ? TextInputType.number : null,
             ),
@@ -454,7 +480,7 @@ class DynamicForm extends StatelessWidget {
             controller.getTextController(field.headers);
 
         // Fetch the values from formData
-        String? value1String = controller.formData[field.endpoint];
+        String? value1String = controller.formData[field.endpoint].toString();
         String? value2String = field.key;
 
         // Debug: Print values to ensure they're being fetched
@@ -556,18 +582,6 @@ class DynamicForm extends StatelessWidget {
                       .toList() ??
                   [];
 
-              // final List<String> selectedIds = (controller
-              //             .formData[field.headers] as List?)
-              //         ?.where((item) =>
-              //             item is Map<String, dynamic> &&
-              //             item.containsKey('_id'))
-              //         .map((item) =>
-              //             (item as Map<String, dynamic>)['_id']?.toString() ??
-              //             '')
-              //         .where((id) => id.isNotEmpty)
-              //         .toList() ??
-              //     [];
-
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -596,6 +610,12 @@ class DynamicForm extends StatelessWidget {
                       absorbing:
                           !isEditable, // Prevent interaction if not editable
                       child: MultiSelectDialogField<String>(
+                        validator: (value) {
+                          if (!isEditable)
+                            return null; // Skip validation if read-only
+                          return controller.validateMultiSelect(
+                              value); // Validate only if editable
+                        },
                         dialogHeight: 300,
                         items: options.map((Map<String, String> option) {
                           return MultiSelectItem<String>(
@@ -642,6 +662,11 @@ class DynamicForm extends StatelessWidget {
         );
 
       case 'imagepicker':
+        // Initialize image field with empty string if not already present
+        if (!controller.formData.containsKey(field.headers)) {
+          controller.formData[field.headers] = "";
+        }
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -650,38 +675,41 @@ class DynamicForm extends StatelessWidget {
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
 
-            // Image Upload Buttons (conditional on editable state)
+            // Upload Button
             Row(
               children: [
                 const SizedBox(width: 30),
                 ElevatedButton(
                   onPressed: isEditable
                       ? () async {
-                          // Call the function to pick and upload the image from the camera
                           await controller.pickAndUploadImage(
                               field.headers, field.endpoint ?? "");
+                          // Clear error if image uploaded successfully
+                          if ((controller.formData[field.headers] ?? "")
+                              .toString()
+                              .isNotEmpty) {
+                            controller.imageErrors[field.headers] = null;
+                          }
                         }
-                      : null, // Disable the button if not editable
+                      : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isEditable
-                        ? null
-                        : Colors.grey, // Visual feedback if disabled
+                    backgroundColor: isEditable ? null : Colors.grey,
                   ),
                   child: const Text('Take Image'),
                 ),
               ],
             ),
 
-            // Display uploaded image URL
+            // Image Preview + Error Display
             Obx(() {
-              // Check if the image URL exists in formData
               final imageUrl = controller.formData[field.headers];
+              final imageError = controller.imageErrors[field.headers];
 
-              // Ensure that imageUrl is a String and not null
-              if (imageUrl is String && imageUrl.isNotEmpty) {
-                return Column(
-                  children: [
-                    const SizedBox(height: 10),
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 10),
+                  if (imageUrl is String && imageUrl.isNotEmpty) ...[
                     GestureDetector(
                       onTap: () {
                         Get.to(ImageViewPage(imageUrl: imageUrl));
@@ -689,20 +717,23 @@ class DynamicForm extends StatelessWidget {
                       child: Image.network(
                         imageUrl,
                         height: 150,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Text('Failed to load image');
-                        },
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Text('Failed to load image'),
                       ),
-                    ), // Display the uploaded image
+                    ),
                     const SizedBox(height: 10),
                     const Text('Image uploaded successfully!'),
                   ],
-                );
-              } else {
-                // Return an empty Container or some placeholder when no image is uploaded
-                return const SizedBox(height: 10);
-              }
-            })
+                  if (imageError != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      imageError,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ],
+                ],
+              );
+            }),
           ],
         );
 
@@ -1032,6 +1063,12 @@ class DynamicForm extends StatelessWidget {
                   .toList();
 
           return MultiSelectDialogField<String>(
+            validator: (value) {
+              if (!isEditable)
+                return null; // Skip validation for read-only fields
+              return controller
+                  .validateMultiSelect(value); // Validate editable fields
+            },
             dialogHeight: 300,
             items: (field.options != null)
                 ? field.options!.map((option) {
@@ -1197,7 +1234,7 @@ class DynamicForm extends StatelessWidget {
         });
       case 'signature':
         String? signatureUrl = controller.formData[field.headers];
-        String? imageUrl;
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1205,6 +1242,7 @@ class DynamicForm extends StatelessWidget {
               field.title,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
+
             isEdit
                 ? (signatureUrl != null && signatureUrl.isNotEmpty
                     ? Image.network(
@@ -1220,7 +1258,8 @@ class DynamicForm extends StatelessWidget {
                     height: 200,
                     backgroundColor: Colors.grey[200]!,
                   ),
-            if (!isEdit) // Show buttons only if not in edit mode
+
+            if (!isEdit)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -1232,18 +1271,31 @@ class DynamicForm extends StatelessWidget {
                   ),
                   ElevatedButton(
                     onPressed: () async {
-                      imageUrl = await controller.saveSignature(
-                        field.headers,
-                        field.endpoint ?? "",
-                      );
+                      String? imageUrl = await controller.saveSignature(
+                          field.headers, field.endpoint ?? "");
                       if (imageUrl != null) {
                         controller.updateFormData(field.headers, imageUrl);
+                        controller.imageErrors[field.headers] = null;
                       }
                     },
                     child: const Text("Save"),
                   ),
                 ],
               ),
+
+            // Error message display
+            Obx(() {
+              final error = controller.imageErrors[field.headers];
+              return error != null
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        error,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    )
+                  : const SizedBox.shrink();
+            }),
           ],
         );
 
@@ -1272,8 +1324,14 @@ class DynamicForm extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               TextFormField(
+                validator: (value) {
+                  if (!isEditable)
+                    return null; // Skip validation for read-only fields
+                  return controller
+                      .validateTextField(value); // Validate editable fields
+                },
                 controller: TextEditingController(
-                  text: currentLocation ?? 'Fetching location...',
+                  text: currentLocation,
                 ),
                 readOnly: true, // Make the field read-only
                 decoration: kTextFieldDecoration("Location"),
@@ -1370,7 +1428,13 @@ class DynamicForm extends StatelessWidget {
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 10),
-        TextField(
+        TextFormField(
+          validator: (value) {
+            if (!isEditable)
+              return null; // Skip validation for read-only fields
+            return controller
+                .validateTextField(value); // Validate editable fields
+          },
           controller: dateController,
           readOnly:
               !isEditable, // Make the TextField read-only based on isEditable
@@ -1422,7 +1486,13 @@ class DynamicForm extends StatelessWidget {
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 10),
-        TextField(
+        TextFormField(
+          validator: (value) {
+            if (!isEditable)
+              return null; // Skip validation for read-only fields
+            return controller
+                .validateTextField(value); // Validate editable fields
+          },
           controller: timeController,
           readOnly:
               !isEditable, // Make the TextField read-only based on isEditable

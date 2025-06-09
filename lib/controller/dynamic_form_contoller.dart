@@ -9,9 +9,12 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
+import 'package:rohan_suraksha_sathi/helpers/dialogos.dart';
 import 'package:rohan_suraksha_sathi/model/form_data_model.dart';
+import 'package:rohan_suraksha_sathi/routes/routes_string.dart';
 import 'package:rohan_suraksha_sathi/services/api_services.dart';
 import 'package:rohan_suraksha_sathi/services/image_service.dart';
+import 'package:rohan_suraksha_sathi/services/load_dropdown_data.dart';
 import 'package:rohan_suraksha_sathi/services/location_service.dart';
 import 'package:rohan_suraksha_sathi/services/notification_service/notification_handler.dart';
 import 'package:rohan_suraksha_sathi/widgets/progress_indicators.dart';
@@ -34,15 +37,16 @@ class DynamicFormController extends GetxController {
   Map<String, Timer?> debounceMap = {};
   RxMap<String, String> dropdownSelections = <String, String>{}.obs;
   RxMap<String, String> radioSelections = <String, String>{}.obs;
-
+  String pagename = "";
   bool fieldsLoaded = false;
-  final Map<String, TextEditingController> _textControllers = {};
+  final Map<String, TextEditingController> textControllers = {};
   RxMap<String, SignatureController> signatureControllers =
       <String, SignatureController>{}.obs;
   // Selected chips observable
   var selectedChips = <String>[].obs;
   // Observable list for storing attendees' names as maps
   var subformData = <Map<String, dynamic>>[].obs;
+  final imageErrors = <String, String?>{}.obs;
 
   // Lifecycle hook
   @override
@@ -51,6 +55,7 @@ class DynamicFormController extends GetxController {
     loadFormData();
   }
 
+//Risk Calculation-------------------------------------------------------------
   void calculateRiskLevel() {
     final score = severity.value * likelihood.value;
     if (score <= 3) {
@@ -101,6 +106,15 @@ class DynamicFormController extends GetxController {
     print(formData);
   }
 
+  Future<void> refreshDropdownData() async {
+    print("refreshing data-----------------------");
+    isLoading.value = true;
+    await loadDropdownData(); // Loads the latest dropdowns globally or for this form
+    refresh(); // Reinitializes fields
+    isLoading.value = false;
+  }
+//Risk Calculation-------------------------------------------------------------
+
   SignatureController getSignatureController(String fieldKey) {
     if (!signatureControllers.containsKey(fieldKey)) {
       signatureControllers[fieldKey] = SignatureController();
@@ -109,13 +123,15 @@ class DynamicFormController extends GetxController {
   }
 
   TextEditingController getTextController(String fieldHeader) {
-    if (!_textControllers.containsKey(fieldHeader)) {
+    print(formData[fieldHeader]);
+    if (!textControllers.containsKey(fieldHeader)) {
+      print(formData[fieldHeader]);
       // Create a new controller if it doesn't exist
-      _textControllers[fieldHeader] = TextEditingController(
+      textControllers[fieldHeader] = TextEditingController(
         text: formData[fieldHeader]?.toString() ?? '',
       );
     }
-    return _textControllers[fieldHeader]!;
+    return textControllers[fieldHeader]!;
   }
 
   getCustomFields(String permitKey) {
@@ -223,6 +239,8 @@ class DynamicFormController extends GetxController {
             formData[key] = value;
           } else if (value is String) {
             formData[key] = value.toString();
+          } else if (value is int || value is double) {
+            formData[key] = value;
           } else if (value is bool) {
             // Add check for boolean values
             formData[key] = value;
@@ -247,7 +265,7 @@ class DynamicFormController extends GetxController {
         (formData["customFields"] as Map<String, dynamic>?) ?? {};
     getCustomFields(formData["permitTypes"]?["permitsType"] ?? "");
 
-    print("Initialized form data: ${jsonEncode(formData["customFields"])}");
+    print("Initialized form data: ${jsonEncode(formData["comment"])}");
   }
 
   void updateSwitchSelection(String header, bool newValue) {
@@ -358,6 +376,7 @@ class DynamicFormController extends GetxController {
 
   // Form Fields Loader
   Future<void> getPageFields(String pageName) async {
+    pagename = pageName;
     pageFields.value = await formResponse
         .where((e) => e.page == pageName)
         .expand((e) => e.pageFields)
@@ -451,7 +470,31 @@ class DynamicFormController extends GetxController {
 
   // Form Submission
   Future<void> submitForm(String endpoint) async {
+    await updateFormDataFromControllers();
     formData["customFields"] = customFields;
+    bool isValid = true;
+    print(formData["safetyMeasuresTaken"]);
+    for (var field in pageFields) {
+      switch (field.type) {
+        case 'imagepicker':
+          if (!validateImagePickerField(field.headers, field.title)) {
+            isValid = false;
+          }
+          break;
+        case 'signature':
+          if (!validateSignatureField(field.headers, field.title)) {
+            isValid = false;
+          }
+          break;
+        // handle other types...
+      }
+    }
+
+    if (!isValid) {
+      Get.snackbar("Validation Failed", "Please complete all required fields",
+          backgroundColor: Colors.red, colorText: Colors.white);
+      return;
+    }
     final bool isConfirmed = await Get.dialog(
       AlertDialog(
         title: const Text("Confirmation"),
@@ -480,19 +523,22 @@ class DynamicFormController extends GetxController {
     try {
       await Future.delayed(const Duration(milliseconds: 2500));
       final response = await ApiService().postRequest(endpoint, formData);
-      if (response == 201) {
-        Get.snackbar(
-          "Success",
-          "Data Posted successfully",
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
-        );
-        sendNotification(endpoint, false);
-        // Delay for snackbar visibility, then go back
-        await Future.delayed(const Duration(seconds: 2));
-        isLoading(false);
-        Get.back(result: true);
+      if (response != null || response == 200 || response == 201) {
+        showSuccessDialog(
+            title: "Successful",
+            message: "Data Submitted successfully, press OK to continue",
+            onOkPressed: sendNotification(endpoint, false));
+        // Get.snackbar(
+        //   "Success",
+        //   "Data Posted successfully",
+        //   backgroundColor: Colors.green,
+        //   colorText: Colors.white,
+        //   snackPosition: SnackPosition.BOTTOM,
+        // );
+        // sendNotification(endpoint, false);
+        // // Delay for snackbar visibility, then go back
+        // await Future.delayed(const Duration(seconds: 2));
+        // isLoading(false);
       }
     } catch (e) {
       isLoading.value = false;
@@ -506,14 +552,13 @@ class DynamicFormController extends GetxController {
         snackPosition: SnackPosition.BOTTOM,
       );
       print(e);
-    } finally {
-      // Ensure the dialog is closed
     }
   }
 
   // Data Update
 
   Future<void> updateData(String endpoint) async {
+    await updateFormDataFromControllers();
     formData["customFields"] = customFields;
     final isConfirmed = await Get.dialog(
       AlertDialog(
@@ -549,18 +594,59 @@ class DynamicFormController extends GetxController {
       isLoading.value = false;
 
       if (response == 200 || response == 201) {
-        // Show success snackbar
-        Get.snackbar(
-          "Success",
-          "Data updated successfully",
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
+        // Show success dialog
+        showSuccessDialog(
+          title: "Update Successful",
+          message: "Data updated successfully, press OK to continue",
         );
-        sendNotification(endpoint, true);
-        // Delay for snackbar visibility, then go back
-        await Future.delayed(const Duration(seconds: 2));
-        Get.back(result: true); // Return to previous page
+        // await Get.dialog(
+        //   AlertDialog(
+        //     shape: RoundedRectangleBorder(
+        //       borderRadius: BorderRadius.circular(16),
+        //     ),
+        //     backgroundColor: Colors.white,
+        //     title: Row(
+        //       children: const [
+        //         Icon(Icons.check_circle, color: Colors.green),
+        //         SizedBox(width: 8),
+        //         Text(
+        //           "Success",
+        //           style: TextStyle(
+        //             fontWeight: FontWeight.bold,
+        //             fontSize: 20,
+        //           ),
+        //         ),
+        //       ],
+        //     ),
+        //     content: const Text(
+        //       "Data updated successfully",
+        //       style: TextStyle(fontSize: 16),
+        //     ),
+        //     actions: [
+        //       TextButton(
+        //         style: TextButton.styleFrom(
+        //           backgroundColor: Colors.green,
+        //           padding:
+        //               const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        //           shape: RoundedRectangleBorder(
+        //             borderRadius: BorderRadius.circular(8),
+        //           ),
+        //         ),
+        //         onPressed: () {
+        //           Get.back(); // Close the dialog
+        //           Get.back(
+        //               result: true); // Go back to previous screen with result
+        //         },
+        //         child: const Text(
+        //           "OK",
+        //           style: TextStyle(
+        //               color: Colors.white, fontWeight: FontWeight.bold),
+        //         ),
+        //       ),
+        //     ],
+        //   ),
+        //   barrierDismissible: false, // Prevent dismiss on tap outside
+        // );
       } else {
         throw Exception("Unexpected response code: $response");
       }
@@ -623,7 +709,7 @@ class DynamicFormController extends GetxController {
     }
   }
 
-  // Validations for form fields
+  // Validations for form fields------------------------------------------//
   String? validateTextField(String? value) {
     if (value == null || value.isEmpty) {
       return 'This field cannot be empty';
@@ -638,6 +724,42 @@ class DynamicFormController extends GetxController {
     return null;
   }
 
+  String? validateMultiSelect(List<String>? values) {
+    if (values == null || values.isEmpty) {
+      return 'Please select at least one option';
+    }
+    return null;
+  }
+
+  bool validateImagePickerField(String fieldKey, String fieldTitle) {
+    final imageUrl = formData[fieldKey];
+    if (imageUrl == null || imageUrl.toString().isEmpty) {
+      imageErrors[fieldKey] = "$fieldTitle is required";
+      return false;
+    } else {
+      imageErrors[fieldKey] = null;
+      return true;
+    }
+  }
+
+  bool validateSignatureField(String fieldKey, String fieldTitle) {
+    final signatureUrl = formData[fieldKey];
+    if (signatureUrl == null || signatureUrl.toString().isEmpty) {
+      imageErrors[fieldKey] = "$fieldTitle is required"; // reuse same error map
+      return false;
+    } else {
+      imageErrors[fieldKey] = null;
+      return true;
+    }
+  }
+
+  updateFormDataFromControllers() async {
+    textControllers.forEach((key, controller) {
+      formData[key] = controller.text;
+    });
+  }
+
+  // Validations for form fields------------------------------------------//
   sendNotification(String source, bool isUpdate) {
     switch (source) {
       case "uauc":
