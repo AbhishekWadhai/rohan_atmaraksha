@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
 import 'package:rohan_suraksha_sathi/model/uauc_model.dart';
 import 'package:rohan_suraksha_sathi/model/work_permit_model.dart';
@@ -12,6 +13,7 @@ import 'package:rohan_suraksha_sathi/services/api_services.dart';
 import 'package:rohan_suraksha_sathi/services/load_dropdown_data.dart';
 import 'package:rohan_suraksha_sathi/widgets/gradient_button.dart';
 import 'package:rohan_suraksha_sathi/widgets/progress_indicators.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomeController extends GetxController {
@@ -25,6 +27,10 @@ class HomeController extends GetxController {
   var isUpdateAvailable = false.obs;
   var latestVersion = ''.obs;
   var updateLink = ''.obs;
+  Rx<DateTimeRange> selectedRange = DateTimeRange(
+    start: DateTime.now(),
+    end: DateTime.now(),
+  ).obs;
 
   void changeTabIndex(int index) {
     currentIndex.value = index;
@@ -196,7 +202,13 @@ class HomeController extends GetxController {
             child: Text("Later"),
           ),
           Container(
-              child: GradientButton(height: 30, width: 90, onTap: launchUpdateLink, text: "Update", shadowColor: Colors.transparent,)),
+              child: GradientButton(
+            height: 30,
+            width: 90,
+            onTap: launchUpdateLink,
+            text: "Update",
+            shadowColor: Colors.transparent,
+          )),
         ],
       ),
       barrierDismissible: false,
@@ -248,8 +260,35 @@ class HomeController extends GetxController {
     );
   }
 
-  void launchUpdateLink() {
+  void launchUpdateLink() async {
+    await clearAppCache();
     final uri = Uri.parse(updateLink.value);
     launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
+  Future<void> clearAppCache() async {
+    try {
+      // Clear temporary/cache directory
+      final tempDir = await getTemporaryDirectory();
+      if (tempDir.existsSync()) {
+        tempDir.deleteSync(recursive: true);
+      }
+
+      // Clear SharedPreferences
+      // final prefs = await SharedPreferences.getInstance();
+      // await prefs.clear();
+
+      // Clear GetX memory/controllers
+      Get.reset();
+      await Get.deleteAll(force: true);
+
+      // Optional: Clear GetStorage or Hive if you're using them
+      // await GetStorage().erase();
+      // await Hive.box('yourBoxName').clear();
+
+      print("App cache and SharedPreferences cleared.");
+    } catch (e) {
+      print("Error clearing cache or preferences: $e");
+    }
   }
 }

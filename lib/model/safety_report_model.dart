@@ -3,36 +3,36 @@ import 'dart:convert';
 class SafetyReportModel {
   String id;
   Project project;
-  int totalAvgManpower;
-  int totalManHoursWorked;
-  int fatality;
-  int ltiCases;
-  int mtiCases;
-  int fac;
-  int majorEnvironmentalCases;
-  int animalAndInsectBiteCases;
-  int dangerousOccurrences;
-  int nearMissIncidents;
-  int fireCases;
-  int manDaysLost;
-  int fr;
-  int sr;
-  int safeLtiFreeDays;
-  int safeLtiFreeManHours;
-  int ncrPenaltyWarnings;
-  int suggestionsReceived;
-  int uaUcReportedClosed;
-  double tbtMeetingHours;
-  int personsSafetyInducted;
-  int specificSafetyTrainingHours;
-  int totalTrainingHours;
-  int safetyItemsInspections;
-  int safetyCommitteeMeetings;
-  int internalAudits;
-  int externalAudits;
-  int awardsAndAppreciations;
-  int safetyAwardRatingHighest;
-  int safetyAwardRatingLowest;
+  num totalAvgManpower;
+  num totalManHoursWorked;
+  num fatality;
+  num ltiCases;
+  num mtiCases;
+  num fac;
+  num majorEnvironmentalCases;
+  num animalAndInsectBiteCases;
+  num dangerousOccurrences;
+  num nearMissIncidents;
+  num fireCases;
+  num manDaysLost;
+  num fr;
+  num sr;
+  num safeLtiFreeDays;
+  num safeLtiFreeManHours;
+  num ncrPenaltyWarnings;
+  num suggestionsReceived;
+  num uaUcReportedClosed;
+  num tbtMeetingHours;
+  num personsSafetyInducted;
+  num specificSafetyTrainingHours;
+  num totalTrainingHours;
+  num safetyItemsInspections;
+  num safetyCommitteeMeetings;
+  num internalAudits;
+  num externalAudits;
+  num awardsAndAppreciations;
+  num safetyAwardRatingHighest;
+  num safetyAwardRatingLowest;
   DateTime createdAt;
   DateTime updatedAt;
   int v;
@@ -106,7 +106,7 @@ class SafetyReportModel {
         tbtMeetingHours: json["tbtMeetingHours"]?.toDouble(),
         personsSafetyInducted: json["personsSafetyInducted"],
         specificSafetyTrainingHours: json["specificSafetyTrainingHours"],
-        totalTrainingHours: json["totalTrainingHours"],
+        totalTrainingHours: json["totalTrainingHours"]?.toDouble(),
         safetyItemsInspections: json["safetyItemsInspections"],
         safetyCommitteeMeetings: json["safetyCommitteeMeetings"],
         internalAudits: json["internalAudits"],
@@ -152,13 +152,14 @@ class SafetyReportModel {
         "awardsAndAppreciations": awardsAndAppreciations,
         "safetyAwardRatingHighest": safetyAwardRatingHighest,
         "safetyAwardRatingLowest": safetyAwardRatingLowest,
-        "createdAt": createdAt.toIso8601String(),
-        "updatedAt": updatedAt.toIso8601String(),
+        "createdAt": createdAt,
+        "updatedAt": updatedAt,
         "__v": v,
       };
 }
 
 class Project {
+  String workpermitAllow;
   String id;
   String projectId;
   String projectName;
@@ -171,6 +172,7 @@ class Project {
   int v;
 
   Project({
+    required this.workpermitAllow,
     required this.id,
     required this.projectId,
     required this.projectName,
@@ -188,6 +190,7 @@ class Project {
   String toRawJson() => json.encode(toJson());
 
   factory Project.fromJson(Map<String, dynamic> json) => Project(
+        workpermitAllow: json["workpermitAllow"],
         id: json["_id"],
         projectId: json["projectId"],
         projectName: json["projectName"],
@@ -195,12 +198,13 @@ class Project {
         startDate: json["startDate"],
         endDate: json["endDate"],
         status: json["status"],
-        description: json["description"],
+        description: json["description"] ?? "",
         company: json["company"],
         v: json["__v"],
       );
 
   Map<String, dynamic> toJson() => {
+        "workpermitAllow": workpermitAllow,
         "_id": id,
         "projectId": projectId,
         "projectName": projectName,

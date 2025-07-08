@@ -9,13 +9,15 @@ import 'package:rohan_suraksha_sathi/app_constants/textstyles.dart';
 import 'package:rohan_suraksha_sathi/controller/home_controller.dart';
 import 'package:rohan_suraksha_sathi/helpers/sixed_boxes.dart';
 import 'package:rohan_suraksha_sathi/routes/routes_string.dart';
+import 'package:rohan_suraksha_sathi/services/formatters.dart';
 import 'package:rohan_suraksha_sathi/views/home_page/home_page.dart';
 import 'package:rohan_suraksha_sathi/widgets/auto_move_slider.dart';
 import 'package:rohan_suraksha_sathi/widgets/dashboard.dart';
 import 'package:rohan_suraksha_sathi/widgets/my_drawer.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class HomeView extends StatelessWidget {
-  const HomeView({
+  HomeView({
     super.key,
     required this.controller,
   });
@@ -92,15 +94,73 @@ class HomeView extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(
-                        "Highlights",
-                        style: GoogleFonts.roboto(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Highlights",
+                              style: GoogleFonts.roboto(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 16,
+                              ),
+                            ),
+                            Obx(
+                              () => TextButton.icon(
+                                iconAlignment: IconAlignment.end,
+                                onPressed: () async {
+                                  Get.defaultDialog(
+                                    title: "Select Date or Date Range",
+                                    content: SizedBox(
+                                      height: 350,
+                                      width: double.maxFinite,
+                                      child: SfDateRangePicker(
+                                        showActionButtons: true,
+                                        selectionMode:
+                                            DateRangePickerSelectionMode.range,
+                                        onSubmit: (Object? value) {
+                                          if (value is PickerDateRange) {
+                                            controller.selectedRange.value =
+                                                DateTimeRange(
+                                              start: value.startDate ??
+                                                  DateTime.now(),
+                                              end: value.endDate ??
+                                                  value.startDate ??
+                                                  DateTime.now(),
+                                            );
+
+                                            Get.back();
+                                          }
+                                        },
+                                        onCancel: () => Get.back(),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                icon: Icon(Icons.more_vert_rounded, size: 16),
+                                label: Text(
+                                  isSameDay(
+                                          controller.selectedRange.value.start,
+                                          controller.selectedRange.value.end)
+                                      ? "Today"
+                                      : controller.selectedRange.value.start ==
+                                              controller.selectedRange.value.end
+                                          ? DateFormat('dd MMM').format(
+                                              controller
+                                                  .selectedRange.value.start)
+                                          : "${DateFormat('dd MMM').format(controller.selectedRange.value.start)} - ${DateFormat('dd MMM').format(controller.selectedRange.value.end)}",
+                                  style: GoogleFonts.roboto(fontSize: 14),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      sb3,
-                      AutoCarousel(),
+                      Obx(
+                        () => AutoCarousel(
+                            selectedRange: controller.selectedRange.value),
+                      ),
                       sb6,
                       const Divider(color: Colors.black87),
                       sb6,
@@ -383,6 +443,8 @@ class AppBarContent extends StatelessWidget {
                             ),
                             children: [
                               if (Strings.roleName == "Execution" ||
+                                  Strings.roleName == "Management" ||
+                                  Strings.roleName == "Project Manager" ||
                                   Strings.roleName == "Admin" &&
                                       Strings.endpointToList['project']
                                               ?["workpermitAllow"] ==
@@ -396,6 +458,8 @@ class AppBarContent extends StatelessWidget {
                                   },
                                 ),
                               if (Strings.roleName == "Safety" ||
+                                  Strings.roleName == "Management" ||
+                                  Strings.roleName == "Project Manager" ||
                                   Strings.roleName == "Admin")
                                 MyGrid(
                                   avatarColor: Colors.blue[100]!,

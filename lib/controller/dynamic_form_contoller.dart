@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
 import 'package:rohan_suraksha_sathi/helpers/dialogos.dart';
@@ -17,16 +18,18 @@ import 'package:rohan_suraksha_sathi/services/image_service.dart';
 import 'package:rohan_suraksha_sathi/services/load_dropdown_data.dart';
 import 'package:rohan_suraksha_sathi/services/location_service.dart';
 import 'package:rohan_suraksha_sathi/services/notification_service/notification_handler.dart';
+import 'package:rohan_suraksha_sathi/services/shared_preferences.dart';
+import 'package:rohan_suraksha_sathi/widgets/custom_alert_dialog.dart';
 import 'package:rohan_suraksha_sathi/widgets/progress_indicators.dart';
 import 'package:signature/signature.dart';
 
 class DynamicFormController extends GetxController {
-  RxInt severity = 1.obs;
-  RxInt likelihood = 1.obs;
+  RxInt severity = 0.obs;
+  RxInt likelihood = 0.obs;
   RxString riskLevel = 'Low'.obs;
   RxList<Map<String, dynamic>> checkList = <Map<String, dynamic>>[].obs;
   RxList<PageField> additionalFields = <PageField>[].obs;
-
+  RxBool isSaved = false.obs;
   final CameraService cameraService = CameraService();
   RxMap<String, dynamic> customFields = <String, dynamic>{}.obs;
   // Observable variables
@@ -47,6 +50,7 @@ class DynamicFormController extends GetxController {
   // Observable list for storing attendees' names as maps
   var subformData = <Map<String, dynamic>>[].obs;
   final imageErrors = <String, String?>{}.obs;
+  final matrixError = <String, String?>{}.obs;
 
   // Lifecycle hook
   @override
@@ -55,85 +59,9 @@ class DynamicFormController extends GetxController {
     loadFormData();
   }
 
-//Risk Calculation-------------------------------------------------------------
-  void calculateRiskLevel() {
-    final score = severity.value * likelihood.value;
-    if (score <= 3) {
-      riskLevel.value = 'Low';
-    } else if (score < 8) {
-      riskLevel.value = 'Medium';
-    } else if (score < 12) {
-      riskLevel.value = 'High';
-    } else {
-      riskLevel.value = 'Critical';
-    }
-    final matchedValue = Strings.endpointToList["RiskRating"].firstWhere((e) {
-      print('Comparing: ${e['severity']} with ${riskLevel.value}');
-      return e['severity'] == riskLevel.value;
-    }, orElse: () => null);
-
-    if (matchedValue != null) {
-      formData['riskValue'] = matchedValue['_id'];
-
-      // Parse the alert timeline (in hours)
-      final int timelineHours =
-          int.tryParse(matchedValue['alertTimeline'] ?? '0') ?? 0;
-
-      // Calculate deadline
-      final DateTime deadline =
-          DateTime.now().add(Duration(hours: timelineHours));
-
-      // Format deadline nicely
-      final String formattedDeadline =
-          "${deadline.day.toString().padLeft(2, '0')}/"
-          "${deadline.month.toString().padLeft(2, '0')}/"
-          "${deadline.year} at ${deadline.hour.toString().padLeft(2, '0')}:"
-          "${deadline.minute.toString().padLeft(2, '0')}";
-
-      // Show the dialog
-      Get.defaultDialog(
-        title: "Risk Level: ${riskLevel.value}",
-        middleText:
-            "You have to complete the given action by $formattedDeadline.\n\n"
-            "Severity: ${matchedValue['severity']}\n"
-            "Alert Window: $timelineHours hour(s)",
-        textConfirm: "OK",
-        confirmTextColor: Colors.white,
-        onConfirm: () => Get.back(),
-      );
-    }
-
-    print(formData);
+  saveForm() async {
+    //await SharedPrefService
   }
-
-  Future<void> refreshDropdownData() async {
-    print("refreshing data-----------------------");
-    isLoading.value = true;
-    await loadDropdownData(); // Loads the latest dropdowns globally or for this form
-    refresh(); // Reinitializes fields
-    isLoading.value = false;
-  }
-//Risk Calculation-------------------------------------------------------------
-
-  SignatureController getSignatureController(String fieldKey) {
-    if (!signatureControllers.containsKey(fieldKey)) {
-      signatureControllers[fieldKey] = SignatureController();
-    }
-    return signatureControllers[fieldKey]!;
-  }
-
-  TextEditingController getTextController(String fieldHeader) {
-    print(formData[fieldHeader]);
-    if (!textControllers.containsKey(fieldHeader)) {
-      print(formData[fieldHeader]);
-      // Create a new controller if it doesn't exist
-      textControllers[fieldHeader] = TextEditingController(
-        text: formData[fieldHeader]?.toString() ?? '',
-      );
-    }
-    return textControllers[fieldHeader]!;
-  }
-
   getCustomFields(String permitKey) {
     final newFields = Strings.workpermitPageFild;
     if (newFields != null) {
@@ -143,9 +71,6 @@ class DynamicFormController extends GetxController {
         orElse: () => null,
       );
       if (matchingFields != null) {
-        print(
-            ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::if not null");
-        print(matchingFields);
         // Assign its SafetyChecks to checkList.value
         additionalFields.value =
             (matchingFields["PageFields"] as List<dynamic>?)
@@ -153,9 +78,6 @@ class DynamicFormController extends GetxController {
                     .toList()
                     .cast<PageField>() ??
                 [];
-        print(
-            ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::if not null");
-        print(additionalFields);
       } else {
         // If no match is found, clear the checklist
         print(
@@ -164,34 +86,6 @@ class DynamicFormController extends GetxController {
       }
     }
   }
-
-  getChecklist(String checklistKey) {
-    final permitsList = Strings.endpointToList["permitstype"];
-
-    if (permitsList != null) {
-      // Find the matching permit by comparing permitsType with checklistKey
-      final matchingPermit = permitsList.firstWhere(
-        (permit) => permit["permitsType"] == checklistKey,
-        orElse: () => null,
-      );
-
-      if (matchingPermit != null) {
-        // Assign its SafetyChecks to checkList.value
-        checkList.value = (matchingPermit["SafetyChecks"] as List<dynamic>?)
-                ?.map((e) => e as Map<String, dynamic>)
-                .toList() ??
-            [];
-      } else {
-        // If no match is found, clear the checklist
-        checkList.clear();
-      }
-    } else {
-      // If permitsList is null, clear the checklist
-      checkList.clear();
-    }
-  }
-
-  saveCheckList() {}
 
   // Function to check if the user has permission to view a field
   bool hasViewPermission(List<String> requiredPermissions) {
@@ -218,7 +112,7 @@ class DynamicFormController extends GetxController {
               id: ""), // Safely return null if no matching field is found
         );
         print("------------------------------${pageField.type}");
-        print("Processing key: $key with value: $value");
+        print("Processing key: $key with value: $value----${pageField.type}");
 
         if (pageField != null) {
           String fieldType = pageField.type;
@@ -226,7 +120,6 @@ class DynamicFormController extends GetxController {
           if (value is List) {
             formData[key] = value.map((e) {
               if (e is Map && e.containsKey("_id")) {
-                print("------------------------------${fieldType}");
                 // Store only _id for multiselect
                 return fieldType == "multiselect" ? e["_id"].toString() : e;
               } else if (e is String) {
@@ -273,7 +166,8 @@ class DynamicFormController extends GetxController {
     update(); // Update the UI if using GetX
   }
 
-  Future<dynamic> pickAndUploadImage(String key, String endpoint) async {
+  Future<dynamic> pickAndUploadImage(
+      String key, String endpoint, String source) async {
     File? imageFile;
 
     try {
@@ -287,7 +181,15 @@ class DynamicFormController extends GetxController {
 
       // Pick an image
 
-      imageFile = await Get.to(() => CameraPreviewScreen());
+      if (source == "camera") {
+        // Open custom camera screen
+        imageFile = await Get.to(() => CameraPreviewScreen());
+      } else {
+        // Pick image from gallery
+        final picked =
+            await ImagePicker().pickImage(source: ImageSource.gallery);
+        if (picked != null) imageFile = File(picked.path);
+      }
 
       if (imageFile != null) {
         // Upload the image and get the URL
@@ -473,16 +375,26 @@ class DynamicFormController extends GetxController {
     await updateFormDataFromControllers();
     formData["customFields"] = customFields;
     bool isValid = true;
-    print(formData["safetyMeasuresTaken"]);
+    print("-----------------------------------------------");
+    print(formData["riskValue"]);
     for (var field in pageFields) {
       switch (field.type) {
         case 'imagepicker':
-          if (!validateImagePickerField(field.headers, field.title)) {
+          if (!validateImagePickerField(field.headers, field.title,
+              isEditable: hasEditPermission(field.permissions?.edit ?? []))) {
+            isValid = false;
+          }
+
+          break;
+        case 'signature':
+          if (!validateSignatureField(field.headers, field.title,
+              isEditable: hasEditPermission(field.permissions?.edit ?? []))) {
             isValid = false;
           }
           break;
-        case 'signature':
-          if (!validateSignatureField(field.headers, field.title)) {
+        case 'riskMatrix':
+          if (!validateRiskMatrixField(field.headers, field.title,
+              isEditable: hasEditPermission(field.permissions?.edit ?? []))) {
             isValid = false;
           }
           break;
@@ -496,22 +408,23 @@ class DynamicFormController extends GetxController {
       return;
     }
     final bool isConfirmed = await Get.dialog(
-      AlertDialog(
-        title: const Text("Confirmation"),
-        content: const Text("Are you sure you want to submit the Data?"),
-        actions: [
-          TextButton(
+      CustomAlertDialog(
+        title: "Confirmation",
+        description: "Are you sure you want to submit the Data?",
+        buttons: [
+          CustomDialogButton(
             onPressed: () {
+              print(jsonEncode(formData));
               Get.back(result: false); // Close the dialog and return false
             },
-            child: const Text("Cancel"),
+            label: "Cancel",
           ),
-          ElevatedButton(
+          CustomDialogButton(
             onPressed: () {
               print(jsonEncode(formData));
               Get.back(result: true); // Close the dialog and return true
             },
-            child: const Text("Submit"),
+            label: "Submit",
           ),
         ],
       ),
@@ -528,17 +441,6 @@ class DynamicFormController extends GetxController {
             title: "Successful",
             message: "Data Submitted successfully, press OK to continue",
             onOkPressed: sendNotification(endpoint, false));
-        // Get.snackbar(
-        //   "Success",
-        //   "Data Posted successfully",
-        //   backgroundColor: Colors.green,
-        //   colorText: Colors.white,
-        //   snackPosition: SnackPosition.BOTTOM,
-        // );
-        // sendNotification(endpoint, false);
-        // // Delay for snackbar visibility, then go back
-        // await Future.delayed(const Duration(seconds: 2));
-        // isLoading(false);
       }
     } catch (e) {
       isLoading.value = false;
@@ -599,54 +501,6 @@ class DynamicFormController extends GetxController {
           title: "Update Successful",
           message: "Data updated successfully, press OK to continue",
         );
-        // await Get.dialog(
-        //   AlertDialog(
-        //     shape: RoundedRectangleBorder(
-        //       borderRadius: BorderRadius.circular(16),
-        //     ),
-        //     backgroundColor: Colors.white,
-        //     title: Row(
-        //       children: const [
-        //         Icon(Icons.check_circle, color: Colors.green),
-        //         SizedBox(width: 8),
-        //         Text(
-        //           "Success",
-        //           style: TextStyle(
-        //             fontWeight: FontWeight.bold,
-        //             fontSize: 20,
-        //           ),
-        //         ),
-        //       ],
-        //     ),
-        //     content: const Text(
-        //       "Data updated successfully",
-        //       style: TextStyle(fontSize: 16),
-        //     ),
-        //     actions: [
-        //       TextButton(
-        //         style: TextButton.styleFrom(
-        //           backgroundColor: Colors.green,
-        //           padding:
-        //               const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        //           shape: RoundedRectangleBorder(
-        //             borderRadius: BorderRadius.circular(8),
-        //           ),
-        //         ),
-        //         onPressed: () {
-        //           Get.back(); // Close the dialog
-        //           Get.back(
-        //               result: true); // Go back to previous screen with result
-        //         },
-        //         child: const Text(
-        //           "OK",
-        //           style: TextStyle(
-        //               color: Colors.white, fontWeight: FontWeight.bold),
-        //         ),
-        //       ),
-        //     ],
-        //   ),
-        //   barrierDismissible: false, // Prevent dismiss on tap outside
-        // );
       } else {
         throw Exception("Unexpected response code: $response");
       }
@@ -710,6 +564,7 @@ class DynamicFormController extends GetxController {
   }
 
   // Validations for form fields------------------------------------------//
+
   String? validateTextField(String? value) {
     if (value == null || value.isEmpty) {
       return 'This field cannot be empty';
@@ -731,7 +586,10 @@ class DynamicFormController extends GetxController {
     return null;
   }
 
-  bool validateImagePickerField(String fieldKey, String fieldTitle) {
+  bool validateImagePickerField(String fieldKey, String fieldTitle,
+      {bool isEditable = true}) {
+    if (!isEditable) return true; // Skip validation if field is not editable
+
     final imageUrl = formData[fieldKey];
     if (imageUrl == null || imageUrl.toString().isEmpty) {
       imageErrors[fieldKey] = "$fieldTitle is required";
@@ -742,7 +600,25 @@ class DynamicFormController extends GetxController {
     }
   }
 
-  bool validateSignatureField(String fieldKey, String fieldTitle) {
+  bool validateRiskMatrixField(String fieldKey, String fieldTitle,
+      {bool isEditable = true}) {
+    if (!isEditable) return true; // Skip validation if field is not editable
+
+    final riskValue = formData[fieldKey];
+    if (riskValue == null || riskValue.toString().isEmpty) {
+      matrixError[fieldKey] =
+          "$fieldTitle should be Updated please select again";
+      return false;
+    } else {
+      matrixError[fieldKey] = null;
+      return true;
+    }
+  }
+
+  bool validateSignatureField(String fieldKey, String fieldTitle,
+      {bool isEditable = true}) {
+    if (!isEditable) return true; // Skip validation if field is not editable
+
     final signatureUrl = formData[fieldKey];
     if (signatureUrl == null || signatureUrl.toString().isEmpty) {
       imageErrors[fieldKey] = "$fieldTitle is required"; // reuse same error map
@@ -812,4 +688,110 @@ class DynamicFormController extends GetxController {
         break;
     }
   }
+
+  void calculateRiskLevel() {
+    final score = severity.value * likelihood.value;
+    if (score <= 3) {
+      riskLevel.value = 'Low';
+    } else if (score < 8) {
+      riskLevel.value = 'Medium';
+    } else if (score < 12) {
+      riskLevel.value = 'High';
+    } else {
+      riskLevel.value = 'Critical';
+    }
+    final matchedValue = Strings.endpointToList["RiskRating"].firstWhere((e) {
+      print('Comparing: ${e['severity']} with ${riskLevel.value}');
+      return e['severity'] == riskLevel.value;
+    }, orElse: () => null);
+
+    if (matchedValue != null) {
+      formData['riskValue'] = matchedValue['_id'];
+
+      // Parse the alert timeline (in hours)
+      final int timelineHours =
+          int.tryParse(matchedValue['alertTimeline'] ?? '0') ?? 0;
+
+      // Calculate deadline
+      final DateTime deadline =
+          DateTime.now().add(Duration(hours: timelineHours));
+
+      // Format deadline nicely
+      final String formattedDeadline =
+          "${deadline.day.toString().padLeft(2, '0')}/"
+          "${deadline.month.toString().padLeft(2, '0')}/"
+          "${deadline.year} at ${deadline.hour.toString().padLeft(2, '0')}:"
+          "${deadline.minute.toString().padLeft(2, '0')}";
+
+      // Show the dialog
+      Get.defaultDialog(
+        title: "Risk Level: ${riskLevel.value}",
+        middleText:
+            "You have to complete the given action by $formattedDeadline.\n\n"
+            "Severity: ${matchedValue['severity']}\n"
+            "Alert Window: $timelineHours hour(s)",
+        textConfirm: "OK",
+        confirmTextColor: Colors.white,
+        onConfirm: () => Get.back(),
+      );
+    }
+
+    print(formData);
+  }
+
+  Future<void> refreshDropdownData() async {
+    print("refreshing data-----------------------");
+    isLoading.value = true;
+    await loadDropdownData(); // Loads the latest dropdowns globally or for this form
+    refresh(); // Reinitializes fields
+    isLoading.value = false;
+  }
+//Risk Calculation-------------------------------------------------------------
+
+  SignatureController getSignatureController(String fieldKey) {
+    if (!signatureControllers.containsKey(fieldKey)) {
+      signatureControllers[fieldKey] = SignatureController();
+    }
+    return signatureControllers[fieldKey]!;
+  }
+
+  TextEditingController getTextController(String fieldHeader) {
+    print(formData[fieldHeader]);
+    if (!textControllers.containsKey(fieldHeader)) {
+      print(formData[fieldHeader]);
+      // Create a new controller if it doesn't exist
+      textControllers[fieldHeader] = TextEditingController(
+        text: formData[fieldHeader]?.toString() ?? '',
+      );
+    }
+    return textControllers[fieldHeader]!;
+  }
+
+  getChecklist(String checklistKey) {
+    final permitsList = Strings.endpointToList["permitstype"];
+
+    if (permitsList != null) {
+      // Find the matching permit by comparing permitsType with checklistKey
+      final matchingPermit = permitsList.firstWhere(
+        (permit) => permit["permitsType"] == checklistKey,
+        orElse: () => null,
+      );
+
+      if (matchingPermit != null) {
+        // Assign its SafetyChecks to checkList.value
+        checkList.value = (matchingPermit["SafetyChecks"] as List<dynamic>?)
+                ?.map((e) => e as Map<String, dynamic>)
+                .toList() ??
+            [];
+      } else {
+        // If no match is found, clear the checklist
+        checkList.clear();
+      }
+    } else {
+      // If permitsList is null, clear the checklist
+      checkList.clear();
+    }
+  }
+
+  saveCheckList() {}
 }

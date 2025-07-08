@@ -9,4 +9,5 @@ class Assets {
   static const String rohanLogo = "assets/rohan_logo.png";
   static const String appBarBg = "assets/building_bg.jpg";
   static const String cardBg = "assets/card_background.jpg";
+  static const String xls = "assets/xls.png";
 }

@@ -12,6 +12,7 @@ class SpecificTrainingController extends GetxController
     with GetSingleTickerProviderStateMixin {
   TabController? tabController;
   RxList<SpecificTraining> trainingList = <SpecificTraining>[].obs;
+  RxBool isLoading = false.obs;
   RxInt currentPage = 0.obs;
   final int itemsPerPage = 20;
   RxString searchQuery = ''.obs;
@@ -88,6 +89,7 @@ class SpecificTrainingController extends GetxController
   }
 
   getPermitData() async {
+    isLoading.value = true;
     try {
       final meetingtData = await ApiService().getRequest("specific");
 
@@ -122,6 +124,8 @@ class SpecificTrainingController extends GetxController
     } catch (e) {
       print("Error fetching permit data: $e");
       // Handle the error accordingly, e.g., show a dialog or retry
+    } finally {
+      isLoading.value = false;
     }
   }
 

@@ -87,7 +87,7 @@ class WorkPermit {
             ? PermitTypes.fromJson(json["permitTypes"])
             : null,
         date: json["date"],
-        startTime: json["startTime"],
+        startTime: json["StartTime"],
         endTime: json["endTime"],
         toolsTested: json["toolsTested"],
         workDescription: json["workDescription"],

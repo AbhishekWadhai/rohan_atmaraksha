@@ -10,6 +10,7 @@ class SafetyInductionController extends GetxController
     with GetSingleTickerProviderStateMixin {
   TabController? tabController;
   RxList<Induction> inductionList = <Induction>[].obs;
+  RxBool isLoading = false.obs;
   var searchQuery = ''.obs;
   var currentPage = 0.obs;
   final int itemsPerPage = 100;
@@ -84,6 +85,7 @@ class SafetyInductionController extends GetxController
   }
 
   getPermitData() async {
+    isLoading.value = true;
     try {
       final meetingtData = await ApiService().getRequest("induction");
 
@@ -119,6 +121,8 @@ class SafetyInductionController extends GetxController
     } catch (e) {
       print("Error fetching permit data: $e");
       // Handle the error accordingly, e.g., show a dialog or retry
+    } finally {
+      isLoading.value = false;
     }
   }
 

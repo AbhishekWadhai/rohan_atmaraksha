@@ -8,8 +8,10 @@ import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
 import 'package:rohan_suraksha_sathi/controller/safety_induction_controller.dart';
 import 'package:rohan_suraksha_sathi/model/induction_model.dart';
 import 'package:rohan_suraksha_sathi/routes/routes_string.dart';
+import 'package:rohan_suraksha_sathi/services/download_excel.dart';
 import 'package:rohan_suraksha_sathi/views/image_view_page.dart';
 import 'package:rohan_suraksha_sathi/widgets/my_drawer.dart';
+import 'package:rohan_suraksha_sathi/widgets/shimmers.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class InductionPage extends StatelessWidget {
@@ -30,6 +32,14 @@ class InductionPage extends StatelessWidget {
           ),
         ),
         actions: [
+          if (Strings.roleName == 'Admin' ||
+              Strings.roleName == 'Management' ||
+              Strings.roleName == 'Project Manager')
+            IconButton(
+                icon: const Icon(Icons.file_download_rounded),
+                onPressed: () {
+                  showDownloadBottomSheet('induction');
+                }),
           IconButton(
               icon: const Icon(Icons.refresh_rounded),
               onPressed: () {
@@ -127,77 +137,92 @@ class InductionPage extends StatelessWidget {
             ),
             Expanded(
               child: Obx(
-                () => ListView.builder(
-                  itemCount: controller.paginatedInductions.length,
-                  itemBuilder: (context, index) {
-                    final induction = controller.paginatedInductions[index];
-                    return Card(
-                      margin: const EdgeInsets.all(8.0),
-                      child: ListTile(
-                        onLongPress: () {
-                          if (induction.createdby?.id == Strings.userId) {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: const Text('Confirm Delete'),
-                                  content: const Text(
-                                      'Are you sure you want to delete this item?'),
-                                  actions: [
-                                    TextButton(
-                                      child: const Text('Cancel'),
-                                      onPressed: () {
-                                        Navigator.of(context)
-                                            .pop(); // Close dialog
-                                      },
-                                    ),
-                                    TextButton(
-                                      child: const Text('Delete'),
-                                      onPressed: () async {
-                                        controller.deleteSelection(
-                                            induction.id ?? "");
-                                        Navigator.of(context)
-                                            .pop(); // Delete item
-                                      },
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          }
-                        },
-                        title: Text(
-                          "Topic: ${induction.typeOfTopic?.map((topic) => topic.topicTypes).join(', ')}",
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: const TextStyle(fontSize: 16),
+                () {
+                  if (controller.isLoading.value) {
+                    // Show shimmer list while loading
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.8,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 20.0),
+                        child: ListView.builder(
+                          itemCount: 12,
+                          itemBuilder: (context, index) => buildShimmerCard(),
                         ),
-                        subtitle: Text(
-                          'Date: ${DateFormat('dd MM yyyy').format(DateTime.parse(induction.date ?? ""))}',
-                        ),
-                        trailing: IconButton(
-                          onPressed: () async {
-                            print(jsonEncode(induction));
-                            var result = await Get.toNamed(Routes.formPage,
-                                arguments: [
-                                  'induction',
-                                  induction.toJson(),
-                                  true
-                                ]);
-                            if (result == true) {
-                              controller.getPermitData();
-                            }
-                          },
-                          icon: const Icon(Icons.edit),
-                        ),
-                        onTap: () {
-                          // Handle on tap if needed
-                          onTapView(context, induction);
-                        },
                       ),
                     );
-                  },
-                ),
+                  }
+                  return ListView.builder(
+                    itemCount: controller.paginatedInductions.length,
+                    itemBuilder: (context, index) {
+                      final induction = controller.paginatedInductions[index];
+                      return Card(
+                        margin: const EdgeInsets.all(8.0),
+                        child: ListTile(
+                          onLongPress: () {
+                            if (induction.createdby?.id == Strings.userId) {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text('Confirm Delete'),
+                                    content: const Text(
+                                        'Are you sure you want to delete this item?'),
+                                    actions: [
+                                      TextButton(
+                                        child: const Text('Cancel'),
+                                        onPressed: () {
+                                          Navigator.of(context)
+                                              .pop(); // Close dialog
+                                        },
+                                      ),
+                                      TextButton(
+                                        child: const Text('Delete'),
+                                        onPressed: () async {
+                                          controller.deleteSelection(
+                                              induction.id ?? "");
+                                          Navigator.of(context)
+                                              .pop(); // Delete item
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            }
+                          },
+                          title: Text(
+                            "Topic: ${induction.typeOfTopic?.map((topic) => topic.topicTypes).join(', ')}",
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          subtitle: Text(
+                            'Date: ${DateFormat('dd MM yyyy').format(DateTime.parse(induction.date ?? ""))}',
+                          ),
+                          trailing: IconButton(
+                            onPressed: () async {
+                              print(jsonEncode(induction));
+                              var result = await Get.toNamed(Routes.formPage,
+                                  arguments: [
+                                    'induction',
+                                    induction.toJson(),
+                                    true
+                                  ]);
+                              if (result == true) {
+                                controller.getPermitData();
+                              }
+                            },
+                            icon: const Icon(Icons.edit),
+                          ),
+                          onTap: () {
+                            // Handle on tap if needed
+                            onTapView(context, induction);
+                          },
+                        ),
+                      );
+                    },
+                  );
+                },
               ),
             ),
             Row(
@@ -349,7 +374,8 @@ Future<dynamic> onTapView(BuildContext context, Induction inductionData) {
                     ),
                   ],
                 ),
-                _buildDetailRow('Inductees:', inductionData.inductees ?? ""),
+                _buildDetailRow('Inductees:',
+                    inductionData.inductees?.map((e) => e).join(",") ?? ""),
                 _buildDetailRow(
                     'Inductees Name:', inductionData.inducteesName ?? ""),
                 _buildDetailRow('Sub Contractor Name:',

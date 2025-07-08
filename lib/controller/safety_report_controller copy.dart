@@ -59,13 +59,16 @@ class SafetyReportChartController extends GetxController {
   DateTime? endDate;
 
   //RxString selectedWeek = ''.obs;
-  Map<String, dynamic>? selectedWeek;
+  RxMap<String, dynamic>? selectedWeek;
 
   @override
   void onInit() {
     super.onInit();
-    safetyReportData.value =
-        Strings.safetyreport.map((e) => SafetyReportModel.fromJson(e)).toList();
+    safetyReportData.value = Strings.safetyreport
+        .map((e) => SafetyReportModel.fromJson(e))
+        .toList()
+      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
     _populateChartData();
     getLticases();
   }
@@ -212,7 +215,8 @@ class SafetyReportChartController extends GetxController {
   void _updateChartData(List<SafetyReportModel> data) {
     avgManPowers.value =
         _aggregateData(data, (report) => report.totalAvgManpower.toDouble());
-    tbtMeeting.value = _aggregateData(data, (report) => report.tbtMeetingHours);
+    tbtMeeting.value =
+        _aggregateData(data, (report) => report.tbtMeetingHours.toDouble());
 
     uaucResolved.value =
         _aggregateData(data, (report) => report.uaUcReportedClosed.toDouble());
@@ -303,7 +307,7 @@ class SafetyReportChartController extends GetxController {
         formula: (values) {
           final totalManHoursWorked = values["totalManHoursWorked"] ?? 0;
 
-          return totalManHoursWorked/1000000;
+          return totalManHoursWorked / 1000;
         });
   }
 
@@ -406,7 +410,7 @@ class SafetyReportChartController extends GetxController {
       case "Monthly":
         if (date.year.toString() == selectedYear.value &&
             selectedMonth.value == date.month) {
-          return "${date.day}-${date.month}-${date.year}";
+          return "${date.day}-${date.month}";
         }
         return null;
 

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rohan_suraksha_sathi/app_constants/colors.dart';
 import 'package:rohan_suraksha_sathi/controller/dynamic_form_contoller.dart';
-import 'package:rohan_suraksha_sathi/services/load_dropdown_data.dart';
+
 import 'package:rohan_suraksha_sathi/services/translation.dart';
+import 'package:rohan_suraksha_sathi/widgets/custom_alert_dialog.dart';
 import 'package:rohan_suraksha_sathi/widgets/dynamic_form.dart';
 import 'package:rohan_suraksha_sathi/widgets/helper_widgets/flexibleText.dart';
 
@@ -33,25 +35,43 @@ class FormPage extends StatelessWidget {
 
         elevation: 2,
         actions: [
-          PopupMenuButton(
-              icon: const Icon(Icons.more_vert), // Three-dot icon
-              onSelected: (value) async {
-                if (value == 'refresh') {
-                  controller.refreshDropdownData();
-                  // Call the refresh logic here
-                  //await loadDropdownData();
-                  // You can pass this refresh action to the controller or a function in DynamicForm
-                }
-              },
-              itemBuilder: (BuildContext context) {
-                return [
-                  const PopupMenuItem<String>(
-                    value: 'refresh',
-                    child: Text('Refresh'),
+          IconButton(
+            icon: const Icon(Icons.refresh_rounded),
+            onPressed: () {
+              Get.dialog(CustomAlertDialog(
+                visual: const Icon(Icons.refresh_rounded,
+                    color: AppColors.appMainMid),
+                title: 'Confirm Refresh',
+                description:
+                    'This will fetch the latest dropdown data.\nPress "Yes" to continue?',
+                buttons: [
+                  CustomDialogButton(
+                    label: 'Cancel',
+                    onPressed: () => Get.back(),
                   ),
-                  // Add more menu options here if needed
-                ];
-              })
+                  CustomDialogButton(
+                    color: AppColors.appMainMid,
+                    label: 'Yes',
+                    isPrimary: true,
+                    onPressed: () {
+                      Get.back();
+                      controller.refreshDropdownData();
+                    },
+                  ),
+                ],
+              ));
+            },
+          ),
+          IconButton(
+            onPressed: () {
+              controller.isSaved.value = !controller.isSaved.value;
+            },
+            icon: Obx(() => Icon(
+                  controller.isSaved.value
+                      ? Icons.bookmark_rounded
+                      : Icons.bookmark_border_rounded,
+                )),
+          )
         ],
       ),
       body: DynamicForm(

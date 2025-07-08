@@ -111,24 +111,44 @@ Future<void> loadDropdownData() async {
             Strings.endpointToList["trade"] = parsedData;
             break;
           case "workpermit":
-            Strings.workpermit = parsedData;
+            Strings.workpermit = parsedData.where((data) {
+              // Ensure user['project'] is a list and check if any project matches the selected one
+              return data['project']['_id'] ==
+                  Strings.endpointToList['project']['_id'];
+            }).toList();
 
             break;
 
           case "meeting":
-            Strings.meetings = parsedData;
+            Strings.meetings = parsedData.where((data) {
+              // Ensure user['project'] is a list and check if any project matches the selected one
+              return data['project']['_id'] ==
+                  Strings.endpointToList['project']['_id'];
+            }).toList();
             break;
 
           case "specific":
-            Strings.specific = parsedData;
+            Strings.specific = parsedData.where((data) {
+              // Ensure user['project'] is a list and check if any project matches the selected one
+              return data['project']['_id'] ==
+                  Strings.endpointToList['project']['_id'];
+            }).toList();
             break;
 
           case "uauc":
-            Strings.uauc = parsedData;
+            Strings.uauc = parsedData.where((data) {
+              // Ensure user['project'] is a list and check if any project matches the selected one
+              return data['project']['_id'] ==
+                  Strings.endpointToList['project']['_id'];
+            }).toList();
             break;
 
           case "induction":
-            Strings.induction = parsedData;
+            Strings.induction = parsedData.where((data) {
+              // Ensure user['project'] is a list and check if any project matches the selected one
+              return data['project']['_id'] ==
+                  Strings.endpointToList['project']['_id'];
+            }).toList();
             break;
           case "safetyreport":
             Strings.safetyreport = parsedData.where((e) {

@@ -7,11 +7,13 @@ import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
 import 'package:rohan_suraksha_sathi/app_constants/colors.dart';
 import 'package:rohan_suraksha_sathi/model/work_permit_model.dart';
 import 'package:rohan_suraksha_sathi/routes/routes_string.dart';
+import 'package:rohan_suraksha_sathi/services/download_excel.dart';
 import 'package:rohan_suraksha_sathi/services/location_service.dart';
 import 'package:rohan_suraksha_sathi/services/pdf_generator/pdf_generator.dart';
 import 'package:rohan_suraksha_sathi/services/translation.dart';
 import 'package:rohan_suraksha_sathi/widgets/dynamic_data_view.dart';
 import 'package:rohan_suraksha_sathi/widgets/my_drawer.dart';
+import 'package:rohan_suraksha_sathi/widgets/shimmers.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 import '../controller/work_permit_controller.dart';
@@ -25,7 +27,7 @@ class WorkPermitPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         backgroundColor: AppColors.scaffoldColor,
         appBar: AppBar(
@@ -41,6 +43,14 @@ class WorkPermitPage extends StatelessWidget {
           ),
           backgroundColor: AppColors.appMainDark,
           actions: [
+            if (Strings.roleName == 'Admin' ||
+                Strings.roleName == 'Management' ||
+                Strings.roleName == 'Project Manager')
+              IconButton(
+                  icon: const Icon(Icons.file_download_rounded),
+                  onPressed: () {
+                    showDownloadBottomSheet('workpermit');
+                  }),
             IconButton(
                 icon: const Icon(Icons.refresh_rounded),
                 onPressed: () {
@@ -60,13 +70,24 @@ class WorkPermitPage extends StatelessWidget {
             tabs: [
               Tab(text: "All"),
               Tab(text: "Pending"),
-              Tab(text: "Completed"),
+              Tab(text: "Verified"),
+              Tab(text: "Approved"),
             ],
           ),
         ),
         drawer: const MyDrawer(),
-        body: Obx(
-          () => Column(
+        body: Obx(() {
+          if (workPermitController.isLoading.value) {
+            // Show shimmer list while loading
+            return Padding(
+              padding: const EdgeInsets.only(top: 20.0),
+              child: ListView.builder(
+                itemCount: 12,
+                itemBuilder: (context, index) => buildShimmerCard(),
+              ),
+            );
+          }
+          return Column(
             children: [
               SizedBox(
                 height: 60,
@@ -154,13 +175,18 @@ class WorkPermitPage extends StatelessWidget {
                     _buildWorkPermitList(workPermitController
                         .paginatedWorkPermits
                         .where((permit) => permit.verifiedDone)
+                        .toList()),
+                    _buildWorkPermitList(workPermitController
+                        .paginatedWorkPermits
+                        .where((permit) =>
+                            permit.verifiedDone && permit.approvalDone)
                         .toList()), // Completed permits
                   ],
                 ),
               ),
             ],
-          ),
-        ),
+          );
+        }),
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
             if (Strings.permisssions.contains("Workpermit Creation")) {
@@ -208,9 +234,11 @@ class WorkPermitPage extends StatelessWidget {
                       borderRadius:
                           BorderRadius.circular(12.0), // Circular edges
                     ),
-                    tileColor: permit.verifiedDone
+                    tileColor: permit.verifiedDone && permit.approvalDone
                         ? Colors.green[100]
-                        : Colors.red[100],
+                        : permit.verifiedDone
+                            ? Colors.yellow[100]
+                            : Colors.red[100],
                     onLongPress: () {
                       if (permit.createdby.id == Strings.userId) {
                         showDialog(

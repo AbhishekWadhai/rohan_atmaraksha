@@ -73,5 +73,8 @@ final Map<String, dynamic> keysForMap = {
   "safetyMeasuresTaken": "CheckPoints",
   "TbtGivenBy": "name",
   "instructionBy": "name",
-  "tradeTypes": "tradeTypes"
+  "tradeTypes": "tradeTypes",
+  "observer": "name",
+  "hazards": "hazards",
+  "attendeesName": "name"
 };

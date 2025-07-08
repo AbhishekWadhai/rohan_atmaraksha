@@ -7,7 +7,7 @@ class Induction {
   Project? project;
   String? date;
   String? time;
-  String? inductees;
+  List<String>? inductees;
   String? inducteesName;
   List<TradeType>? tradeTypes;
   String? subContractorName;
@@ -53,7 +53,9 @@ class Induction {
         project: Project.fromJson(json["project"]),
         date: json["date"],
         time: json["time"],
-        inductees: json["inductees"],
+        inductees: json["inductees"] == null
+            ? null
+            : List<String>.from(json["inductees"].map((x) => x.toString())),
         inducteesName: json["inducteesName"],
         tradeTypes: List<TradeType>.from(
             json["tradeTypes"].map((x) => TradeType.fromJson(x))),

@@ -8,7 +8,7 @@ class TbtMeeting {
   TbtGivenBy? createdby;
   String? date;
   String? time;
-  String? attendees;
+  List<String>? attendees;
   String? attendeesNos;
   List<TypeOfTopic>? typeOfTopic;
   String? documentaryEvidencePhoto;
@@ -42,13 +42,16 @@ class TbtMeeting {
 
   factory TbtMeeting.fromJson(Map<String, dynamic> json) => TbtMeeting(
         id: json["_id"],
-        project: Project.fromJson(json["project"]),
+        project:
+            json["project"] == null ? null : Project.fromJson(json["project"]),
         createdby: json["createdby"] == null
             ? null
             : TbtGivenBy.fromJson(json["createdby"]),
         date: json["date"],
         time: json["time"],
-        attendees: json["attendees"],
+        attendees: json["attendees"] == null
+            ? null
+            : List<String>.from(json["attendees"].map((x) => x.toString())),
         attendeesNos: json["attendeesNos"],
         typeOfTopic: List<TypeOfTopic>.from(
             json["typeOfTopic"].map((x) => TypeOfTopic.fromJson(x))),

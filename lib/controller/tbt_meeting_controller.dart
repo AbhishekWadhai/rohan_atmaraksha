@@ -7,6 +7,7 @@ import 'package:rohan_suraksha_sathi/services/api_services.dart';
 
 class TBTMeetingController extends GetxController {
   RxList<TbtMeeting> tbtMeetingList = <TbtMeeting>[].obs;
+  RxBool isLoading = false.obs;
   RxInt currentPage = 0.obs;
   final int itemsPerPage = 20;
   var searchQuery = ''.obs;
@@ -83,6 +84,7 @@ class TBTMeetingController extends GetxController {
   }
 
   fetchTBTMeetings() async {
+    isLoading.value = true;
     try {
       final meetingData = await ApiService().getRequest("meeting");
 
@@ -111,6 +113,8 @@ class TBTMeetingController extends GetxController {
       print("TBT Meeting List Length: ${tbtMeetingList.length}");
     } catch (e) {
       print("Error fetching TBT meeting data: $e");
+    } finally {
+      isLoading.value = false;
     }
   }
 

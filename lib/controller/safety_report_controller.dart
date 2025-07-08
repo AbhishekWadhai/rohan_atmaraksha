@@ -9,6 +9,7 @@ import 'package:rohan_suraksha_sathi/services/api_services.dart';
 class SafetyReportController extends GetxController
     with GetSingleTickerProviderStateMixin {
   TabController? tabController;
+  RxBool isLoading = false.obs;
   RxList<SafetyReportModel> reportList = <SafetyReportModel>[].obs;
 
   @override
@@ -19,6 +20,7 @@ class SafetyReportController extends GetxController
   }
 
   getPermitData() async {
+    isLoading.value = true;
     try {
       final meetingtData = await ApiService().getRequest("safetyreport");
 
@@ -51,6 +53,8 @@ class SafetyReportController extends GetxController
     } catch (e) {
       print("Error fetching permit data: $e");
       // Handle the error accordingly, e.g., show a dialog or retry
+    } finally {
+      isLoading.value = false;
     }
   }
 

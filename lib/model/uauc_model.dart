@@ -13,6 +13,7 @@ class UaUc {
   List<Hazard>? hazards;
   String? causes;
   RiskValue? riskValue;
+  String? suggestedActions;
   AssignedTo? assignedTo;
   String? status;
   String? comment;
@@ -35,6 +36,7 @@ class UaUc {
     this.hazards,
     this.causes,
     this.riskValue,
+    this.suggestedActions,
     this.assignedTo,
     this.status,
     this.comment,
@@ -72,6 +74,7 @@ class UaUc {
         riskValue: json["riskValue"] == null
             ? null
             : RiskValue.fromJson(json["riskValue"]),
+        suggestedActions: json["suggestedActions"] as String?,
         assignedTo: json["assignedTo"] == null
             ? null
             : AssignedTo.fromJson(json["assignedTo"]),
@@ -100,6 +103,7 @@ class UaUc {
         "hazards": hazards?.map((x) => x.toJson()).toList(),
         "causes": causes,
         "riskValue": riskValue?.toJson(),
+        "suggestedActions": suggestedActions,
         "assignedTo": assignedTo?.toJson(),
         "status": status,
         "comment": comment,

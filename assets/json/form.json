@@ -362,7 +362,18 @@
           "edit": ["Safety Creation"]
         }
       },
-
+      {
+        "Title": "Type of Topic",
+        "Headers": "typeOfTopic",
+        "Type": "multiselect",
+        "_id": "66b230b6cc8539b4ed3861cc1",
+        "endpoint": "topic",
+        "key": "topicTypes",
+        "permissions": {
+          "view": ["Safety Creation", "UAUC Prevention Action"],
+          "edit": ["Safety Creation"]
+        }
+      },
       {
         "Title": "Date",
         "Headers": "date",
@@ -386,7 +397,7 @@
       {
         "Title": "Attendees",
         "Headers": "attendees",
-        "Type": "simpledropdown",
+        "Type": "simplemultiselect",
         "_id": "66b34b204ecde7c5bfeab153",
         "Options": ["Staff", "Workers", "Suppliers", "Clients", "Visitors"],
         "permissions": {
@@ -405,18 +416,7 @@
           "edit": ["Safety Creation"]
         }
       },
-      {
-        "Title": "Type of Topic",
-        "Headers": "typeOfTopic",
-        "Type": "multiselect",
-        "_id": "66b230b6cc8539b4ed3861cc1",
-        "endpoint": "topic",
-        "key": "topicTypes",
-        "permissions": {
-          "view": ["Safety Creation", "UAUC Prevention Action"],
-          "edit": ["Safety Creation"]
-        }
-      },
+      
 
       {
         "Title": "Documentation of Evidence Photo",
@@ -529,7 +529,7 @@
       {
         "Title": "Inductees",
         "Headers": "inductees",
-        "Type": "simpledropdown",
+        "Type": "simplemultiselect",
         "_id": "66b34b204ecde7c5bfeab153",
         "Options": ["Staff", "Workers", "Suppliers", "Clients", "Visitors"],
         "permissions": {
@@ -913,6 +913,16 @@
         }
       },
       {
+        "Title": "Suggested Actions",
+        "Headers": "suggestedActions",
+        "Type": "CustomTextField",
+        "_id": "66b230b6cc8539b4ed3861cc2",
+        "permissions": {
+          "view": ["UAUC Creation", "UAUC Prevention Action"],
+          "edit": ["UAUC Creation"]
+        }
+      },
+      {
         "Title": "Assigned To",
         "Headers": "assignedTo",
         "Type": "dropdown",
@@ -958,17 +968,7 @@
         }
       },
 
-      {
-        "Title": "Status",
-        "Headers": "status",
-        "Type": "radio",
-        "Options": ["Open", "Closed"],
-        "_id": "66b230b6cc8539b4ed3861cc7",
-        "permissions": {
-          "view": ["UAUC Creation", "UAUC Prevention Action"],
-          "edit": ["UAUC Creation"]
-        }
-      },
+     
 
       {
         "Title": "Geo Tagging",

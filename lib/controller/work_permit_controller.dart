@@ -9,6 +9,7 @@ import 'package:rohan_suraksha_sathi/services/shared_preferences.dart';
 class WorkPermitController extends GetxController
     with GetSingleTickerProviderStateMixin {
   RxList<WorkPermit> workPermitList = <WorkPermit>[].obs;
+  RxBool isLoading = false.obs;
   var currentPage = 0.obs;
   final int itemsPerPage = 20;
   var searchQuery = ''.obs;
@@ -83,6 +84,7 @@ class WorkPermitController extends GetxController
   }
 
   getPermitData() async {
+    isLoading.value = true;
     try {
       final permitData = await ApiService().getRequest("workpermit");
 
@@ -122,6 +124,8 @@ class WorkPermitController extends GetxController
     } catch (e) {
       print("Error fetching permit data: $e");
       // Handle the error accordingly, e.g., show a dialog or retry
+    } finally {
+      isLoading.value = false;
     }
   }
 

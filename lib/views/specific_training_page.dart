@@ -8,8 +8,10 @@ import 'package:rohan_suraksha_sathi/app_constants/colors.dart';
 import 'package:rohan_suraksha_sathi/controller/specific_training_controller.dart';
 import 'package:rohan_suraksha_sathi/model/secific_training_model.dart';
 import 'package:rohan_suraksha_sathi/routes/routes_string.dart';
+import 'package:rohan_suraksha_sathi/services/download_excel.dart';
 import 'package:rohan_suraksha_sathi/views/image_view_page.dart';
 import 'package:rohan_suraksha_sathi/widgets/my_drawer.dart';
+import 'package:rohan_suraksha_sathi/widgets/shimmers.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class SpecificTrainingPage extends StatelessWidget {
@@ -35,6 +37,14 @@ class SpecificTrainingPage extends StatelessWidget {
           ),
           backgroundColor: AppColors.appMainDark,
           actions: [
+            if (Strings.roleName == 'Admin' ||
+                Strings.roleName == 'Management' ||
+                Strings.roleName == 'Project Manager')
+              IconButton(
+                  icon: const Icon(Icons.file_download_rounded),
+                  onPressed: () {
+                    showDownloadBottomSheet('specific');
+                  }),
             IconButton(
                 icon: const Icon(Icons.refresh_rounded),
                 onPressed: () {
@@ -129,75 +139,91 @@ class SpecificTrainingPage extends StatelessWidget {
               // Training list
               Expanded(
                 child: Obx(
-                  () => ListView.builder(
-                    itemCount: controller.paginatedTrainingList.length,
-                    itemBuilder: (context, index) {
-                      final training = controller.paginatedTrainingList[index];
-                      return Card(
-                        margin: const EdgeInsets.all(8.0),
-                        child: ListTile(
-                          onTap: () {
-                            onTapView(context, training);
-                          },
-                          onLongPress: () {
-                            if (training.createdby?.id == Strings.userId) {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: const Text('Confirm Delete'),
-                                    content: const Text(
-                                        'Are you sure you want to delete this item?'),
-                                    actions: [
-                                      TextButton(
-                                        child: const Text('Cancel'),
-                                        onPressed: () {
-                                          Navigator.of(context)
-                                              .pop(); // Close the dialog
-                                        },
-                                      ),
-                                      TextButton(
-                                        child: const Text('Delete'),
-                                        onPressed: () async {
-                                          controller
-                                              .deleteSelection(training.id);
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            }
-                          },
-                          title: Text(
-                              "Topic: ${training.typeOfTopic?.map((topic) => topic.topicTypes).join(', ') ?? ""}",
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style: const TextStyle(fontSize: 16)),
-                          subtitle: Text(
-                            'Date: ${DateFormat('dd MM yyyy').format(DateTime.parse(training.date ?? ""))}',
-                          ),
-                          trailing: IconButton(
-                            onPressed: () async {
-                              var result = await Get.toNamed(
-                                Routes.formPage,
-                                arguments: [
-                                  'specific',
-                                  training.toJson(),
-                                  true
-                                ],
-                              );
-                              if (result == true) {
-                                controller.getPermitData();
-                              }
-                            },
-                            icon: const Icon(Icons.edit),
+                  () {
+                    if (controller.isLoading.value) {
+                      // Show shimmer list while loading
+                      return SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.8,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 20.0),
+                          child: ListView.builder(
+                            itemCount: 12,
+                            itemBuilder: (context, index) => buildShimmerCard(),
                           ),
                         ),
                       );
-                    },
-                  ),
+                    }
+                    return ListView.builder(
+                      itemCount: controller.paginatedTrainingList.length,
+                      itemBuilder: (context, index) {
+                        final training =
+                            controller.paginatedTrainingList[index];
+                        return Card(
+                          margin: const EdgeInsets.all(8.0),
+                          child: ListTile(
+                            onTap: () {
+                              onTapView(context, training);
+                            },
+                            onLongPress: () {
+                              if (training.createdby?.id == Strings.userId) {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text('Confirm Delete'),
+                                      content: const Text(
+                                          'Are you sure you want to delete this item?'),
+                                      actions: [
+                                        TextButton(
+                                          child: const Text('Cancel'),
+                                          onPressed: () {
+                                            Navigator.of(context)
+                                                .pop(); // Close the dialog
+                                          },
+                                        ),
+                                        TextButton(
+                                          child: const Text('Delete'),
+                                          onPressed: () async {
+                                            controller
+                                                .deleteSelection(training.id);
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              }
+                            },
+                            title: Text(
+                                "Topic: ${training.typeOfTopic?.map((topic) => topic.topicTypes).join(', ') ?? ""}",
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: const TextStyle(fontSize: 16)),
+                            subtitle: Text(
+                              'Date: ${DateFormat('dd MM yyyy').format(DateTime.parse(training.date ?? ""))}',
+                            ),
+                            trailing: IconButton(
+                              onPressed: () async {
+                                var result = await Get.toNamed(
+                                  Routes.formPage,
+                                  arguments: [
+                                    'specific',
+                                    training.toJson(),
+                                    true
+                                  ],
+                                );
+                                if (result == true) {
+                                  controller.getPermitData();
+                                }
+                              },
+                              icon: const Icon(Icons.edit),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
                 ),
               ),
               // Pagination buttons
@@ -301,7 +327,7 @@ Future<dynamic> onTapView(BuildContext context, SpecificTraining training) {
                 _buildDetailRow(
                     'Project Name:', training.project.projectName ?? ""),
                 _buildDetailRow('Attendees Name:',
-                    training.attendees.map((e) => e).join(",")),
+                    training.attendees?.map((e) => e).join(",") ?? ""),
                 _buildDetailRow('Attendees Name:',
                     training.attendeesName?.map((e) => e.name).join(",") ?? ""),
                 Row(

@@ -8,9 +8,11 @@ import 'package:rohan_suraksha_sathi/controller/uauc_controller.dart';
 import 'package:rohan_suraksha_sathi/helpers/sixed_boxes.dart';
 import 'package:rohan_suraksha_sathi/model/uauc_model.dart';
 import 'package:rohan_suraksha_sathi/routes/routes_string.dart';
+import 'package:rohan_suraksha_sathi/services/download_excel.dart';
 import 'package:rohan_suraksha_sathi/views/image_view_page.dart';
 import 'package:rohan_suraksha_sathi/widgets/helper_widgets/risk_color_switch.dart';
 import 'package:rohan_suraksha_sathi/widgets/my_drawer.dart';
+import 'package:rohan_suraksha_sathi/widgets/shimmers.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class UaucPage extends StatelessWidget {
@@ -36,6 +38,14 @@ class UaucPage extends StatelessWidget {
           ),
           backgroundColor: AppColors.appMainDark,
           actions: [
+            if (Strings.roleName == 'Admin' ||
+                Strings.roleName == 'Management' ||
+                Strings.roleName == 'Project Manager')
+              IconButton(
+                  icon: const Icon(Icons.file_download_rounded),
+                  onPressed: () {
+                    showDownloadBottomSheet('uauc');
+                  }),
             IconButton(
                 icon: const Icon(Icons.refresh_rounded),
                 onPressed: () {
@@ -67,82 +77,100 @@ class UaucPage extends StatelessWidget {
             // TabBarView
             Expanded(
               child: Obx(
-                () => Column(
-                  children: [
-                    Column(
-                      children: [
-                        TextButton(
-                          onPressed: () {
-                            Get.defaultDialog(
-                              title: "Select Date or Date Range",
-                              content: SizedBox(
-                                height: 350, // Give a fixed height
-                                width: double
-                                    .maxFinite, // Allow it to expand horizontally
-                                child: SfDateRangePicker(
-                                  showActionButtons: true,
-                                  selectionMode:
-                                      DateRangePickerSelectionMode.range,
-                                  onSubmit: (Object? value) {
-                                    if (value is PickerDateRange) {
-                                      controller.startDate.value =
-                                          value.startDate;
-                                      controller.endDate.value = value.endDate;
-
-                                      // Optional: Close dialog or update UI
-                                      Get.back();
-                                    }
-                                  },
-                                  onCancel: () {
-                                    // Optional: handle cancel action
-                                    Get.back();
-                                  },
-                                ),
-                              ),
-                            );
-                          },
-                          child: Text(
-                            controller.startDate.value == null ||
-                                    controller.endDate.value == null
-                                ? "Select Date Range"
-                                : "${DateFormat('MMMM d, y').format(controller.startDate.value!)} - ${DateFormat('MMMM d, y').format(controller.endDate.value!)}",
-                          ),
+                () {
+                  if (controller.isLoading.value) {
+                    // Show shimmer list while loading
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.8,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 20.0),
+                        child: ListView.builder(
+                          itemCount: 12,
+                          itemBuilder: (context, index) => buildShimmerCard(),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            severityCheckbox(
-                                "Critical", Colors.red, controller),
-                            severityCheckbox("High", Colors.orange, controller),
-                            severityCheckbox(
-                                "Medium", Colors.amber, controller),
-                            severityCheckbox("Low", Colors.green, controller),
-                          ],
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Divider(
-                            thickness: 2,
-                          ),
-                        )
-                      ],
-                    ),
-                    Expanded(
-                      child: TabBarView(
+                      ),
+                    );
+                  }
+                  return Column(
+                    children: [
+                      Column(
                         children: [
-                          _buildListView(
-                              controller.paginatedWorkPermits), // All
-                          _buildListView(controller.paginatedWorkPermits
-                              .where((uauc) => uauc.status == "Open")
-                              .toList()), // Open
-                          _buildListView(controller.paginatedWorkPermits
-                              .where((uauc) => uauc.status == "Closed")
-                              .toList()), // Closed
+                          TextButton(
+                            onPressed: () {
+                              Get.defaultDialog(
+                                title: "Select Date or Date Range",
+                                content: SizedBox(
+                                  height: 350, // Give a fixed height
+                                  width: double
+                                      .maxFinite, // Allow it to expand horizontally
+                                  child: SfDateRangePicker(
+                                    showActionButtons: true,
+                                    selectionMode:
+                                        DateRangePickerSelectionMode.range,
+                                    onSubmit: (Object? value) {
+                                      if (value is PickerDateRange) {
+                                        controller.startDate.value =
+                                            value.startDate;
+                                        controller.endDate.value =
+                                            value.endDate;
+
+                                        // Optional: Close dialog or update UI
+                                        Get.back();
+                                      }
+                                    },
+                                    onCancel: () {
+                                      // Optional: handle cancel action
+                                      Get.back();
+                                    },
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              controller.startDate.value == null ||
+                                      controller.endDate.value == null
+                                  ? "Select Date Range"
+                                  : "${DateFormat('MMMM d, y').format(controller.startDate.value!)} - ${DateFormat('MMMM d, y').format(controller.endDate.value!)}",
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              severityCheckbox(
+                                  "Critical", Colors.red, controller),
+                              severityCheckbox(
+                                  "High", Colors.orange, controller),
+                              severityCheckbox(
+                                  "Medium", Colors.amber, controller),
+                              severityCheckbox("Low", Colors.green, controller),
+                            ],
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Divider(
+                              thickness: 2,
+                            ),
+                          )
                         ],
                       ),
-                    ),
-                  ],
-                ),
+                      Expanded(
+                        child: TabBarView(
+                          children: [
+                            _buildListView(
+                                controller.paginatedWorkPermits), // All
+                            _buildListView(controller.paginatedWorkPermits
+                                .where((uauc) => uauc.status == "Open")
+                                .toList()), // Open
+                            _buildListView(controller.paginatedWorkPermits
+                                .where((uauc) => uauc.status == "Closed")
+                                .toList()), // Closed
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ],
@@ -190,10 +218,11 @@ class UaucPage extends StatelessWidget {
                         ? Colors.yellow[100]
                         : Colors.white70,
                     onTap: () {
-                      onTapView(context, specificUauc);
+                      onTapView(context, specificUauc, controller);
                     },
                     onLongPress: () {
-                      if (specificUauc.createdby.id == Strings.userId) {
+                      if (specificUauc.createdby.id == Strings.userId ||
+                          Strings.roleName == "Admin") {
                         showDialog(
                           context: context,
                           builder: (BuildContext context) {
@@ -248,7 +277,8 @@ class UaucPage extends StatelessWidget {
                       ],
                     ),
                     trailing: specificUauc.assignedTo?.id == Strings.userId ||
-                            Strings.roleName == "Safety"
+                            Strings.roleName == "Admin" ||
+                            specificUauc.createdby.id == Strings.userId
                         ? IconButton(
                             onPressed: () async {
                               print(jsonEncode(specificUauc));
@@ -342,7 +372,8 @@ Widget severityCheckbox(String label, Color color, UaucController controller) {
   });
 }
 
-Future<dynamic> onTapView(BuildContext context, UaUc data) {
+Future<dynamic> onTapView(
+    BuildContext context, UaUc data, UaucController controller) {
   return showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -355,6 +386,9 @@ Future<dynamic> onTapView(BuildContext context, UaUc data) {
       final screenHeight = MediaQuery.of(context).size.height;
       String imageUrl1 = data.photo ?? "";
       String imageUrl2 = data.actionTakenPhoto ?? "";
+      controller.isStatusActive.value = data.status == "Open" ? true : false;
+      print(
+          "${data.actionTakenBy}--------------${data.correctivePreventiveAction}-------------------${data.actionTakenPhoto}");
       return ConstrainedBox(
         constraints: BoxConstraints(
           maxHeight: screenHeight * 0.8, // Limit height to 50% of the screen
@@ -376,6 +410,33 @@ Future<dynamic> onTapView(BuildContext context, UaUc data) {
                       ),
                     ),
                     const Spacer(),
+                    data.createdby?.id == Strings.userId ||
+                            Strings.roleName == "Admin"
+                        ? Obx(() {
+                            var isOpen = controller.isStatusActive.value;
+                            return Row(
+                              children: [
+                                Switch(
+                                    value: isOpen,
+                                    onChanged: (val) {
+                                      handleStatusToggle(
+                                          context, controller, data, val);
+                                    }),
+                                Text(
+                                  isOpen ? "Open" : "Closed",
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            );
+                          })
+                        : Text(
+                            "Status: ${data.status ?? ""}",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                     IconButton(
                         onPressed: () {
                           Navigator.of(context).pop();
@@ -392,119 +453,22 @@ Future<dynamic> onTapView(BuildContext context, UaUc data) {
                         .format(DateTime.parse(data.date.toString() ?? ""))),
                 _buildDetailRow('Time:', data.time ?? ""),
                 _buildDetailRow('Observation:', data.observation ?? ""),
-                _buildDetailRow(
-                    'Types of Hazards:', data.hazards!.map((e) => e).join(",")),
+                _buildDetailRow('Types of Hazards:',
+                    data.hazards!.map((e) => e.hazards).join(",")),
                 _buildDetailRow('Causes', data.causes ?? ""),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Flexible(
-                      child: Text(
-                        "Photo",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                    GestureDetector(
-                      onTap: () {
-                        Get.to(ImageViewPage(imageUrl: imageUrl1));
-                      },
-                      child: SizedBox(
-                        height: 200,
-                        width: 200,
-                        child: FittedBox(
-                          fit: BoxFit.contain,
-                          child: Image.network(
-                            imageUrl1,
-                            loadingBuilder: (context, child, progress) {
-                              if (progress == null) return child;
-                              return const Center(
-                                child: Padding(
-                                  padding: EdgeInsets.all(16.0),
-                                  child: CircularProgressIndicator(),
-                                ),
-                              );
-                            },
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Center(
-                                child: Icon(
-                                  Icons.broken_image,
-                                  size: 50,
-                                  color: Colors.grey,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                buildImageViewer("Photo", imageUrl1,
+                    () => Get.to(ImageViewPage(imageUrl: imageUrl1))),
                 _buildDetailRow('Severity:', data.riskValue?.severity ?? ""),
+                _buildDetailRow(
+                    'Suggested Actions:', data.suggestedActions ?? "-"),
                 _buildDetailRow('Assigned to:', data.assignedTo?.name ?? ""),
                 _buildDetailRow('Status:', data.status ?? ""),
                 _buildDetailRow(
                     'Geotagging:', data.geotagging ?? "No Location Data"),
-                _buildDetailRow(
-                    'Corrective Preventive Actions:',
-                    data.correctivePreventiveAction ??
-                        "No Actions Suggested yet"),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Flexible(
-                      child: Text(
-                        "Action Photo",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                    GestureDetector(
-                      onTap: () {
-                        Get.to(ImageViewPage(imageUrl: imageUrl2));
-                      },
-                      child: SizedBox(
-                        height: 200,
-                        width: 200,
-                        child: FittedBox(
-                          fit: BoxFit.contain,
-                          child: Image.network(
-                            imageUrl2,
-                            loadingBuilder: (context, child, progress) {
-                              if (progress == null) return child;
-                              return const Center(
-                                child: Padding(
-                                  padding: EdgeInsets.all(16.0),
-                                  child: CircularProgressIndicator(),
-                                ),
-                              );
-                            },
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Center(
-                                  child: Column(
-                                children: [
-                                  Icon(Icons.image_not_supported_rounded),
-                                  Text(
-                                    "No Image Provided",
-                                    style: TextStyle(fontSize: 4),
-                                  ),
-                                ],
-                              ));
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                _buildDetailRow('Corrective Actions Taken:',
+                    data.correctivePreventiveAction ?? "No Actions Taken"),
+                buildImageViewer("Action Photo", imageUrl2,
+                    () => Get.to(ImageViewPage(imageUrl: imageUrl2))),
                 // _buildDetailRow('Comment:', data ?? ""),
                 _buildDetailRow(
                     'Action Taken By:', data.actionTakenBy?.name ?? ""),
@@ -517,6 +481,80 @@ Future<dynamic> onTapView(BuildContext context, UaUc data) {
       );
     },
   );
+}
+
+void handleStatusToggle(BuildContext context, UaucController controller,
+    UaUc data, bool newValue) async {
+  final isAnyFieldNullOrEmpty = data.actionTakenBy == null ||
+      data.correctivePreventiveAction == null ||
+      data.correctivePreventiveAction.toString().trim().isEmpty ||
+      data.actionTakenPhoto == null;
+
+  if (isAnyFieldNullOrEmpty && data.status == "Open") {
+    // Show warning: required fields are missing
+    await Get.dialog(
+      AlertDialog(
+        title: const Text("Cannot Change Status"),
+        content: const Text(
+            "Action Taken By, Corrective Actions, and Action Taken Photo is Missing."),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+    return;
+  }
+
+  // Ask for confirmation if everything is filled
+  final confirmed = await Get.dialog<bool>(
+    AlertDialog(
+      title: Text("Confirm Status Change"),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+              "Are you sure you want to mark this as '${newValue ? "Open" : "Closed"}'?"),
+          _buildDetailRow("Action Taken By:", data.actionTakenBy?.name ?? ""),
+          _buildDetailRow(
+              "Corrective Action:", data.correctivePreventiveAction ?? ""),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Get.back(result: false),
+          child: const Text("Cancel"),
+        ),
+        ElevatedButton(
+          onPressed: () => Get.back(result: true),
+          child: const Text("Confirm"),
+        ),
+      ],
+    ),
+  );
+
+  if (confirmed == true) {
+    controller.isStatusActive.value = newValue;
+    await controller.updateStatus(data.id ?? "", newValue ? "Open" : "Closed");
+
+    // Show success snackbar
+    final now = DateTime.now();
+    final formattedTime =
+        "${now.day}-${now.month}-${now.year} at ${DateFormat('hh:mm a').format(now)}";
+
+    Get.snackbar(
+      "Status Changed",
+      "Marked as ${newValue ? "Open" : "Closed"} on $formattedTime",
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.green.shade600,
+      colorText: Colors.white,
+      duration: const Duration(seconds: 3),
+      margin: const EdgeInsets.all(12),
+      borderRadius: 8,
+    );
+  }
 }
 
 /// Builds a row with evenly spaced title and description
@@ -550,6 +588,78 @@ Widget _buildDetailRow(String title, String description) {
                   color: Colors.black,
                 ),
               ),
+            ),
+          ],
+        ),
+        const Divider()
+      ],
+    ),
+  );
+}
+
+Widget buildImageViewer(String label, String imageUrl, VoidCallback onTap) {
+  final hasImage = imageUrl.trim().isNotEmpty;
+
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 5),
+    child: Column(
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// Label with flex: 1
+            Expanded(
+              flex: 1,
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+
+            const Spacer(),
+
+            /// Image or placeholder with flex: 2
+            Expanded(
+              flex: 2,
+              child: hasImage
+                  ? GestureDetector(
+                      onTap: onTap,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          maxWidth: 200,
+                          maxHeight: 200,
+                        ),
+                        child: Image.network(
+                          imageUrl,
+                          fit: BoxFit.contain,
+                          loadingBuilder: (context, child, progress) {
+                            if (progress == null) return child;
+                            return const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(16.0),
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Padding(
+                              padding: EdgeInsets.only(top: 4.0),
+                              child: Text("Failed to load image",
+                                  style: TextStyle(
+                                      fontSize: 14, color: Colors.grey)),
+                            );
+                          },
+                        ),
+                      ),
+                    )
+                  : const Text(
+                      "No Image Provided",
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
             ),
           ],
         ),

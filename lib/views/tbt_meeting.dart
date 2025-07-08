@@ -8,8 +8,10 @@ import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:rohan_suraksha_sathi/app_constants/app_strings.dart';
 import 'package:rohan_suraksha_sathi/app_constants/colors.dart';
 import 'package:rohan_suraksha_sathi/routes/routes_string.dart';
+import 'package:rohan_suraksha_sathi/services/download_excel.dart';
 import 'package:rohan_suraksha_sathi/views/image_view_page.dart';
 import 'package:rohan_suraksha_sathi/widgets/my_drawer.dart';
+import 'package:rohan_suraksha_sathi/widgets/shimmers.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 import '../controller/tbt_meeting_controller.dart';
@@ -36,6 +38,14 @@ class TBTMeetingPage extends StatelessWidget {
           ),
           backgroundColor: AppColors.appMainDark,
           actions: [
+            if (Strings.roleName == 'Admin' ||
+                Strings.roleName == 'Management' ||
+                Strings.roleName == 'Project Manager')
+              IconButton(
+                  icon: const Icon(Icons.file_download_rounded),
+                  onPressed: () {
+                    showDownloadBottomSheet('meeting');
+                  }),
             IconButton(
                 icon: const Icon(Icons.refresh_rounded),
                 onPressed: () {
@@ -54,78 +64,94 @@ class TBTMeetingPage extends StatelessWidget {
         body: Column(
           children: [
             Obx(
-              () => Column(
-                mainAxisSize:
-                    MainAxisSize.min, // important to avoid unbounded height
-                children: [
-                  Flexible(
-                    // instead of Expanded
-                    fit: FlexFit.loose,
-                    child: TextButton(
-                      onPressed: () {
-                        Get.defaultDialog(
-                          title: "Select Date or Date Range",
-                          content: SizedBox(
-                            height: 350,
-                            width: double.maxFinite,
-                            child: SfDateRangePicker(
-                              showActionButtons: true,
-                              selectionMode: DateRangePickerSelectionMode.range,
-                              onSubmit: (Object? value) {
-                                if (value is PickerDateRange) {
-                                  tbtMeetingController.startDate.value =
-                                      value.startDate;
-                                  tbtMeetingController.endDate.value =
-                                      value.endDate;
-                                  Get.back();
-                                }
-                              },
-                              onCancel: () {
-                                Get.back();
-                              },
-                            ),
-                          ),
-                        );
-                      },
-                      child: Text(
-                        tbtMeetingController.startDate.value == null ||
-                                tbtMeetingController.endDate.value == null
-                            ? "Select Date Range"
-                            : "${DateFormat('MMMM d, y').format(tbtMeetingController.startDate.value!)} - ${DateFormat('MMMM d, y').format(tbtMeetingController.endDate.value!)}",
-                      ),
-                    ),
-                  ),
-                  Flexible(
-                    fit: FlexFit.loose,
+              () {
+                if (tbtMeetingController.isLoading.value) {
+                  // Show shimmer list while loading
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.8,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      child: MultiSelectDialogField<String>(
-                        items: tbtMeetingController.topics
-                            .map((type) => MultiSelectItem<String>(
-                                type['_id'], type['topicTypes']))
-                            .toList(),
-                        title: const Text("Select Topics"),
-                        buttonText: const Text(
-                          "Select Topics",
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        initialValue: tbtMeetingController.selectedTopics,
-                        onConfirm: (selectedValues) {
-                          tbtMeetingController.selectedTopics.value =
-                              selectedValues;
-                          tbtMeetingController.currentPage.value = 0;
-                        },
-                        chipDisplay: MultiSelectChipDisplay(
-                          textStyle: const TextStyle(fontSize: 14),
-                          scroll: true,
-                          scrollBar: HorizontalScrollBar(),
-                        ),
-                        searchable: true,
+                      padding: const EdgeInsets.only(top: 20.0),
+                      child: ListView.builder(
+                        itemCount: 12,
+                        itemBuilder: (context, index) => buildShimmerCard(),
                       ),
                     ),
-                  ),
-                ],
-              ),
+                  );
+                }
+                return Column(
+                  mainAxisSize:
+                      MainAxisSize.min, // important to avoid unbounded height
+                  children: [
+                    Flexible(
+                      // instead of Expanded
+                      fit: FlexFit.loose,
+                      child: TextButton(
+                        onPressed: () {
+                          Get.defaultDialog(
+                            title: "Select Date or Date Range",
+                            content: SizedBox(
+                              height: 350,
+                              width: double.maxFinite,
+                              child: SfDateRangePicker(
+                                showActionButtons: true,
+                                selectionMode:
+                                    DateRangePickerSelectionMode.range,
+                                onSubmit: (Object? value) {
+                                  if (value is PickerDateRange) {
+                                    tbtMeetingController.startDate.value =
+                                        value.startDate;
+                                    tbtMeetingController.endDate.value =
+                                        value.endDate;
+                                    Get.back();
+                                  }
+                                },
+                                onCancel: () {
+                                  Get.back();
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          tbtMeetingController.startDate.value == null ||
+                                  tbtMeetingController.endDate.value == null
+                              ? "Select Date Range"
+                              : "${DateFormat('MMMM d, y').format(tbtMeetingController.startDate.value!)} - ${DateFormat('MMMM d, y').format(tbtMeetingController.endDate.value!)}",
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      fit: FlexFit.loose,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: MultiSelectDialogField<String>(
+                          items: tbtMeetingController.topics
+                              .map((type) => MultiSelectItem<String>(
+                                  type['_id'], type['topicTypes']))
+                              .toList(),
+                          title: const Text("Select Topics"),
+                          buttonText: const Text(
+                            "Select Topics",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          initialValue: tbtMeetingController.selectedTopics,
+                          onConfirm: (selectedValues) {
+                            tbtMeetingController.selectedTopics.value =
+                                selectedValues;
+                            tbtMeetingController.currentPage.value = 0;
+                          },
+                          chipDisplay: MultiSelectChipDisplay(
+                            textStyle: const TextStyle(fontSize: 14),
+                            scroll: true,
+                            scrollBar: HorizontalScrollBar(),
+                          ),
+                          searchable: true,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
             Expanded(
               child: Obx(
@@ -307,6 +333,8 @@ Future<dynamic> onTapView(BuildContext context, dynamic meeting) {
                   ],
                 ),
                 const SizedBox(height: 16),
+                // _buildDetailRow('Topic:',
+                //     meeting.typeOfTopic.map((e) => e.topicTypes).join(",")),
                 _buildDetailRow('Topic:',
                     meeting.typeOfTopic.map((e) => e.topicTypes).join(",")),
                 _buildDetailRow(
@@ -315,6 +343,13 @@ Future<dynamic> onTapView(BuildContext context, dynamic meeting) {
                         .format(DateTime.parse(meeting.date))),
                 _buildDetailRow('Time:', meeting.time),
                 _buildDetailRow('Project Name:', meeting.project.projectName),
+                _buildDetailRow('Number of Attendees:', meeting.attendeesNos),
+                _buildDetailRow(
+                    'Attendees Hrs:', meeting.attendeesHours.toString()),
+                _buildDetailRow('Attendees:',
+                    meeting.attendees.map((e) => e).join(",") ?? ""),
+                _buildDetailRow(
+                    'TBT Given By:', meeting.tbtGivenBy?.name ?? ""),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

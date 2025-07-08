@@ -1,6 +1,7 @@
 class Routes {
   static const loginPage = '/loginPage';
   static const homePage = "/homePage";
+  static const userDetailsDataPage = "/serDetailsDataPage";
   static const workPermitPage = "/workPermitPage";
   static const safetyReportPage = "/safetyReportPage";
   static const safetyCheckPage = "/safetyCheckPage";
@@ -14,4 +15,6 @@ class Routes {
   static const notificationPage = "/notificationPage";
   static const packageInfoPage = "/packageInfoPage";
   static const actionView = "/actionView";
+  static const userDetailsListView = "/userDetailsListView";
+  static const savedFormData = "/savedFormData";
 }

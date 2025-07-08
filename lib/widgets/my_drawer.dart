@@ -103,77 +103,94 @@ class MyDrawer extends StatelessWidget {
             Expanded(
               child: ListView(
                 children: [
-                  ListTile(
-                    title: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: Colors.blue.shade100,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Image.asset(Assets.workPermit),
+                  if (Strings.roleName == "Execution" ||
+                      Strings.roleName == "Management" ||
+                      Strings.roleName == "Project Manager" ||
+                      Strings.roleName == "Admin" &&
+                          Strings.endpointToList['project']
+                                  ?["workpermitAllow"] ==
+                              "yes") ...[
+                    ListTile(
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: Colors.blue.shade100,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Image.asset(Assets.workPermit),
+                            ),
                           ),
-                        ),
-                        sb20,
-                        Text(
-                          Strings.workPermit,
-                          style: TextStyles.drawerTextStyle,
-                        ),
-                      ],
-                    ),
-                    onTap: () {
-                      Get.toNamed(Routes.workPermitPage);
-                    },
-                  ),
-                  const Divider(),
-                  ListTile(
-                    title: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: Colors.blue.shade100,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Image.asset(Assets.tbtMeeting),
+                          sb20,
+                          Text(
+                            Strings.workPermit,
+                            style: TextStyles.drawerTextStyle,
                           ),
-                        ),
-                        sb20,
-                        Text(
-                          Strings.tbtMeeting,
-                          style: TextStyles.drawerTextStyle,
-                        ),
-                        sb10,
-                      ],
+                        ],
+                      ),
+                      onTap: () {
+                        Get.toNamed(Routes.workPermitPage);
+                      },
                     ),
-                    onTap: () {
-                      Get.toNamed(Routes.tbtMeetingPage);
-                    },
-                  ),
-                  const Divider(),
-                  ListTile(
-                    title: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: Colors.blue.shade100,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Image.asset(Assets.safetyInduction),
+                    const Divider(),
+                  ],
+                  if (Strings.roleName == "Safety" ||
+                      Strings.roleName == "Management" ||
+                      Strings.roleName == "Project Manager" ||
+                      Strings.roleName == "Admin") ...[
+                    ListTile(
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: Colors.blue.shade100,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Image.asset(Assets.tbtMeeting),
+                            ),
                           ),
-                        ),
-                        sb20,
-                        Text(
-                          Strings.safetyInduction,
-                          style: TextStyles.drawerTextStyle,
-                        ),
-                        sb10,
-                      ],
+                          sb20,
+                          Text(
+                            Strings.tbtMeeting,
+                            style: TextStyles.drawerTextStyle,
+                          ),
+                          sb10,
+                        ],
+                      ),
+                      onTap: () {
+                        Get.toNamed(Routes.tbtMeetingPage);
+                      },
                     ),
-                    onTap: () {
-                      Get.toNamed(Routes.inductionPage);
-                    },
-                  ),
-                  const Divider(),
+                    const Divider(),
+                  ],
+                  if (Strings.roleName == "Safety" ||
+                      Strings.roleName == "Management" ||
+                      Strings.roleName == "Project Manager" ||
+                      Strings.roleName == "Admin")...[
+                    ListTile(
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: Colors.blue.shade100,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Image.asset(Assets.safetyInduction),
+                            ),
+                          ),
+                          sb20,
+                          Text(
+                            Strings.safetyInduction,
+                            style: TextStyles.drawerTextStyle,
+                          ),
+                          sb10,
+                        ],
+                      ),
+                      onTap: () {
+                        Get.toNamed(Routes.inductionPage);
+                      },
+                    ),
+                  const Divider(),],
                   ListTile(
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -198,30 +215,34 @@ class MyDrawer extends StatelessWidget {
                     },
                   ),
                   const Divider(),
-                  ListTile(
-                    title: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: Colors.blue.shade100,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Image.asset(Assets.specificTraining),
+                  if (Strings.roleName == "Safety" ||
+                      Strings.roleName == "Management" ||
+                      Strings.roleName == "Project Manager" ||
+                      Strings.roleName == "Admin")...[
+                    ListTile(
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: Colors.blue.shade100,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Image.asset(Assets.specificTraining),
+                            ),
                           ),
-                        ),
-                        sb20,
-                        Text(
-                          Strings.specificTraining,
-                          style: TextStyles.drawerTextStyle,
-                        ),
-                        sb10,
-                      ],
+                          sb20,
+                          Text(
+                            Strings.specificTraining,
+                            style: TextStyles.drawerTextStyle,
+                          ),
+                          sb10,
+                        ],
+                      ),
+                      onTap: () {
+                        Get.toNamed(Routes.speceficTrainingPage);
+                      },
                     ),
-                    onTap: () {
-                      Get.toNamed(Routes.speceficTrainingPage);
-                    },
-                  ),
-                  const Divider(),
+                  const Divider(),],
                   ListTile(
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.start,

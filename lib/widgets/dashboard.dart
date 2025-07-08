@@ -41,6 +41,7 @@ class _DashboardPageState extends State<DashboardPage> {
         showLegend: showLegend,
         chartType: ChartType.column,
         textColor: Colors.white,
+        titleColor: Colors.white,
       ),
       DynamicChart(
         data: safetyReportController1.totalManHoursWorkedinM,
@@ -49,6 +50,7 @@ class _DashboardPageState extends State<DashboardPage> {
         showLegend: showLegend,
         chartType: ChartType.column,
         textColor: Colors.white,
+        titleColor: Colors.white,
       ),
       DynamicChart(
         data: safetyReportController1.safetyTraining,
@@ -57,6 +59,7 @@ class _DashboardPageState extends State<DashboardPage> {
         showLegend: showLegend,
         chartType: ChartType.doughnut,
         textColor: Colors.white,
+        titleColor: Colors.white,
       ),
       DynamicChart(
         title: "Frequency Rate(FR) and Severity Rate(SR)",
@@ -71,6 +74,7 @@ class _DashboardPageState extends State<DashboardPage> {
         showLegend: showLegend,
         chartType: ChartType.groupedColumn,
         textColor: Colors.white,
+        titleColor: Colors.white,
       ),
       DynamicChart(
         data: safetyReportController1.uaucResolved,
@@ -79,6 +83,7 @@ class _DashboardPageState extends State<DashboardPage> {
         showLegend: showLegend,
         chartType: ChartType.bar,
         textColor: Colors.white,
+        titleColor: Colors.white,
       ),
       DynamicChart(
         data: safetyReportController1.safetyInduction,
@@ -87,6 +92,7 @@ class _DashboardPageState extends State<DashboardPage> {
         showLegend: showLegend,
         chartType: ChartType.bar,
         textColor: Colors.white,
+        titleColor: Colors.white,
       ),
       DynamicChart(
         data: safetyReportController1.safetyCommitteeMeetings,
@@ -95,6 +101,7 @@ class _DashboardPageState extends State<DashboardPage> {
         showLegend: showLegend,
         chartType: ChartType.column,
         textColor: Colors.white,
+        titleColor: Colors.white,
       ),
       DynamicChart(
         title: "Safety Audit",
@@ -106,6 +113,7 @@ class _DashboardPageState extends State<DashboardPage> {
         showLegend: showLegend,
         chartType: ChartType.groupedColumn,
         textColor: Colors.white,
+        titleColor: Colors.white,
       ),
       DynamicChart(
         title: "Non-Injury Incident",
@@ -126,6 +134,7 @@ class _DashboardPageState extends State<DashboardPage> {
         showLegend: showLegend,
         chartType: ChartType.groupedColumn,
         textColor: Colors.white,
+        titleColor: Colors.white,
       ),
       DynamicChart(
         title: "Injury Incident",
@@ -139,6 +148,7 @@ class _DashboardPageState extends State<DashboardPage> {
         showLegend: showLegend,
         chartType: ChartType.groupedColumn,
         textColor: Colors.white,
+        titleColor: Colors.white,
       )
     ];
   }

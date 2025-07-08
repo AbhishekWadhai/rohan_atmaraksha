@@ -1,11 +1,28 @@
 import 'dart:convert';
 import 'dart:io'; // Import for File
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:rohan_suraksha_sathi/env.dart'; // Import for basename
 
 class ApiService {
   static String baseUrl = AppEnvironment.baseUrl; // Replace with your base URL
+
+  // Common method for making GET requests to download file
+  Future<Uint8List> getFileRequest(String endpoint) async {
+    final url = Uri.parse('$baseUrl/$endpoint');
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        return response.bodyBytes; // ✅ This is binary-safe
+      } else {
+        throw Exception('Failed to download file');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
 
   // Common method for making GET requests
   Future<dynamic> getRequest(String endpoint) async {

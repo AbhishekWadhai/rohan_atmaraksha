@@ -22,20 +22,40 @@ class Formatters {
     }
     return camelCaseString;
   }
-
-  
 }
-
 
 class IndianDateFormatters {
-  static String formatDate1(DateTime date) => DateFormat('dd-MM-yyyy').format(date);
-  static String formatDate2(DateTime date) => DateFormat('dd/MM/yyyy').format(date);
-  static String formatDate3(DateTime date) => DateFormat('dd MMM yyyy').format(date);
-  static String formatDate4(DateTime date) => DateFormat('EEEE, dd MMMM yyyy').format(date);
-  static String formatISO(DateTime date) => DateFormat('yyyy-MM-dd').format(date);
-  static String formatWithTime(DateTime date) => DateFormat('dd-MM-yyyy hh:mm a').format(date);
+  static String formatDate1(DateTime date) => DateFormat('dd-MM').format(date);
+  static String formatDate2(DateTime date) =>
+      DateFormat('dd/MM/yyyy').format(date);
+  static String formatDate3(DateTime date) =>
+      DateFormat('dd MMM yyyy').format(date);
+  static String formatDate4(DateTime date) =>
+      DateFormat('EEEE, dd MMMM yyyy').format(date);
+  static String formatISO(DateTime date) =>
+      DateFormat('yyyy-MM-dd').format(date);
+  static String formatWithTime(DateTime date) =>
+      DateFormat('dd-MM-yyyy hh:mm a').format(date);
 
   // Custom Formatter
-  static String formatCustom(DateTime date, String pattern) => DateFormat(pattern).format(date);
+  static String formatCustom(DateTime date, String pattern) =>
+      DateFormat(pattern).format(date);
+
+  static String formatDateFromString(dynamic rawDate) {
+    if (rawDate == null) return '-';
+
+    try {
+      final DateTime parsedDate = DateTime.parse(rawDate.toString());
+      return DateFormat('dd-MM-yyyy').format(parsedDate);
+    } catch (e) {
+      return '-';
+    }
+  }
 }
 
+bool isSameDay(DateTime a, DateTime b) {
+  return a.year == b.year &&
+      a.month == b.month &&
+      a.day == b.day &&
+      a.day == DateTime.now().day;
+}

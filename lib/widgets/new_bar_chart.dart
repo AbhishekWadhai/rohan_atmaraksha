@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:rohan_suraksha_sathi/app_constants/colors.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import 'package:rohan_suraksha_sathi/app_constants/textstyles.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -30,6 +31,7 @@ class DynamicChart extends StatelessWidget {
   final bool showLegend;
   final ChartType chartType;
   final Color textColor;
+  final Color? titleColor;
 
   DynamicChart(
       {Key? key,
@@ -40,7 +42,8 @@ class DynamicChart extends StatelessWidget {
       this.legendNames,
       required this.showLegend,
       required this.chartType,
-      required this.textColor})
+      required this.textColor,
+      this.titleColor})
       : super(key: key);
 
   @override
@@ -72,15 +75,33 @@ class DynamicChart extends StatelessWidget {
     final titleFontSize = screenWidth < 400 ? 12.0 : 16.0;
     final labelFontSize = screenWidth < 400 ? 10.0 : 12.0;
 
+    final int itemCount = data?.length ?? 0;
+    int rotationAngle = 0;
+
+    if (itemCount > 5) {
+      rotationAngle = -45;
+    }
+
     return SfCartesianChart(
       margin: const EdgeInsets.all(10),
-      title: ChartTitle(text: title, textStyle: TextStyles.chartTitle),
+      title: ChartTitle(
+        text: title,
+        textStyle: GoogleFonts.roboto(
+          textStyle: TextStyles.chartTitle,
+        ).copyWith(
+          color: titleColor,
+        ),
+      ),
+      plotAreaBorderWidth: showLegend ? 1 : 0, // 👈 removes the graph border
       primaryXAxis: CategoryAxis(
-        labelStyle: TextStyle(color: textColor),
-        majorGridLines: const MajorGridLines(width: 0),
+        labelStyle: TextStyle(color: textColor, fontSize: labelFontSize),
+        majorGridLines: MajorGridLines(
+          width: 0,
+        ),
+        labelRotation: rotationAngle,
       ),
       primaryYAxis: NumericAxis(
-        labelStyle: TextStyle(color: textColor),
+        labelStyle: TextStyle(color: textColor, fontSize: 8),
         axisLine: const AxisLine(width: 0),
         majorGridLines: MajorGridLines(
           width: 0.5,
@@ -96,9 +117,12 @@ class DynamicChart extends StatelessWidget {
           xValueMapper: (dynamic sales, _) => sales.category,
           yValueMapper: (dynamic sales, _) => sales.value,
           name: legendName,
-          dataLabelSettings: const DataLabelSettings(isVisible: true),
+          dataLabelSettings: DataLabelSettings(
+            isVisible: true,
+            textStyle: TextStyle(color: textColor, fontSize: 8),
+          ),
           gradient: const LinearGradient(
-            colors: [Colors.blue, Colors.greenAccent], // Gradient colors
+            colors: [Colors.blue, Colors.greenAccent],
             begin: Alignment.bottomCenter,
             end: Alignment.topCenter,
           ),
@@ -109,13 +133,29 @@ class DynamicChart extends StatelessWidget {
 
   Widget _buildLineChart() {
     return SfCartesianChart(
+      plotAreaBorderWidth: showLegend ? 1 : 0,
       primaryXAxis: CategoryAxis(
-        labelStyle: TextStyle(color: textColor),
+        labelStyle: TextStyle(color: textColor, fontSize: 8),
+        majorGridLines: MajorGridLines(
+          width: showLegend ? 0 : 0, // No grid lines on X-axis anyway
+        ),
       ),
-      primaryYAxis: CategoryAxis(
-        labelStyle: TextStyle(color: textColor),
+      primaryYAxis: NumericAxis(
+        labelStyle: TextStyle(color: textColor, fontSize: 8),
+        axisLine: const AxisLine(width: 0),
+        majorGridLines: MajorGridLines(
+          width: 0.5,
+          color: textColor,
+        ),
       ),
-      title: ChartTitle(text: title, textStyle: TextStyles.chartTitle),
+      title: ChartTitle(
+        text: title,
+        textStyle: GoogleFonts.roboto(
+          textStyle: TextStyles.chartTitle,
+        ).copyWith(
+          color: titleColor,
+        ),
+      ),
       legend: Legend(isVisible: showLegend),
       tooltipBehavior: TooltipBehavior(enable: true),
       series: <CartesianSeries<dynamic, dynamic>>[
@@ -124,7 +164,10 @@ class DynamicChart extends StatelessWidget {
           xValueMapper: (dynamic sales, _) => sales.category,
           yValueMapper: (dynamic sales, _) => sales.value,
           name: legendName,
-          dataLabelSettings: const DataLabelSettings(isVisible: true),
+          dataLabelSettings: DataLabelSettings(
+            isVisible: true,
+            textStyle: TextStyle(color: textColor, fontSize: 8),
+          ),
         ),
       ],
     );
@@ -136,21 +179,38 @@ class DynamicChart extends StatelessWidget {
     final labelFontSize = screenWidth < 400 ? 10.0 : 12.0;
     final chartHeight = screenWidth < 400 ? 250.0 : 300.0;
     final List<Color> barColors = [
-      Colors.blue,
-      Colors.green,
-      Colors.orange,
-      Colors.red,
-      Colors.purple,
-      Colors.teal,
+      Colors.deepOrangeAccent,
+      Colors.pinkAccent,
+      Colors.redAccent,
+      Colors.blueAccent,
+      Colors.lightBlueAccent,
+      Colors.cyanAccent,
     ];
 
     return SfCartesianChart(
-      title: ChartTitle(text: title, textStyle: TextStyles.chartTitle),
-      primaryXAxis: CategoryAxis(
-        labelStyle: TextStyle(color: textColor),
+      plotAreaBorderWidth: showLegend ? 1 : 0,
+      title: ChartTitle(
+        text: title,
+        textStyle: GoogleFonts.roboto(
+          textStyle: TextStyles.chartTitle,
+        ).copyWith(
+          color: titleColor,
+        ),
       ),
-      primaryYAxis: CategoryAxis(
-        labelStyle: TextStyle(color: textColor),
+      primaryXAxis: CategoryAxis(
+        majorGridLines: MajorGridLines(
+          width: showLegend ? 0 : 0, // No grid lines on X-axis anyway
+        ),
+        labelStyle: TextStyle(color: textColor, fontSize: 8),
+      ),
+      primaryYAxis: NumericAxis(
+        labelStyle: TextStyle(color: textColor, fontSize: 8),
+        axisLine: const AxisLine(width: 0),
+        majorGridLines: MajorGridLines(
+          dashArray: [10, 8],
+          width: 0.5,
+          color: textColor,
+        ),
       ),
       legend: Legend(isVisible: showLegend),
       tooltipBehavior: TooltipBehavior(enable: true),
@@ -161,7 +221,10 @@ class DynamicChart extends StatelessWidget {
           xValueMapper: (dynamic sales, _) => sales.category,
           yValueMapper: (dynamic sales, _) => sales.value,
           name: legendName,
-          dataLabelSettings: const DataLabelSettings(isVisible: true),
+          dataLabelSettings: DataLabelSettings(
+            isVisible: true,
+            textStyle: TextStyle(color: textColor, fontSize: 8),
+          ),
           pointColorMapper: (dynamic sales, int index) =>
               barColors[index % barColors.length], // Assigns different colors
         ),
@@ -171,7 +234,14 @@ class DynamicChart extends StatelessWidget {
 
   Widget _buildPieChart() {
     return SfCircularChart(
-      title: ChartTitle(text: title, textStyle: TextStyles.chartTitle),
+      title: ChartTitle(
+        text: title,
+        textStyle: GoogleFonts.roboto(
+          textStyle: TextStyles.chartTitle,
+        ).copyWith(
+          color: titleColor,
+        ),
+      ),
       legend: Legend(isVisible: showLegend),
       tooltipBehavior: TooltipBehavior(enable: true),
       series: <CircularSeries>[
@@ -180,7 +250,10 @@ class DynamicChart extends StatelessWidget {
           xValueMapper: (ChartData data, _) => data.category,
           yValueMapper: (ChartData data, _) => data.value,
           name: legendName,
-          dataLabelSettings: const DataLabelSettings(isVisible: true),
+          dataLabelSettings: DataLabelSettings(
+            isVisible: true,
+            textStyle: TextStyle(color: textColor, fontSize: 8),
+          ),
         ),
       ],
     );
@@ -188,13 +261,29 @@ class DynamicChart extends StatelessWidget {
 
   Widget _buildAreaChart() {
     return SfCartesianChart(
+      plotAreaBorderWidth: showLegend ? 1 : 0,
       primaryXAxis: CategoryAxis(
-        labelStyle: TextStyle(color: textColor),
+        majorGridLines: MajorGridLines(
+          width: showLegend ? 0 : 0, // No grid lines on X-axis anyway
+        ),
+        labelStyle: TextStyle(color: textColor, fontSize: 8),
       ),
-      primaryYAxis: CategoryAxis(
-        labelStyle: TextStyle(color: textColor),
+      primaryYAxis: NumericAxis(
+        labelStyle: TextStyle(color: textColor, fontSize: 8),
+        axisLine: const AxisLine(width: 0),
+        majorGridLines: MajorGridLines(
+          width: 0.5,
+          color: textColor,
+        ),
       ),
-      title: ChartTitle(text: title, textStyle: TextStyles.chartTitle),
+      title: ChartTitle(
+        text: title,
+        textStyle: GoogleFonts.roboto(
+          textStyle: TextStyles.chartTitle,
+        ).copyWith(
+          color: titleColor,
+        ),
+      ),
       legend: Legend(isVisible: showLegend),
       tooltipBehavior: TooltipBehavior(enable: true),
       series: <CartesianSeries<dynamic, dynamic>>[
@@ -203,7 +292,10 @@ class DynamicChart extends StatelessWidget {
           xValueMapper: (dynamic sales, _) => sales.category,
           yValueMapper: (dynamic sales, _) => sales.value,
           name: legendName,
-          dataLabelSettings: const DataLabelSettings(isVisible: true),
+          dataLabelSettings: DataLabelSettings(
+            isVisible: true,
+            textStyle: TextStyle(color: textColor, fontSize: 8),
+          ),
         ),
       ],
     );
@@ -211,13 +303,29 @@ class DynamicChart extends StatelessWidget {
 
   Widget _buildScatterChart() {
     return SfCartesianChart(
+      plotAreaBorderWidth: showLegend ? 1 : 0,
       primaryXAxis: CategoryAxis(
-        labelStyle: TextStyle(color: textColor),
+        majorGridLines: MajorGridLines(
+          width: showLegend ? 0 : 0, // No grid lines on X-axis anyway
+        ),
+        labelStyle: TextStyle(color: textColor, fontSize: 8),
       ),
-      primaryYAxis: CategoryAxis(
-        labelStyle: TextStyle(color: textColor),
+      primaryYAxis: NumericAxis(
+        labelStyle: TextStyle(color: textColor, fontSize: 8),
+        axisLine: const AxisLine(width: 0),
+        majorGridLines: MajorGridLines(
+          width: 0.5,
+          color: textColor,
+        ),
       ),
-      title: ChartTitle(text: title, textStyle: TextStyles.chartTitle),
+      title: ChartTitle(
+        text: title,
+        textStyle: GoogleFonts.roboto(
+          textStyle: TextStyles.chartTitle,
+        ).copyWith(
+          color: titleColor,
+        ),
+      ),
       legend: Legend(isVisible: showLegend),
       tooltipBehavior: TooltipBehavior(enable: true),
       series: <CartesianSeries<dynamic, dynamic>>[
@@ -226,7 +334,10 @@ class DynamicChart extends StatelessWidget {
           xValueMapper: (dynamic sales, _) => sales.category,
           yValueMapper: (dynamic sales, _) => sales.value,
           name: legendName,
-          dataLabelSettings: const DataLabelSettings(isVisible: true),
+          dataLabelSettings: DataLabelSettings(
+            isVisible: true,
+            textStyle: TextStyle(color: textColor, fontSize: 8),
+          ),
         ),
       ],
     );
@@ -234,17 +345,34 @@ class DynamicChart extends StatelessWidget {
 
   Widget _buildDoughnutChart() {
     return SfCircularChart(
-      title: ChartTitle(text: title, textStyle: TextStyles.chartTitle),
-      legend: Legend(isVisible: showLegend),
+      title: ChartTitle(
+        text: title,
+        textStyle: GoogleFonts.roboto(
+          textStyle: TextStyles.chartTitle,
+        ).copyWith(
+          color: titleColor,
+        ),
+      ),
       tooltipBehavior: TooltipBehavior(enable: true),
+      legend: Legend(
+        isVisible: showLegend,
+        position: LegendPosition.bottom, // Places legend below the chart
+        orientation: LegendItemOrientation.vertical, // Stack items in a column
+        overflowMode:
+            LegendItemOverflowMode.wrap, // Wrap to next line if space ends
+        alignment: ChartAlignment.near, // Center the legend horizontally
+      ),
       series: <CircularSeries>[
         DoughnutSeries<ChartData, String>(
           dataSource: data,
           xValueMapper: (ChartData data, _) => data.category,
           yValueMapper: (ChartData data, _) => data.value,
           name: legendName,
-          dataLabelSettings: const DataLabelSettings(isVisible: true),
-          innerRadius: '60%',
+          dataLabelSettings: DataLabelSettings(
+            isVisible: true,
+            textStyle: TextStyle(color: textColor, fontSize: 8),
+          ),
+          innerRadius: '50%',
         ),
       ],
     );
@@ -257,12 +385,37 @@ class DynamicChart extends StatelessWidget {
     }
 
     return SfCartesianChart(
+      plotAreaBorderWidth: showLegend ? 1 : 0,
       primaryXAxis: CategoryAxis(
-        labelStyle: TextStyle(color: textColor),
+        majorGridLines: MajorGridLines(
+          width: showLegend ? 0 : 0, // No grid lines on X-axis anyway
+        ),
+        labelStyle: TextStyle(color: textColor, fontSize: 8),
       ),
-      // primaryYAxis: CategoryAxis(labelStyle: TextStyle(color: textColor),),
-      title: ChartTitle(text: title, textStyle: TextStyles.chartTitle),
-      legend: Legend(isVisible: showLegend),
+      primaryYAxis: NumericAxis(
+        labelStyle: TextStyle(color: textColor, fontSize: 8),
+        axisLine: const AxisLine(width: 0),
+        majorGridLines: MajorGridLines(
+          width: 0.5,
+          color: textColor,
+        ),
+      ),
+      title: ChartTitle(
+        text: title,
+        textStyle: GoogleFonts.roboto(
+          textStyle: TextStyles.chartTitle,
+        ).copyWith(
+          color: titleColor,
+        ),
+      ),
+      legend: Legend(
+        isVisible: showLegend,
+        position: LegendPosition.bottom, // Places legend below the chart
+        orientation: LegendItemOrientation.vertical, // Stack items in a column
+        overflowMode:
+            LegendItemOverflowMode.wrap, // Wrap to next line if space ends
+        alignment: ChartAlignment.near, // Center the legend horizontally
+      ),
       tooltipBehavior: TooltipBehavior(enable: true),
       series: List.generate(groupedData!.length, (index) {
         return ColumnSeries<ChartData, String>(
@@ -270,7 +423,10 @@ class DynamicChart extends StatelessWidget {
           xValueMapper: (ChartData data, _) => data.category,
           yValueMapper: (ChartData data, _) => data.value,
           name: legendNames![index],
-          dataLabelSettings: const DataLabelSettings(isVisible: true),
+          dataLabelSettings: DataLabelSettings(
+            isVisible: true,
+            textStyle: TextStyle(color: textColor, fontSize: 8),
+          ),
         );
       }),
     );

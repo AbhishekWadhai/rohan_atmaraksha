@@ -9,7 +9,9 @@ import 'package:rohan_suraksha_sathi/services/api_services.dart';
 class UaucController extends GetxController
     with GetSingleTickerProviderStateMixin {
   TabController? tabController;
+  RxBool isLoading = false.obs;
   RxList<UaUc> uaucList = <UaUc>[].obs;
+  RxBool isStatusActive = false.obs;
   var currentPage = 0.obs;
   final int itemsPerPage = 100; // You can change this to your preferred number
   var searchQuery = ''.obs;
@@ -74,6 +76,7 @@ class UaucController extends GetxController
   }
 
   getPermitData() async {
+    isLoading.value = true;
     try {
       final meetingtData = await ApiService().getRequest("uauc");
 
@@ -108,7 +111,15 @@ class UaucController extends GetxController
     } catch (e) {
       print("Error fetching permit data: $e");
       // Handle the error accordingly, e.g., show a dialog or retry
+    } finally {
+      isLoading.value = false;
     }
+  }
+
+  updateStatus(String id, String status) async {
+    await ApiService().updateData("uauc", id, {"status": status});
+    print("Status Changed;;;;;;;;;;;;;;;;;;;;;;; $status");
+    getPermitData();
   }
 
   deleteSelection(String key) async {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rohan_suraksha_sathi/app_constants/colors.dart';
 import 'package:rohan_suraksha_sathi/env.dart';
 
 class TextStyles {
@@ -16,7 +17,5 @@ class TextStyles {
       fontSize: 16, fontWeight: FontWeight.normal, color: Colors.white);
 
   static TextStyle get chartTitle => TextStyle(
-      fontSize: 12,
-      fontWeight: FontWeight.bold,
-      color: Colors.orange);
+      fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.appMainMid);
 }

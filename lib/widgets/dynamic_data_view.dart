@@ -73,17 +73,24 @@ class DynamicDataPage extends StatelessWidget {
       }
 
       // Check if the value is a list of maps
-      if (value is List && value.isNotEmpty && value.first is Map) {
-        return value.map((map) {
-          if (map is Map) {
-            if (fieldKeys.containsKey(key)) {
-              String fieldName = fieldKeys[key]!;
-              return map[fieldName]?.toString() ?? '';
+      if (value is List) {
+        if (value.isEmpty) return '-'; // handle empty list gracefully
+
+        if (value.first is Map) {
+          return value.map((item) {
+            if (item is Map) {
+              if (fieldKeys.containsKey(key)) {
+                String fieldName = fieldKeys[key]!;
+                return item[fieldName]?.toString() ?? '';
+              }
+              return item.values.join(', ');
             }
-            return map.values.join(', ');
-          }
-          return '';
-        }).join('; ');
+            return '';
+          }).join('; ');
+        }
+
+        // If it's a list of primitives like List<String> or List<int>
+        return value.map((e) => e.toString()).join(', ');
       }
 
       // Check if the field exists in fieldKeys

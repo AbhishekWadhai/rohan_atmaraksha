@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:rohan_suraksha_sathi/app_constants/colors.dart';
 import 'package:rohan_suraksha_sathi/controller/login_controller.dart';
 import 'package:rohan_suraksha_sathi/env.dart';
-import 'package:rohan_suraksha_sathi/widgets/dynamic_form.dart';
+
 import 'package:rohan_suraksha_sathi/widgets/progress_indicators.dart';
 
 import '../widgets/custom_textfield.dart';
@@ -61,13 +61,18 @@ class LoginPage extends StatelessWidget {
                             validator: loginController.validateUsername,
                           ),
                           const SizedBox(height: 20),
-                          CustomTextField(
-                            fieldName: 'Password',
-                            controller: loginController.passwordController,
-                            labelText: 'Enter Password',
-                            isPassword: true,
-                            validator: loginController.validatePassword,
-                          ),
+                          Obx(() => CustomTextField(
+                                fieldName: 'Password',
+                                controller: loginController.passwordController,
+                                labelText: 'Enter Password',
+                                isPassword: true,
+                                obscureText:
+                                    loginController.isPasswordHidden.value,
+                                onTogglePassword: () {
+                                  loginController.isPasswordHidden.toggle();
+                                },
+                                validator: loginController.validatePassword,
+                              )),
                           const SizedBox(height: 20),
                           Align(
                             alignment: Alignment.centerLeft,

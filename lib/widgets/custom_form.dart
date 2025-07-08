@@ -3,10 +3,11 @@ import 'package:get/get.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:rohan_suraksha_sathi/controller/dynamic_form_contoller.dart';
-import 'package:rohan_suraksha_sathi/helpers/sixed_boxes.dart';
+
 import 'package:rohan_suraksha_sathi/model/form_data_model.dart';
-import 'package:rohan_suraksha_sathi/widgets/dynamic_form.dart';
 import 'package:signature/signature.dart';
+
+import 'dynamic_form/form_extras.dart';
 
 class FormController extends GetxController {
   RxMap<String, dynamic> formValues = <String, dynamic>{}.obs;

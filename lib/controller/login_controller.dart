@@ -15,6 +15,7 @@ class LoginController extends GetxController {
   final TextEditingController passwordController = TextEditingController();
   String fcmToken = Strings.fcmToken;
   var isLoading = false.obs;
+  var isPasswordHidden = true.obs;
 
   onInit() {
     super.onInit();
@@ -48,7 +49,7 @@ class LoginController extends GetxController {
         if (a != null) {
           await SharedPrefService().saveString("token", a["token"]);
           await isTokenValid();
-          Get.toNamed(Routes.homePage);
+          Get.offAllNamed(Routes.homePage);
         } else {
           Get.snackbar("Login Failed", "Enter valid credentials",
               backgroundColor: Colors.red, colorText: Colors.white);

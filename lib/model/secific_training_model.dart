@@ -9,14 +9,14 @@ class SpecificTraining {
   String date;
   String time;
   List<TypeOfTopic>? typeOfTopic;
-  List<String> attendees;
+  List<String>? attendees;
   List<AttendeesName>? attendeesName;
   Createdby? instructionBy;
   String? documentaryEvidencePhoto;
   String? geotagging;
   String? commentsBox;
-  int attendance;
-  int attendanceHours;
+  int? attendance;
+  int? attendanceHours;
   int v;
 
   SpecificTraining({
@@ -75,7 +75,7 @@ class SpecificTraining {
         "time": time,
         "typeOfTopic":
             List<dynamic>.from(typeOfTopic?.map((x) => x.toJson()) ?? []),
-        "attendees": List<dynamic>.from(attendees.map((x) => x)),
+        "attendees": List<dynamic>.from(attendees?.map((x) => x) ?? []),
         "attendeesName":
             List<dynamic>.from(attendeesName?.map((x) => x.toJson()) ?? []),
         "instructionBy": instructionBy?.toJson(),
